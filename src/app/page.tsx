@@ -1,11 +1,10 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { jsPDF } from 'jspdf';
-import html2canvas from 'html2canvas';
 
 import type { GenerateReportOutput } from '@/ai/flows/generate-report';
 import { useLocalStorage } from '@/hooks/use-local-storage';
@@ -28,12 +27,29 @@ const formSchema = z.object({
 
 type ReportData = GenerateReportOutput['report'];
 
+const sectionOrder: (keyof ReportData)[] = [
+  'introduction',
+  'history',
+  'benefits',
+  'challenges',
+  'currentTrends',
+  'futureScope',
+];
+
+const sectionTitles: Record<keyof ReportData, string> = {
+  introduction: 'Introduction',
+  history: 'History',
+  benefits: 'Benefits',
+  challenges: 'Challenges',
+  currentTrends: 'Current Trends',
+  futureScope: 'Future Scope',
+};
+
 export default function Home() {
   const [report, setReport] = useState<ReportData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [history, setHistory] = useLocalStorage<string[]>('report-history', []);
   const { toast } = useToast();
-  const reportContainerRef = useRef<HTMLDivElement>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -80,54 +96,79 @@ export default function Home() {
   }
 
   const handleExportPdf = () => {
-    if (!reportContainerRef.current) {
-        toast({ variant: 'destructive', title: 'Error', description: 'Could not find report content to export.' });
+    if (!report) {
+        toast({ variant: 'destructive', title: 'Error', description: 'No report data available to export.' });
         return;
     }
-    const topicTitle = form.getValues('topic').replace(/ /g, '_');
-    const fileName = `InsightForge_Report_${topicTitle || 'Untitled'}.pdf`;
+
+    const topicTitle = form.getValues('topic');
+    const fileName = `InsightForge_Report_${topicTitle.replace(/ /g, '_') || 'Untitled'}.pdf`;
     
     toast({ title: 'Exporting PDF...', description: 'Please wait while your report is being prepared.' });
 
-    html2canvas(reportContainerRef.current, {
-        scale: 2,
-        backgroundColor: '#0f0f0f',
-        useCORS: true,
-    }).then((canvas) => {
-        const imgData = canvas.toDataURL('image/png');
+    try {
         const pdf = new jsPDF({
             orientation: 'p',
             unit: 'mm',
             format: 'a4',
         });
 
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = pdf.internal.pageSize.getHeight();
-        const canvasWidth = canvas.width;
-        const canvasHeight = canvas.height;
-        const ratio = canvasWidth / canvasHeight;
-        const imgWidth = pdfWidth;
-        const imgHeight = imgWidth / ratio;
-        
-        let heightLeft = imgHeight;
-        let position = 0;
+        const pageMargin = 15;
+        const pageWidth = pdf.internal.pageSize.getWidth() - (pageMargin * 2);
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        let yPosition = pageMargin;
 
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pdfHeight;
+        const checkPageBreak = (spaceNeeded: number) => {
+            if (yPosition + spaceNeeded > pageHeight - pageMargin) {
+                pdf.addPage();
+                yPosition = pageMargin;
+            }
+        };
 
-        while (heightLeft > 0) {
-            position = -heightLeft;
-            pdf.addPage();
-            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-            heightLeft -= pdfHeight;
-        }
+        // Add Topic Title
+        pdf.setFontSize(22);
+        pdf.setFont('helvetica', 'bold');
+        const topicLines = pdf.splitTextToSize(topicTitle, pageWidth);
+        checkPageBreak(topicLines.length * 10);
+        pdf.text(topicLines, pageMargin, yPosition);
+        yPosition += (topicLines.length * 8) + 10;
         
+        pdf.setFont('helvetica', 'normal');
+
+        sectionOrder.forEach(sectionKey => {
+            if (report[sectionKey]) {
+                checkPageBreak(20); // check for space before adding new section
+
+                // Section Title
+                pdf.setFontSize(16);
+                pdf.setFont('helvetica', 'bold');
+                const sectionTitleText = sectionTitles[sectionKey];
+                const titleLines = pdf.splitTextToSize(sectionTitleText, pageWidth);
+                pdf.text(titleLines, pageMargin, yPosition);
+                yPosition += (titleLines.length * 7) + 5;
+                
+                // Section Content
+                pdf.setFontSize(12);
+                pdf.setFont('helvetica', 'normal');
+                const contentLines = pdf.splitTextToSize(report[sectionKey], pageWidth);
+
+                contentLines.forEach((line: string) => {
+                    checkPageBreak(5);
+                    pdf.text(line, pageMargin, yPosition);
+                    yPosition += 5; // line height
+                });
+                
+                yPosition += 10; // space after section
+            }
+        });
+
         pdf.save(fileName);
         toast({ title: 'Export complete!', description: `${fileName} has been downloaded.`});
-    }).catch(err => {
-        toast({ variant: 'destructive', title: 'PDF Export Failed', description: 'Something went wrong during the export process.' });
+    } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred.';
+        toast({ variant: 'destructive', title: 'PDF Export Failed', description: errorMessage });
         console.error("PDF Export Error:", err);
-    });
+    }
   };
 
   return (
@@ -167,7 +208,7 @@ export default function Home() {
               </CardContent>
             </Card>
 
-            <div ref={reportContainerRef}>
+            <div>
               {isLoading && <ReportSkeleton />}
               {report && <ReportDisplay report={report} onReportUpdate={handleReportUpdate} />}
               {!isLoading && !report && (
