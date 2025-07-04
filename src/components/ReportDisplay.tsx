@@ -2,12 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import type { GenerateReportOutput } from '@/ai/flows/generate-report';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Edit, Save, X } from 'lucide-react';
@@ -19,6 +14,15 @@ interface ReportDisplayProps {
   report: Report;
   onReportUpdate: (updatedReport: Report) => void;
 }
+
+const sectionOrder: ReportSection[] = [
+  'introduction',
+  'history',
+  'benefits',
+  'challenges',
+  'currentTrends',
+  'futureScope',
+];
 
 const sectionTitles: Record<ReportSection, string> = {
   introduction: 'Introduction',
@@ -55,42 +59,38 @@ export function ReportDisplay({ report, onReportUpdate }: ReportDisplayProps) {
     setEditingSection(null);
   };
 
-  const reportSections = Object.keys(report) as ReportSection[];
-
   return (
-    <Accordion type="multiple" defaultValue={reportSections} className="w-full space-y-4">
-      {reportSections.map((sectionKey) => (
-        <AccordionItem value={sectionKey} key={sectionKey} className="rounded-lg border bg-card text-card-foreground shadow-sm overflow-hidden">
-          <AccordionTrigger className="p-6 hover:no-underline text-left">
-            <h3 className="text-2xl font-semibold leading-none tracking-tight flex-1">{sectionTitles[sectionKey]}</h3>
-          </AccordionTrigger>
-          <AccordionContent>
-            <div className="px-6 pb-6">
-              {editingSection === sectionKey ? (
-                <div className="space-y-4">
-                  <Textarea
-                    value={editContent}
-                    onChange={(e) => setEditContent(e.target.value)}
-                    className="min-h-[200px] text-base leading-relaxed"
-                    autoFocus
-                  />
-                  <div className="flex justify-end space-x-2">
-                    <Button variant="ghost" size="sm" onClick={handleCancelClick}><X className="mr-2 h-4 w-4" />Cancel</Button>
-                    <Button size="sm" onClick={handleSaveClick}><Save className="mr-2 h-4 w-4" />Save</Button>
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <p className="text-base text-muted-foreground leading-relaxed whitespace-pre-wrap">{editableReport[sectionKey]}</p>
-                  <div className="flex justify-end pt-2">
-                    <Button variant="outline" size="sm" onClick={() => handleEditClick(sectionKey)}><Edit className="mr-2 h-4 w-4" />Edit</Button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </AccordionContent>
-        </AccordionItem>
+    <div className="space-y-8">
+      {sectionOrder.map((sectionKey) => (
+        report[sectionKey] && (
+            <Card key={sectionKey} className="overflow-hidden">
+                <CardHeader className="flex flex-row items-center justify-between p-6">
+                    <CardTitle className="text-2xl">{sectionTitles[sectionKey]}</CardTitle>
+                    {editingSection !== sectionKey && (
+                         <Button variant="outline" size="sm" onClick={() => handleEditClick(sectionKey)}><Edit className="mr-2 h-4 w-4" />Edit</Button>
+                    )}
+                </CardHeader>
+                <CardContent className="px-6 pb-6">
+                {editingSection === sectionKey ? (
+                    <div className="space-y-4">
+                    <Textarea
+                        value={editContent}
+                        onChange={(e) => setEditContent(e.target.value)}
+                        className="min-h-[300px] text-base leading-relaxed"
+                        autoFocus
+                    />
+                    <div className="flex justify-end space-x-2">
+                        <Button variant="ghost" size="sm" onClick={handleCancelClick}><X className="mr-2 h-4 w-4" />Cancel</Button>
+                        <Button size="sm" onClick={handleSaveClick}><Save className="mr-2 h-4 w-4" />Save</Button>
+                    </div>
+                    </div>
+                ) : (
+                    <p className="text-base text-muted-foreground leading-relaxed whitespace-pre-wrap">{editableReport[sectionKey]}</p>
+                )}
+                </CardContent>
+            </Card>
+        )
       ))}
-    </Accordion>
+    </div>
   );
 }

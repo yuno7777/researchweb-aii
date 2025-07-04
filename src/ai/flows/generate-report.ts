@@ -18,13 +18,13 @@ export type GenerateReportInput = z.infer<typeof GenerateReportInputSchema>;
 
 const GenerateReportOutputSchema = z.object({
   report: z.object({
-    introduction: z.string().describe('An introduction to the topic.'),
-    history: z.string().describe('The history of the topic.'),
-    benefits: z.string().describe('The benefits of the topic.'),
-    challenges: z.string().describe('The challenges of the topic.'),
-    currentTrends: z.string().describe('The current trends of the topic.'),
-    futureScope: z.string().describe('The future scope of the topic.'),
-  }).describe('The structured report on the topic.'),
+    introduction: z.string().describe('A compelling introduction that clearly defines the topic, explains its significance, and gives a brief overview of what the report will cover. This should be a substantial section.'),
+    history: z.string().describe("An in-depth look at the historical background of the topic, covering its origins, key milestones, and evolution."),
+    benefits: z.string().describe("A detailed explanation of the topic's benefits, supported by examples or data. Discuss the positive impacts on society, industry, or individuals."),
+    challenges: z.string().describe("A thorough analysis of the problems, difficulties, and criticisms related to the topic, including ethical, technical, or social hurdles."),
+    currentTrends: z.string().describe("A detailed analysis of the latest trends, recent research, and current events shaping the topic."),
+    futureScope: z.string().describe("A thoughtful forecast of the topic's future, including potential innovations and long-term implications over the next decade."),
+  }).describe('The structured report on the topic. The total length should be at least 1500 words.'),
 });
 export type GenerateReportOutput = z.infer<typeof GenerateReportOutputSchema>;
 
@@ -36,19 +36,18 @@ const reportPrompt = ai.definePrompt({
   name: 'reportPrompt',
   input: {schema: GenerateReportInputSchema},
   output: {schema: GenerateReportOutputSchema},
-  prompt: `You are an AI research assistant. Your task is to generate a structured report on the given topic.
-  The report should include the following sections:
+  prompt: `You are an expert AI research assistant. Your task is to generate a comprehensive, in-depth, and well-structured report on the given topic. The total length of the report should be at least 1500 words.
 
-  - Introduction: An overview of the topic.
-  - History: The historical background of the topic.
-  - Benefits: The advantages and benefits associated with the topic.
-  - Challenges: The problems and difficulties related to the topic.
-  - Current Trends: The latest trends and developments in the topic.
-  - Future Scope: The potential future implications and applications of the topic.
+For the topic "{{{topic}}}", please provide a detailed explanation for each of the following sections:
 
-  Topic: {{{topic}}}
+- Introduction: Provide a compelling introduction that clearly defines the topic, explains its significance, and gives a brief overview of what the report will cover. This should be a substantial section.
+- History: Delve into the historical background of the topic. Cover its origins, key milestones, and the evolution of thought or technology related to it. Explain how past events have shaped its current state.
+- Benefits: Elaborate on the advantages and benefits associated with the topic. Provide specific examples, data, or case studies to support your points. Discuss the positive impacts on society, industry, or individuals.
+- Challenges: Thoroughly analyze the problems, difficulties, and criticisms related to the topic. Discuss any ethical, technical, or social hurdles. Explain the complexities and nuances of these challenges.
+- Current Trends: Detail the latest trends and developments. Analyze recent research, emerging technologies, or current events that are shaping the topic. Provide a forward-looking perspective on what is happening right now.
+- Future Scope: Extrapolate on the potential future implications and applications of the topic. Discuss long-term potential, possible innovations, and how it might evolve over the next decade. Provide a thoughtful and well-reasoned forecast.
 
-  Please provide a well-structured and informative report.
+Please ensure your writing is explanatory, insightful, and goes beyond surface-level descriptions. The final output must be a single, cohesive report that is at least 1500 words long.
 `,
 });
 
