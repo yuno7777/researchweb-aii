@@ -93,3 +93,30 @@ Once both servers are running, open your web browser and navigate to:
 [http://localhost:3000](http://localhost:3000)
 
 You should now be able to use the InsightForge application locally!
+
+## Publishing to GitHub
+
+If you have the project code locally and want to publish it to your own new repository on GitHub, follow these instructions.
+
+1.  **Create a Repository on GitHub:**
+    -   Go to [github.com](https://github.com), log in, and click the `+` icon in the top-right to select **New repository**.
+    -   Choose a name for your repository (e.g., `insightforge-app`).
+    -   **Important:** Leave the "Initialize this repository with:" options unchecked. Your project already has a `README.md` and other necessary files.
+    -   Click **Create repository**.
+
+2.  **Push Your Local Code:**
+    -   In your terminal, navigate to the project's root directory.
+    -   Initialize Git, add your files, and make your first commit:
+        ```bash
+        git init -b main
+        git add .
+        git commit -m "Initial commit"
+        ```
+    -   Link your local repository to the remote one on GitHub. **Replace the URL** with the one provided by GitHub:
+        ```bash
+        git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPOSITORY.git
+        ```
+    -   Push your code to GitHub:
+        ```bash
+        git push -u origin main
+        ```
