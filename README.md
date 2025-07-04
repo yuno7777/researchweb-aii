@@ -27,10 +27,23 @@ To run InsightForge on your local machine, follow these steps:
 
 -   [Node.js](https://nodejs.org/) (version 20 or later recommended)
 -   [npm](https://www.npmjs.com/) (or another package manager like yarn or pnpm)
+-   [Git](https://git-scm.com/) for version control
 
 ### 2. Clone the Repository
 
-First, clone the project to your local machine (if you haven't already).
+To get the app's code on your local machine, you'll need to clone its source code repository.
+
+1.  Open your terminal or command prompt.
+2.  Run the following command (replace the placeholder with your repository's actual URL):
+    ```bash
+    git clone <YOUR_REPOSITORY_URL_HERE>
+    ```
+3.  Navigate into the newly created project directory:
+    ```bash
+    cd InsightForge
+    ```
+
+After cloning, you can proceed to the next steps.
 
 ### 3. Install Dependencies
 
