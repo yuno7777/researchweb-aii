@@ -195,13 +195,16 @@ export default function Home() {
                 y += 8;
                 
                 pdf.setFont('helvetica', 'normal');
-                pdf.setFontSize(11);
+                pdf.setFontSize(12);
                 const contentLines = pdf.splitTextToSize(sectionContent, contentWidth);
-                const lineHeight = 5.5;
+                const lineHeight = 6.5;
 
                 contentLines.forEach((line: string) => {
                     if (y + lineHeight > pageHeight - pageMargin) {
                         addPageWithHeaderFooter();
+                        // Reset font for the new page's content
+                        pdf.setFont('helvetica', 'normal');
+                        pdf.setFontSize(12);
                     }
                     pdf.text(line, pageMargin, y);
                     y += lineHeight;
