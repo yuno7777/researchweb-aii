@@ -120,7 +120,11 @@ export default function Home() {
         return;
     }
 
-    const topicTitle = form.getValues('topic');
+    const capitalizeTitle = (title: string) => {
+      return title.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    };
+
+    const topicTitle = capitalizeTitle(form.getValues('topic'));
     const fileName = `InsightForge_Report_${topicTitle.replace(/ /g, '_') || 'Untitled'}.pdf`;
     
     toast({ title: 'Exporting PDF...', description: 'Please wait while your report is being prepared.' });
@@ -140,10 +144,8 @@ export default function Home() {
 
         const addPageHeaderAndFooter = () => {
             pdf.setFontSize(9);
-            pdf.setFont('helvetica', 'italic');
+            pdf.setFont('times', 'italic');
             pdf.setTextColor(150);
-            // Header
-            pdf.text('InsightForge Report', pageMargin, 15);
             // Footer
             pdf.text(`Page ${pageNum}`, pdf.internal.pageSize.getWidth() / 2, pageHeight - 10, { align: 'center' });
             pdf.setTextColor(0);
@@ -283,37 +285,31 @@ export default function Home() {
               </div>
             )}
             
-            {!isLoading && !report && (
+            {!isLoading && !report && history.length > 0 && (
               <div className="mt-8">
                   <div className="flex items-center justify-between px-4 pb-2 pt-4">
                       <h3 className="text-white text-lg font-bold leading-tight tracking-[-0.015em]">Search History</h3>
-                      {history.length > 0 && (
-                          <Button
-                              variant="secondary"
-                              onClick={handleClearHistory}
-                              className="h-10 rounded-full px-4 text-sm font-bold leading-normal tracking-[0.015em] bg-[#422942] text-white hover:bg-[#422942]/90"
-                          >
-                              Delete History
-                          </Button>
-                      )}
+                      <Button
+                          variant="secondary"
+                          onClick={handleClearHistory}
+                          className="h-10 rounded-full px-4 text-sm font-bold leading-normal tracking-[0.015em] bg-[#422942] text-white hover:bg-[#422942]/90"
+                      >
+                          Delete History
+                      </Button>
                   </div>
                   <div className="p-4">
-                      {history.length === 0 ? (
-                          <p className="text-[#c19ac1] text-base font-normal leading-normal pb-3 pt-1">No search history yet.</p>
-                      ) : (
-                          <div className="flex flex-col gap-2">
-                              {history.map((topic, index) => (
-                                  <Button
-                                      key={`${topic}-${index}`}
-                                      variant="ghost"
-                                      className="w-full rounded-full justify-start text-left h-auto py-2 px-2 text-white hover:bg-[#422942]"
-                                      onClick={() => handleSelectTopic(topic)}
-                                  >
-                                      <span className="truncate">{topic}</span>
-                                  </Button>
-                              ))}
-                          </div>
-                      )}
+                      <div className="flex flex-col gap-2">
+                          {history.map((topic, index) => (
+                              <Button
+                                  key={`${topic}-${index}`}
+                                  variant="ghost"
+                                  className="w-full rounded-full justify-start text-left h-auto py-2 px-2 text-white hover:bg-[#422942]"
+                                  onClick={() => handleSelectTopic(topic)}
+                              >
+                                  <span className="truncate">{topic}</span>
+                              </Button>
+                          ))}
+                      </div>
                   </div>
               </div>
             )}
