@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { jsPDF } from 'jspdf';
+import Image from 'next/image';
 
 import type { GenerateReportOutput } from '@/ai/flows/generate-report';
 import { useLocalStorage } from '@/hooks/use-local-storage';
@@ -12,14 +13,12 @@ import { useToast } from '@/hooks/use-toast';
 
 import { handleGenerateReport } from './actions';
 import { Header } from '@/components/Header';
-import { HistorySidebar } from '@/components/HistorySidebar';
 import { ReportDisplay } from '@/components/ReportDisplay';
 import { ReportSkeleton } from '@/components/ReportSkeleton';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Bot } from 'lucide-react';
+import { Search, FileDown, Trash2 } from 'lucide-react';
 
 const formSchema = z.object({
   topic: z.string().min(3, { message: "Topic must be at least 3 characters long." }).max(100, { message: "Topic must be at most 100 characters long." }),
@@ -172,65 +171,114 @@ export default function Home() {
   };
 
   return (
-    <div className="flex min-h-screen w-full flex-col bg-background">
-      <Header onExport={handleExportPdf} isReportReady={!!report} />
-      <div className="flex flex-1">
-        <aside className="hidden md:block w-64 lg:w-72">
-          <HistorySidebar history={history} onSelectTopic={handleSelectTopic} onClearHistory={handleClearHistory} />
-        </aside>
-        <main className="flex-1 bg-muted/40 p-4 sm:p-6 lg:p-8 overflow-auto">
-          <div className="max-w-4xl mx-auto">
-            <Card className="mb-8 shadow-lg">
-              <CardHeader>
-                <CardTitle className="text-2xl">Generate a New Report</CardTitle>
-                <CardDescription>Enter a topic below and let our AI assistant craft a detailed report for you.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col sm:flex-row items-start gap-4">
-                    <FormField
-                      control={form.control}
-                      name="topic"
-                      render={({ field }) => (
-                        <FormItem className="w-full">
-                          <FormControl>
-                            <Input placeholder="e.g., The future of renewable energy" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <Button type="submit" disabled={isLoading} className="w-full sm:w-auto flex-shrink-0">
-                      {isLoading ? 'Generating...' : 'Generate'}
-                    </Button>
-                  </form>
-                </Form>
-              </CardContent>
-            </Card>
-
-            <div>
-              {isLoading && <ReportSkeleton />}
-              {report && (
-                <>
-                  <h2 className="text-3xl font-extrabold tracking-tight mb-6 capitalize">{form.getValues('topic')}</h2>
-                  <ReportDisplay report={report} onReportUpdate={handleReportUpdate} />
-                </>
-              )}
-              {!isLoading && !report && (
-                <div className="text-center py-20 px-4 bg-card border-2 border-dashed rounded-lg flex flex-col items-center justify-center">
-                    <div className="p-4 bg-primary/10 rounded-full">
-                      <Bot className="h-12 w-12 text-primary" />
-                    </div>
-                    <h3 className="mt-6 text-xl font-bold tracking-tight">Your Report Awaits</h3>
-                    <p className="mt-2 text-md text-muted-foreground">
-                      Enter a topic above and let our AI craft a detailed analysis for you.
-                    </p>
+    <div className="flex min-h-screen w-full flex-col bg-background text-foreground">
+      <Header />
+      <main className="flex-1">
+        <div className="px-4 sm:px-10 md:px-20 lg:px-40 py-5">
+            <div className="flex w-full max-w-[960px] mx-auto flex-col">
+                <h1 className="text-white tracking-light text-[32px] font-bold leading-tight text-center pb-3 pt-6">Generate AI Research Reports</h1>
+                <div className="px-4 py-3">
+                    <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col items-center gap-4">
+                        <FormField
+                        control={form.control}
+                        name="topic"
+                        render={({ field }) => (
+                            <FormItem className="w-full">
+                                <FormControl>
+                                    <div className="relative flex w-full flex-1 items-stretch rounded-xl h-12 bg-input">
+                                        <div className="text-muted-foreground flex items-center justify-center pl-4">
+                                            <Search className="h-6 w-6" />
+                                        </div>
+                                        <Input 
+                                            placeholder="Enter a topic"
+                                            className="h-full rounded-l-none border-none focus-visible:ring-0 focus-visible:ring-offset-0 pl-2 text-base placeholder:text-muted-foreground"
+                                            {...field} />
+                                    </div>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                        />
+                        <Button type="submit" disabled={isLoading} className="h-10 px-4 text-sm font-bold leading-normal tracking-[0.015em]">
+                            {isLoading ? 'Generating...' : 'Generate'}
+                        </Button>
+                    </form>
+                    </Form>
                 </div>
-              )}
+                
+                <div className="mt-8">
+                    {isLoading && <ReportSkeleton />}
+                    
+                    {report && !isLoading && (
+                        <>
+                            <div className="flex justify-between items-center mb-6">
+                                <h2 className="text-3xl font-extrabold tracking-tight capitalize">{form.getValues('topic')}</h2>
+                                <Button onClick={handleExportPdf} disabled={!report} variant="secondary">
+                                    <FileDown className="mr-2 h-4 w-4" />
+                                    Export PDF
+                                </Button>
+                            </div>
+                            <ReportDisplay report={report} onReportUpdate={handleReportUpdate} />
+                        </>
+                    )}
+                    
+                    {!isLoading && !report && (
+                        <>
+                            <div>
+                                <h3 className="text-white text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Your Report Awaits</h3>
+                                <div className="p-4">
+                                    <div className="relative bg-cover bg-center flex flex-col items-stretch justify-end rounded-xl pt-[132px] overflow-hidden"
+                                        style={{backgroundImage: 'linear-gradient(0deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0) 100%)'}}>
+                                        <Image src="https://placehold.co/800x400.png" data-ai-hint="technology abstract" alt="abstract placeholder" layout="fill" objectFit="cover" className="absolute top-0 left-0 w-full h-full -z-10" />
+                                        <div className="flex w-full items-end justify-between gap-4 p-4">
+                                            <div className="flex max-w-[440px] flex-1 flex-col gap-1">
+                                                <p className="text-white tracking-light text-2xl font-bold leading-tight max-w-[440px]">Latest Report</p>
+                                                <p className="text-white text-base font-medium leading-normal">Enter a topic to get started</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="mt-8">
+                                <div className="flex justify-between items-center px-4">
+                                    <h3 className="text-white text-lg font-bold leading-tight tracking-[-0.015em] pb-2 pt-4">Search History</h3>
+                                    {history.length > 0 && (
+                                        <Button
+                                            variant="secondary"
+                                            onClick={handleClearHistory}
+                                        >
+                                            <Trash2 className="mr-2 h-4 w-4" />
+                                            Delete History
+                                        </Button>
+                                    )}
+                                </div>
+                                <div className="p-4">
+                                    {history.length === 0 ? (
+                                        <p className="text-muted-foreground text-base font-normal leading-normal">No search history yet.</p>
+                                    ) : (
+                                        <div className="flex flex-col gap-2">
+                                            {history.map((topic, index) => (
+                                                <Button
+                                                    key={`${topic}-${index}`}
+                                                    variant="ghost"
+                                                    className="w-full justify-start text-left h-auto py-2 px-2"
+                                                    onClick={() => handleSelectTopic(topic)}
+                                                >
+                                                    <span className="truncate">{topic}</span>
+                                                </Button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </>
+                    )}
+                </div>
             </div>
-          </div>
-        </main>
-      </div>
+        </div>
+      </main>
     </div>
   );
 }
