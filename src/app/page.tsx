@@ -196,6 +196,7 @@ export default function Home() {
               <Logo />
               <h2 className="text-white text-lg font-bold leading-tight tracking-[-0.015em]">InsightForge</h2>
           </div>
+          <div className="flex flex-1 justify-end gap-8"></div>
       </header>
       <main className="flex-1 justify-center py-5 sm:px-10 md:px-20 lg:px-40">
         <div className="flex w-full max-w-[960px] mx-auto flex-col">
