@@ -178,9 +178,9 @@ export default function Home() {
         <aside className="hidden md:block w-64 lg:w-72">
           <HistorySidebar history={history} onSelectTopic={handleSelectTopic} onClearHistory={handleClearHistory} />
         </aside>
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto">
+        <main className="flex-1 bg-muted/40 p-4 sm:p-6 lg:p-8 overflow-auto">
           <div className="max-w-4xl mx-auto">
-            <Card className="mb-8">
+            <Card className="mb-8 shadow-lg">
               <CardHeader>
                 <CardTitle className="text-2xl">Generate a New Report</CardTitle>
                 <CardDescription>Enter a topic below and let our AI assistant craft a detailed report for you.</CardDescription>
@@ -210,14 +210,21 @@ export default function Home() {
 
             <div>
               {isLoading && <ReportSkeleton />}
-              {report && <ReportDisplay report={report} onReportUpdate={handleReportUpdate} />}
+              {report && (
+                <>
+                  <h2 className="text-3xl font-extrabold tracking-tight mb-6 capitalize">{form.getValues('topic')}</h2>
+                  <ReportDisplay report={report} onReportUpdate={handleReportUpdate} />
+                </>
+              )}
               {!isLoading && !report && (
-                <div className="text-center py-16 px-4 border-2 border-dashed rounded-lg">
-                  <Bot className="mx-auto h-12 w-12 text-muted-foreground" />
-                  <h3 className="mt-4 text-lg font-semibold">Your Report Awaits</h3>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    Enter a topic above to generate your first report.
-                  </p>
+                <div className="text-center py-20 px-4 bg-card border-2 border-dashed rounded-lg flex flex-col items-center justify-center">
+                    <div className="p-4 bg-primary/10 rounded-full">
+                      <Bot className="h-12 w-12 text-primary" />
+                    </div>
+                    <h3 className="mt-6 text-xl font-bold tracking-tight">Your Report Awaits</h3>
+                    <p className="mt-2 text-md text-muted-foreground">
+                      Enter a topic above and let our AI craft a detailed analysis for you.
+                    </p>
                 </div>
               )}
             </div>
