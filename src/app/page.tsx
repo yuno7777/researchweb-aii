@@ -5,8 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { jsPDF } from 'jspdf';
-import Image from 'next/image';
-import { Search, FileDown, Sun, Moon } from 'lucide-react';
+import { Search, FileDown } from 'lucide-react';
 
 import type { GenerateReportOutput } from '@/ai/flows/generate-report';
 import { useLocalStorage } from '@/hooks/use-local-storage';
@@ -18,9 +17,6 @@ import { ReportSkeleton } from '@/components/ReportSkeleton';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ThemeToggle } from '@/components/ThemeToggle';
-
 
 const formSchema = z.object({
   topic: z.string().min(3, { message: "Topic must be at least 3 characters long." }).max(100, { message: "Topic must be at most 100 characters long." }),
@@ -200,13 +196,6 @@ export default function Home() {
               <Logo />
               <h2 className="text-white text-lg font-bold leading-tight tracking-[-0.015em]">InsightForge</h2>
           </div>
-          <div className="flex items-center gap-2">
-              <ThemeToggle />
-              <Avatar className="h-10 w-10">
-                  <AvatarImage src="https://placehold.co/40x40.png" data-ai-hint="profile picture" />
-                  <AvatarFallback>AV</AvatarFallback>
-              </Avatar>
-          </div>
       </header>
       <main className="flex-1 justify-center py-5 sm:px-10 md:px-20 lg:px-40">
         <div className="flex w-full max-w-[960px] mx-auto flex-col">
@@ -220,13 +209,13 @@ export default function Home() {
                     render={({ field }) => (
                         <FormItem className="w-full">
                             <FormControl>
-                              <div className="flex w-full flex-1 items-stretch rounded-xl h-12 bg-[#422942]">
-                                <div className="text-[#c19ac1] flex items-center justify-center pl-4">
+                              <div className="flex w-full flex-1 items-stretch rounded-xl h-12">
+                                <div className="text-[#c19ac1] flex items-center justify-center pl-4 bg-[#422942] rounded-l-xl">
                                   <Search className="h-6 w-6" />
                                 </div>
                                 <Input
                                   placeholder="Enter a topic"
-                                  className="h-full rounded-l-none border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 pl-2 text-base placeholder:text-[#c19ac1]"
+                                  className="h-full rounded-l-none border-none bg-[#422942] focus-visible:ring-0 focus-visible:ring-offset-0 pl-2 text-base placeholder:text-[#c19ac1]"
                                   {...field}
                                 />
                               </div>
@@ -250,7 +239,7 @@ export default function Home() {
               <div className="mt-8">
                 <div className="flex justify-between items-center mb-6 px-4">
                   <h2 className="text-3xl font-extrabold tracking-tight capitalize">{form.getValues('topic')}</h2>
-                  <Button onClick={handleExportPdf} disabled={!report} variant="secondary" className="bg-[#422942] text-white hover:bg-[#422942]/90">
+                  <Button onClick={handleExportPdf} disabled={!report} variant="secondary" className="bg-[#422944] text-white hover:bg-[#422942]/90">
                     <FileDown className="mr-2 h-4 w-4" />
                     Export PDF
                   </Button>
@@ -260,38 +249,38 @@ export default function Home() {
             )}
             
             {!isLoading && !report && (
-                <div className="mt-8">
-                    <div className="flex items-center justify-between px-4 pb-2 pt-4">
-                        <h3 className="text-white text-lg font-bold leading-tight tracking-[-0.015em]">Search History</h3>
-                        {history.length > 0 && (
-                            <Button
-                                variant="secondary"
-                                onClick={handleClearHistory}
-                                className="h-10 px-4 text-sm font-bold leading-normal tracking-[0.015em] bg-[#422942] text-white hover:bg-[#422942]/90"
-                            >
-                                Delete History
-                            </Button>
-                        )}
-                    </div>
-                    <div className="p-4">
-                        {history.length === 0 ? (
-                            <p className="text-[#c19ac1] text-base font-normal leading-normal pb-3 pt-1">No search history yet.</p>
-                        ) : (
-                            <div className="flex flex-col gap-2">
-                                {history.map((topic, index) => (
-                                    <Button
-                                        key={`${topic}-${index}`}
-                                        variant="ghost"
-                                        className="w-full justify-start text-left h-auto py-2 px-2 text-white hover:bg-[#422942]"
-                                        onClick={() => handleSelectTopic(topic)}
-                                    >
-                                        <span className="truncate">{topic}</span>
-                                    </Button>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                </div>
+              <div className="mt-8">
+                  <div className="flex items-center justify-between px-4 pb-2 pt-4">
+                      <h3 className="text-white text-lg font-bold leading-tight tracking-[-0.015em]">Search History</h3>
+                      {history.length > 0 && (
+                          <Button
+                              variant="secondary"
+                              onClick={handleClearHistory}
+                              className="h-10 px-4 text-sm font-bold leading-normal tracking-[0.015em] bg-[#422942] text-white hover:bg-[#422942]/90"
+                          >
+                              Delete History
+                          </Button>
+                      )}
+                  </div>
+                  <div className="p-4">
+                      {history.length === 0 ? (
+                          <p className="text-[#c19ac1] text-base font-normal leading-normal pb-3 pt-1">No search history yet.</p>
+                      ) : (
+                          <div className="flex flex-col gap-2">
+                              {history.map((topic, index) => (
+                                  <Button
+                                      key={`${topic}-${index}`}
+                                      variant="ghost"
+                                      className="w-full justify-start text-left h-auto py-2 px-2 text-white hover:bg-[#422942]"
+                                      onClick={() => handleSelectTopic(topic)}
+                                  >
+                                      <span className="truncate">{topic}</span>
+                                  </Button>
+                              ))}
+                          </div>
+                      )}
+                  </div>
+              </div>
             )}
         </div>
       </main>
