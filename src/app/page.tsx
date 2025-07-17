@@ -338,7 +338,9 @@ export default function Home() {
     <div className="flex min-h-screen w-full flex-col bg-background text-foreground" suppressHydrationWarning>
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
-            <h1 className="font-sans text-xl font-semibold tracking-wider text-primary">InsightForge</h1>
+            <a href="#home">
+              <h1 className="font-sans text-xl font-semibold tracking-wider text-primary">InsightForge</h1>
+            </a>
             <nav className="hidden items-center gap-6 text-sm font-medium md:flex">
                 {navLinks.map(link => <a key={link.name} href={link.href} className="text-muted-foreground transition-colors hover:text-foreground">{link.name}</a>)}
             </nav>
@@ -350,7 +352,7 @@ export default function Home() {
       </header>
 
       <main className="flex-1">
-        <section className="container mx-auto px-4 md:px-6">
+        <section id="home" className="container mx-auto px-4 md:px-6">
             <div className="relative flex min-h-[calc(100vh-12rem)] flex-col items-center justify-center text-center">
               <div
                   className="absolute inset-0 -z-10 bg-gradient-to-r from-purple-200/20 via-green-100/20 to-lime-200/20 dark:from-purple-900/20 dark:via-green-900/20 dark:to-lime-900/20"
