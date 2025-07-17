@@ -226,6 +226,25 @@ export default function Home() {
     { icon: <CheckCircle2 />, text: "Finds verified sources" },
   ];
 
+  const processSteps = [
+    {
+      title: "Start a chat",
+      description: "Kick off a conversation to explore your query with InsightForge.",
+    },
+    {
+      title: "Trigger deep research",
+      description: "Activate DeepSearch for in-depth, iterative web and data analysis.",
+    },
+    {
+      title: "Tap \"Create Report\"",
+      description: "Generate a structured report from your chat insights.",
+    },
+    {
+      title: "Executive, Find, Export",
+      description: "Get an executive summary, key findings, and export-ready report.",
+    },
+  ];
+
   return (
     <div className="flex min-h-screen w-full flex-col bg-background text-foreground" suppressHydrationWarning>
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -336,7 +355,7 @@ export default function Home() {
             )}
         </section>
 
-        <section className="w-full py-20 md:py-32">
+        <section className="w-full py-20 md:py-32 bg-background">
           <div className="container mx-auto flex h-[500px] items-center justify-center px-4 md:px-6">
             <div className="relative flex h-full w-full max-w-xl items-center justify-center">
                 <h3 className="relative z-10 text-center font-serif text-3xl tracking-tight md:text-5xl">
@@ -359,7 +378,30 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        <section className="w-full py-20 md:py-32 bg-muted/20">
+          <div className="container mx-auto px-4 md:px-6">
+            <div className="mx-auto max-w-5xl text-center space-y-4">
+              <h2 className="font-serif text-3xl tracking-tight md:text-5xl">
+                From Chat to Research Report, <span className="text-primary">Instantly!</span>
+              </h2>
+              <p className="max-w-3xl mx-auto text-lg text-muted-foreground">
+                Ever had a brilliant question snowball into something bigger? InsightForge doesn&apos;t just answer - it documents the journey:
+              </p>
+            </div>
+            <div className="mt-16 grid grid-cols-1 gap-x-8 gap-y-12 md:grid-cols-4">
+              {processSteps.map((step, index) => (
+                <div key={index} className="flex flex-col items-start text-left">
+                  <p className="font-serif text-7xl text-muted-foreground/50">0{index + 1}</p>
+                  <h3 className="mt-4 text-xl font-semibold text-primary">{step.title}</h3>
+                  <p className="mt-2 text-base text-muted-foreground">{step.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
       </main>
     </div>
   );
-}
+
+    
