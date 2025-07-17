@@ -96,6 +96,9 @@ export default {
         'accordion-up': 'accordion-up 0.2s ease-out',
         'revolve': 'revolve 18s linear infinite',
       },
+      backgroundImage: {
+        'text-gradient': 'linear-gradient(to right, #3b82f6, #8b5cf6, #ec4899)',
+      },
     },
   },
   plugins: [require('tailwindcss-animate')],

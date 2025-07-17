@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState } from 'react';
@@ -20,6 +21,7 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Separator } from '@/components/ui/separator';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { GradientText } from '@/components/GradientText';
 
 const formSchema = z.object({
   topic: z.string().min(3, { message: "Topic must be at least 3 characters long." }).max(100, { message: "Topic must be at most 100 characters long." }),
@@ -273,7 +275,7 @@ export default function Home() {
               />
               <div className="max-w-3xl space-y-4">
                   <h2 className="font-sans text-3xl font-bold tracking-tight md:text-5xl">
-                    Generate In-depth Reports with AI
+                    <GradientText>Generate In-depth Reports with AI</GradientText>
                   </h2>
                   <p className="text-lg text-muted-foreground">
                     InsightForge leverages cutting-edge AI to create comprehensive, well-structured research reports on any topic in seconds.
@@ -358,7 +360,7 @@ export default function Home() {
         <section className="w-full py-20 md:py-32 bg-background">
           <div className="container mx-auto flex h-[500px] items-center justify-center px-4 md:px-6">
             <div className="relative flex h-full w-full max-w-xl items-center justify-center">
-                <h3 className="relative z-10 text-center font-serif text-3xl tracking-tight md:text-5xl">
+                <h3 className="relative z-10 text-center font-sans text-3xl tracking-tight md:text-5xl">
                     Too many
                     <br />
                     research actions
@@ -383,7 +385,7 @@ export default function Home() {
           <div className="container mx-auto px-4 md:px-6">
             <div className="mx-auto max-w-5xl text-center space-y-4">
               <h2 className="font-serif text-3xl tracking-tight md:text-5xl">
-                From Chat to Research Report, <span className="text-primary">Instantly!</span>
+                <GradientText>From Chat to Research Report, <span className="text-primary !bg-none">Instantly!</span></GradientText>
               </h2>
               <p className="max-w-3xl mx-auto text-lg text-muted-foreground">
                 Ever had a brilliant question snowball into something bigger? InsightForge doesn&apos;t just answer - it documents the journey:
