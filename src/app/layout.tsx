@@ -3,7 +3,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
 
 export const metadata: Metadata = {
-  title: 'Brello',
+  title: 'InsightForge',
   description: 'AI-powered report generation and editing',
 };
 
