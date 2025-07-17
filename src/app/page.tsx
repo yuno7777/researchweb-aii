@@ -189,14 +189,20 @@ export default function Home() {
             if (report[sectionKey]) {
                 const sectionContent = report[sectionKey];
                 const sectionTitleText = sectionTitles[sectionKey];
+                
+                // Set font for this section before checking for page break
+                pdf.setFont('helvetica', 'bold');
+                pdf.setFontSize(16);
+                pdf.setTextColor(49, 53, 57);
 
                 if (y + 25 > pageHeight - pageMargin) { 
                     addPageWithHeaderFooter();
+                    // Re-apply font styles after adding a new page
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.setFontSize(16);
+                    pdf.setTextColor(49, 53, 57);
                 }
 
-                pdf.setFont('helvetica', 'bold');
-                pdf.setFontSize(16);
-                pdf.setTextColor(49, 53, 57); // Dark grey for titles
                 pdf.text(sectionTitleText, pageMargin, y);
                 y += 7;
                 
@@ -204,7 +210,7 @@ export default function Home() {
                 pdf.setLineWidth(0.25);
                 pdf.line(pageMargin, y, contentWidth + pageMargin, y);
                 y += 8;
-
+                
                 pdf.setFont('helvetica', 'normal');
                 pdf.setFontSize(12);
                 pdf.setTextColor(33, 37, 41); // Standard text color
@@ -214,6 +220,7 @@ export default function Home() {
                 contentLines.forEach((line: string) => {
                     if (y + lineHeight > pageHeight - pageMargin) {
                         addPageWithHeaderFooter();
+                        // Re-apply font styles after adding a new page for content
                         pdf.setFont('helvetica', 'normal');
                         pdf.setFontSize(12);
                         pdf.setTextColor(33, 37, 41);
