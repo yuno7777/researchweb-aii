@@ -8,7 +8,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { jsPDF } from 'jspdf';
-import { ArrowUp, Trash2, BookOpen, FileText, ListEnd, CheckCircle2, Lightbulb, Hourglass } from 'lucide-react';
+import { ArrowUp, Trash2, BookOpen, FileText, ListEnd, CheckCircle2, Lightbulb, Hourglass, Check } from 'lucide-react';
 
 import type { GenerateReportOutput } from '@/ai/flows/generate-report';
 import { useLocalStorage } from '@/hooks/use-local-storage';
@@ -23,6 +23,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from '@/component
 import { Separator } from '@/components/ui/separator';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { GradientText } from '@/components/GradientText';
+import { cn } from '@/lib/utils';
 
 const formSchema = z.object({
   topic: z.string().min(3, { message: "Topic must be at least 3 characters long." }).max(100, { message: "Topic must be at most 100 characters long." }),
@@ -222,7 +223,7 @@ export default function Home() {
     { name: "Features", href: "#features" },
     { name: "How It Works", href: "#how-it-works" },
     { name: "Reports", href: "#reports" },
-    { name: "Pricing", href: "#" },
+    { name: "Pricing", href: "#pricing" },
     { name: "FAQ", href: "#" },
   ];
 
@@ -268,6 +269,41 @@ export default function Home() {
       description: "Seamless access to our past conversations for context and continuity."
     }
   ];
+
+  const pricingPlans = {
+    free: {
+      title: 'Free Plan',
+      description: 'Perfect for light explorers.',
+      price: '$0',
+      features: [
+        '10 Research Credits per month',
+        '5 Deep Research Requests',
+        '5 Web Searches',
+        '5 GPT-4o Usage',
+        '2 AI-Generated Research Reports per month',
+        '1 Project Workspaces'
+      ],
+      footer: "A great way to experience InsightForge's magic without any commitment."
+    },
+    pro: {
+      title: 'Pro Plan',
+      description: 'For serious researchers and innovation teams.',
+      price: '$19',
+      features: [
+        'Unlimited Research Credits per month',
+        '50 Deep Research Requests',
+        'Unlimited Web Searches',
+        'Unlimited GPT-4o Usage',
+        '100 AI-Generated Research Reports per month',
+        '20 Project Workspaces',
+        'Access to Premium AI Models',
+        'Priority Processing',
+        'Early Access to New Features'
+      ],
+      footer: 'Push the boundaries of discovery without limits.'
+    }
+  };
+
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-background text-foreground" suppressHydrationWarning>
@@ -463,6 +499,48 @@ export default function Home() {
           </div>
         </section>
 
+        <section id="pricing" className="w-full py-20 md:py-32 bg-muted/20">
+          <div className="container mx-auto px-4 md:px-6">
+            <div className="mx-auto max-w-5xl text-center space-y-4">
+              <h2 className="font-serif text-3xl tracking-tight md:text-5xl">
+                <GradientText>Flexible Plans for Every Need</GradientText>
+              </h2>
+              <p className="max-w-3xl mx-auto text-lg text-muted-foreground">
+                Choose the plan that's right for you and unlock the full power of AI-driven research.
+              </p>
+            </div>
+            <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+              {[pricingPlans.free, pricingPlans.pro].map((plan, index) => (
+                <div key={plan.title} className={cn("rounded-xl p-8 flex flex-col", index === 0 ? "bg-card" : "bg-card border-2 border-primary shadow-lg")}>
+                  <div className="flex-grow">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="text-2xl font-bold">{plan.title}</h3>
+                        <p className="text-muted-foreground mt-1">{plan.description}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-4xl font-bold text-primary">{plan.price}</p>
+                        <p className="text-muted-foreground">month</p>
+                      </div>
+                    </div>
+                    <ul className="mt-8 space-y-4">
+                      {plan.features.map((feature) => (
+                        <li key={feature} className="flex items-center gap-3">
+                          <Check className="h-5 w-5 text-primary" />
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="mt-8">
+                    <p className="text-sm text-muted-foreground">{plan.footer}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
       </main>
     </div>
   );
@@ -471,3 +549,6 @@ export default function Home() {
 
 
 
+
+
+    
