@@ -1,9 +1,8 @@
 
-
 'use client';
 
 import React from 'react';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -40,6 +39,13 @@ export default function Home() {
   const [history, setHistory] = useLocalStorage<string[]>('report-history', []);
   const [searchType, setSearchType] = useState<'web' | 'deep'>('web');
   const { toast } = useToast();
+  const pageTopRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (pageTopRef.current) {
+        pageTopRef.current.scrollIntoView({ behavior: 'auto' });
+    }
+  }, []);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -360,7 +366,7 @@ export default function Home() {
 
 
   return (
-    <div className="flex min-h-screen w-full flex-col bg-background text-foreground" suppressHydrationWarning>
+    <div ref={pageTopRef} id="home" className="flex min-h-screen w-full flex-col bg-background text-foreground" suppressHydrationWarning>
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
             <a href="#home">
@@ -377,7 +383,7 @@ export default function Home() {
       </header>
 
       <main className="flex-1">
-        <section id="home" className="container mx-auto px-4 md:px-6">
+        <section className="container mx-auto px-4 md:px-6">
             <div className="relative flex min-h-[calc(100vh-12rem)] flex-col items-center justify-center text-center">
               <div
                   className="absolute inset-0 -z-10 bg-gradient-to-r from-purple-200/20 via-green-100/20 to-lime-200/20 dark:from-purple-900/20 dark:via-green-900/20 dark:to-lime-900/20"
