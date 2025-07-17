@@ -217,7 +217,13 @@ export default function Home() {
     }
   };
 
-  const navLinks = ["Features", "How It Works", "Reports", "Pricing", "FAQ"];
+  const navLinks = [
+    { name: "Features", href: "#features" },
+    { name: "How It Works", href: "#how-it-works" },
+    { name: "Reports", href: "#reports" },
+    { name: "Pricing", href: "#" },
+    { name: "FAQ", href: "#" },
+  ];
 
   const features = [
     { icon: <BookOpen />, text: "Learns your style" },
@@ -253,7 +259,7 @@ export default function Home() {
         <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
             <h1 className="font-sans text-2xl font-semibold tracking-wide text-primary">InsightForge</h1>
             <nav className="hidden items-center gap-6 text-sm font-medium md:flex">
-                {navLinks.map(link => <a key={link} href="#" className="text-muted-foreground transition-colors hover:text-foreground">{link}</a>)}
+                {navLinks.map(link => <a key={link.name} href={link.href} className="text-muted-foreground transition-colors hover:text-foreground">{link.name}</a>)}
             </nav>
             <div className="flex items-center gap-2">
               <ThemeToggle />
@@ -315,49 +321,51 @@ export default function Home() {
                   </Form>
               </div>
             </div>
-
-            {isLoading && <div className="py-12"><ReportSkeleton /></div>}
-
-            {report && !isLoading && (
-              <div className="py-12 max-w-4xl mx-auto">
-                <ReportDisplay report={report} onReportUpdate={handleReportUpdate} onExportPdf={handleExportPdf} />
-              </div>
-            )}
             
-            {!isLoading && !report && history.length > 0 && (
-              <div className="py-12 max-w-4xl mx-auto">
-                  <div className="flex items-center justify-between pb-4">
-                      <h3 className="text-xl font-bold">Search History</h3>
-                      <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={handleClearHistory}
-                      >
-                           <Trash2 className="mr-2 h-4 w-4" />
-                          Delete History
-                      </Button>
-                  </div>
-                  <div className="border rounded-lg bg-background">
-                      <div className="flex flex-col">
-                          {history.map((topic, index) => (
-                            <>
-                              <button
-                                  key={`${topic}-${index}`}
-                                  className="w-full text-left p-4 hover:bg-muted/50 transition-colors"
-                                  onClick={() => handleSelectTopic(topic)}
-                              >
-                                  <span className="truncate">{topic}</span>
-                              </button>
-                              {index < history.length - 1 && <Separator />}
-                             </>
-                          ))}
-                      </div>
-                  </div>
-              </div>
-            )}
+            <div id="reports">
+              {isLoading && <div className="py-12"><ReportSkeleton /></div>}
+
+              {report && !isLoading && (
+                <div className="py-12 max-w-4xl mx-auto">
+                  <ReportDisplay report={report} onReportUpdate={handleReportUpdate} onExportPdf={handleExportPdf} />
+                </div>
+              )}
+              
+              {!isLoading && !report && history.length > 0 && (
+                <div className="py-12 max-w-4xl mx-auto">
+                    <div className="flex items-center justify-between pb-4">
+                        <h3 className="text-xl font-bold">Search History</h3>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleClearHistory}
+                        >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete History
+                        </Button>
+                    </div>
+                    <div className="border rounded-lg bg-background">
+                        <div className="flex flex-col">
+                            {history.map((topic, index) => (
+                              <>
+                                <button
+                                    key={`${topic}-${index}`}
+                                    className="w-full text-left p-4 hover:bg-muted/50 transition-colors"
+                                    onClick={() => handleSelectTopic(topic)}
+                                >
+                                    <span className="truncate">{topic}</span>
+                                </button>
+                                {index < history.length - 1 && <Separator />}
+                                </>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+              )}
+            </div>
         </section>
 
-        <section className="w-full py-20 md:py-32 bg-background">
+        <section id="features" className="w-full py-20 md:py-32 bg-background">
           <div className="container mx-auto flex h-[500px] items-center justify-center px-4 md:px-6">
             <div className="relative flex h-full w-full max-w-xl items-center justify-center">
                 <h3 className="relative z-10 text-center font-sans text-3xl tracking-tight md:text-5xl">
@@ -381,7 +389,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="w-full py-20 md:py-32 bg-muted/20">
+        <section id="how-it-works" className="w-full py-20 md:py-32 bg-muted/20">
           <div className="container mx-auto px-4 md:px-6">
             <div className="mx-auto max-w-5xl text-center space-y-4">
               <h2 className="font-serif text-3xl tracking-tight md:text-5xl">
@@ -407,3 +415,4 @@ export default function Home() {
   );
 
     
+
