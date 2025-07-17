@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Edit, Save, X } from 'lucide-react';
+import { Separator } from './ui/separator';
 
 type Report = GenerateReportOutput['report'];
 type ReportSection = keyof Report;
@@ -60,35 +61,35 @@ export function ReportDisplay({ report, onReportUpdate }: ReportDisplayProps) {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-12">
       {sectionOrder.map((sectionKey) => (
         report[sectionKey] && (
-            <Card key={sectionKey} className="overflow-hidden">
-                <CardHeader className="flex flex-row items-center justify-between p-6">
-                    <CardTitle className="text-2xl">{sectionTitles[sectionKey]}</CardTitle>
+            <div key={sectionKey}>
+                <div className="flex flex-row items-center justify-between mb-4">
+                    <h2 className="text-2xl font-bold">{sectionTitles[sectionKey]}</h2>
                     {editingSection !== sectionKey && (
-                         <Button variant="outline" size="sm" onClick={() => handleEditClick(sectionKey)}><Edit className="mr-2 h-4 w-4" />Edit</Button>
+                         <Button variant="outline" size="sm" onClick={() => handleEditClick(sectionKey)} className="rounded-full"><Edit className="mr-2 h-4 w-4" />Edit</Button>
                     )}
-                </CardHeader>
-                <CardContent className="px-6 pb-6">
+                </div>
+                <Separator className="mb-6"/>
+                
                 {editingSection === sectionKey ? (
                     <div className="space-y-4">
                     <Textarea
                         value={editContent}
                         onChange={(e) => setEditContent(e.target.value)}
-                        className="min-h-[300px] text-base leading-relaxed"
+                        className="min-h-[300px] text-base leading-relaxed rounded-lg"
                         autoFocus
                     />
                     <div className="flex justify-end space-x-2">
-                        <Button variant="ghost" size="sm" onClick={handleCancelClick}><X className="mr-2 h-4 w-4" />Cancel</Button>
-                        <Button size="sm" onClick={handleSaveClick}><Save className="mr-2 h-4 w-4" />Save</Button>
+                        <Button variant="ghost" size="sm" onClick={handleCancelClick} className="rounded-full"><X className="mr-2 h-4 w-4" />Cancel</Button>
+                        <Button size="sm" onClick={handleSaveClick} className="rounded-full"><Save className="mr-2 h-4 w-4" />Save</Button>
                     </div>
                     </div>
                 ) : (
                     <p className="text-base text-muted-foreground leading-relaxed whitespace-pre-wrap">{editableReport[sectionKey]}</p>
                 )}
-                </CardContent>
-            </Card>
+            </div>
         )
       ))}
     </div>
