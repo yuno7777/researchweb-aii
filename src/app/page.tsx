@@ -40,39 +40,6 @@ export default function Home() {
   const [searchType, setSearchType] = useState<'web' | 'deep'>('web');
   const { toast } = useToast();
   
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      topic: "",
-    },
-  });
-
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    setIsLoading(true);
-    setReport(null);
-    form.clearErrors();
-
-    const result = await handleGenerateReport({ topic: values.topic });
-
-    if (result.error || !result.report) {
-      toast({
-        variant: "destructive",
-        title: "Error Generating Report",
-        description: result.error || "An unknown error occurred.",
-      });
-    } else {
-      setReport(result.report);
-      if (!history.includes(values.topic)) {
-        setHistory([values.topic, ...history]);
-      }
-    }
-    setIsLoading(false);
-  };
-
   const handleSelectTopic = (topic: string) => {
     form.setValue('topic', topic);
     onSubmit({ topic });
@@ -371,6 +338,35 @@ export default function Home() {
     }
   ];
 
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      topic: "",
+    },
+  });
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    setIsLoading(true);
+    setReport(null);
+    form.clearErrors();
+
+    const result = await handleGenerateReport({ topic: values.topic });
+
+    if (result.error || !result.report) {
+      toast({
+        variant: "destructive",
+        title: "Error Generating Report",
+        description: result.error || "An unknown error occurred.",
+      });
+    } else {
+      setReport(result.report);
+      if (!history.includes(values.topic)) {
+        setHistory([values.topic, ...history]);
+      }
+    }
+    setIsLoading(false);
+  };
+
 
   return (
     <div id="home" className="flex min-h-screen w-full flex-col bg-background text-foreground" suppressHydrationWarning>
@@ -455,6 +451,7 @@ export default function Home() {
                             variant="outline"
                             size="sm"
                             onClick={handleClearHistory}
+                            className="rounded-full"
                         >
                             <Trash2 className="mr-2 h-4 w-4" />
                             Delete History
