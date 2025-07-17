@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 
 export function GradientText({ children, className }: { children: React.ReactNode, className?: string }) {
   return (
-    <span className={cn("bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent", className)}>
+    <span className={cn("bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent", className)}>
       {children}
     </span>
   );
