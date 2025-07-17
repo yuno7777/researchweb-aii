@@ -18,7 +18,6 @@ import { ReportSkeleton } from '@/components/ReportSkeleton';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
-import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
 import { ThemeToggle } from '@/components/ThemeToggle';
 
@@ -87,7 +86,8 @@ export default function Home() {
 
     const capitalizeTitle = (title: string) => {
       if (!title) return '';
-      return title.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+      // A simple regex to find words and capitalize them
+      return title.replace(/\b\w/g, char => char.toUpperCase());
     };
     
     const topicTitle = capitalizeTitle(form.getValues('topic'));
@@ -166,12 +166,16 @@ export default function Home() {
                 const sectionContent = report[sectionKey];
                 const sectionTitleText = sectionTitles[sectionKey];
                 
+                // Store current font state before changing it for the title
+                const currentFont = { style: pdf.getFont().fontStyle, size: pdf.getFontSize(), color: pdf.getTextColor() };
+                
                 pdf.setFont('helvetica', 'bold');
                 pdf.setFontSize(16);
                 pdf.setTextColor(49, 53, 57);
 
                 if (y + 25 > pageHeight - pageMargin) { 
                     addPageWithHeaderFooter();
+                    // Re-apply font style for title after page break
                     pdf.setFont('helvetica', 'bold');
                     pdf.setFontSize(16);
                     pdf.setTextColor(49, 53, 57);
@@ -185,15 +189,18 @@ export default function Home() {
                 pdf.line(pageMargin, y, contentWidth + pageMargin, y);
                 y += 8;
                 
+                // Restore font for body content
                 pdf.setFont('helvetica', 'normal');
                 pdf.setFontSize(12);
                 pdf.setTextColor(33, 37, 41);
+                
                 const contentLines = pdf.splitTextToSize(sectionContent, contentWidth);
                 const lineHeight = 8; // Increased line height
 
                 contentLines.forEach((line: string) => {
                     if (y + lineHeight > pageHeight - pageMargin) {
                         addPageWithHeaderFooter();
+                        // Restore font for body content after page break
                         pdf.setFont('helvetica', 'normal');
                         pdf.setFontSize(12);
                         pdf.setTextColor(33, 37, 41);
@@ -221,7 +228,7 @@ export default function Home() {
     <div className="flex min-h-screen w-full flex-col bg-background text-foreground" suppressHydrationWarning>
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
-            <h1 className="font-serif text-3xl font-bold text-primary">InsightForge</h1>
+            <h1 className="font-sans text-2xl font-semibold tracking-wide text-primary">InsightForge</h1>
             <nav className="hidden items-center gap-6 text-sm font-medium md:flex">
                 {navLinks.map(link => <a key={link} href="#" className="text-muted-foreground transition-colors hover:text-foreground">{link}</a>)}
             </nav>
@@ -290,7 +297,7 @@ export default function Home() {
 
             {report && !isLoading && (
               <div className="py-12 max-w-4xl mx-auto">
-                <ReportDisplay report={report} onReportUpdate={handleReportUpdate} onExportPdf={handleExportPdf} />
+                <ReportDisplay report={report} onReportUpdate={handleReportUpdate} />
               </div>
             )}
             
