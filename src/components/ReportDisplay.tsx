@@ -63,7 +63,7 @@ export function ReportDisplay({ report, onReportUpdate, onExportPdf }: ReportDis
   return (
     <div className="space-y-8">
       <div className="flex justify-end">
-        <Button onClick={onExportPdf} className="rounded-full">
+        <Button onClick={onExportPdf}>
             <FileDown className="mr-2 h-4 w-4" />
             Export as PDF
         </Button>

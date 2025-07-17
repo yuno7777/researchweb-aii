@@ -234,7 +234,7 @@ export default function Home() {
             </nav>
             <div className="flex items-center gap-2">
               <ThemeToggle />
-              <Button>Get Started</Button>
+              <Button className="rounded-full">Get Started</Button>
             </div>
         </div>
       </header>
@@ -297,7 +297,7 @@ export default function Home() {
 
             {report && !isLoading && (
               <div className="py-12 max-w-4xl mx-auto">
-                <ReportDisplay report={report} onReportUpdate={handleReportUpdate} />
+                <ReportDisplay report={report} onReportUpdate={handleReportUpdate} onExportPdf={handleExportPdf} />
               </div>
             )}
             
