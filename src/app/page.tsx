@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState } from 'react';
@@ -20,6 +21,7 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 const formSchema = z.object({
   topic: z.string().min(3, { message: "Topic must be at least 3 characters long." }).max(100, { message: "Topic must be at most 100 characters long." }),
@@ -85,9 +87,10 @@ export default function Home() {
     }
 
     const capitalizeTitle = (title: string) => {
+      if (!title) return '';
       return title.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
     };
-
+    
     const topicTitle = capitalizeTitle(form.getValues('topic'));
     const fileName = `InsightForge_Report_${topicTitle.replace(/ /g, '_') || 'Untitled'}.pdf`;
     
@@ -134,7 +137,7 @@ export default function Home() {
         pdf.setFont('helvetica', 'normal');
         pdf.setFontSize(14);
         pdf.setTextColor(108, 117, 125);
-        pdf.text('AI-Generated Research Report', pdf.internal.pageSize.getWidth() / 2, pageHeight / 2, { align: 'center' });
+        pdf.text(`AI-Generated Research Report`, pdf.internal.pageSize.getWidth() / 2, pageHeight / 2, { align: 'center' });
         
         pdf.setDrawColor(222, 226, 230);
         pdf.setLineWidth(0.5);
@@ -216,29 +219,41 @@ export default function Home() {
   const navLinks = ["Features", "How It Works", "Reports", "Pricing", "FAQ"];
 
   return (
-    <div className="flex min-h-screen w-full flex-col bg-[hsl(var(--background))] text-foreground" suppressHydrationWarning>
-      <header className="sticky top-0 z-50 w-full bg-[hsl(var(--background))]">
+    <div className="flex min-h-screen w-full flex-col bg-background text-foreground" suppressHydrationWarning>
+      <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
             <h1 className="font-serif text-3xl font-bold text-primary">InsightForge</h1>
             <nav className="hidden items-center gap-6 text-sm font-medium md:flex">
-                {navLinks.map(link => <a key={link} href="#" className="hover:text-primary transition-colors">{link}</a>)}
+                {navLinks.map(link => <a key={link} href="#" className="text-muted-foreground transition-colors hover:text-foreground">{link}</a>)}
             </nav>
-            <Button className="rounded-full bg-gray-900 text-white hover:bg-gray-800">Get Started</Button>
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <Button>Get Started</Button>
+            </div>
         </div>
-        <Separator />
       </header>
 
       <main className="flex-1">
         <div className="container mx-auto px-4 md:px-6">
-            <div className="relative flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center">
-              <div className="absolute inset-0 -z-10 overflow-hidden">
-                  <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                      <div className="absolute -inset-40 bg-gradient-to-br from-purple-200 via-transparent to-lime-200 opacity-30 blur-3xl" />
-                      <h1 className="font-serif text-[30rem] font-bold text-gray-200/50 leading-none">InsightForge</h1>
-                  </div>
+            <div className="relative flex min-h-[calc(100vh-12rem)] flex-col items-center justify-center text-center">
+              <div
+                  className="absolute inset-0 -z-10"
+                  style={{
+                      backgroundImage:
+                      'radial-gradient(circle at top left, hsl(var(--primary) / 0.1), transparent 30%),' +
+                      'radial-gradient(circle at bottom right, hsl(var(--accent) / 0.1), transparent 30%)',
+                  }}
+              />
+              <div className="max-w-3xl space-y-4">
+                  <h2 className="font-serif text-4xl font-bold tracking-tight md:text-6xl">
+                    Generate In-depth Reports with AI
+                  </h2>
+                  <p className="text-lg text-muted-foreground">
+                    InsightForge leverages cutting-edge AI to create comprehensive, well-structured research reports on any topic in seconds.
+                  </p>
               </div>
 
-              <div className="w-full max-w-2xl space-y-4">
+              <div className="mt-8 w-full max-w-2xl space-y-4">
                   <Form {...form}>
                       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                           <FormField
@@ -249,11 +264,11 @@ export default function Home() {
                                       <FormControl>
                                           <div className="relative">
                                               <Input
-                                                  placeholder="Enter a topic to generate a report"
-                                                  className="h-16 w-full rounded-2xl border-gray-200 bg-white/80 py-4 pl-6 pr-16 text-lg shadow-lg backdrop-blur-sm focus-visible:ring-primary"
+                                                  placeholder="e.g., 'The Future of Renewable Energy'"
+                                                  className="h-14 w-full rounded-full border-gray-200 bg-background py-4 pl-6 pr-16 text-lg shadow-sm focus-visible:ring-primary"
                                                   {...field}
                                               />
-                                              <Button type="submit" size="icon" className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full w-10 h-10 bg-gray-900 text-white hover:bg-gray-800" disabled={isLoading}>
+                                              <Button type="submit" size="icon" className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full w-10 h-10" disabled={isLoading}>
                                                   <ArrowUp className="h-5 w-5"/>
                                               </Button>
                                           </div>
@@ -263,19 +278,12 @@ export default function Home() {
                               )}
                           />
 
-                          <div className="flex items-center justify-center gap-4">
-                              <Button type="button" variant="ghost" onClick={() => setSearchType('web')} className={cn("rounded-full", searchType === 'web' && "bg-gray-200")}>Web Search</Button>
-                              <Button type="button" variant="ghost" onClick={() => setSearchType('deep')} className={cn("rounded-full", searchType === 'deep' && "bg-gray-200")}>Deep Search</Button>
+                          <div className="flex items-center justify-center gap-4 text-sm">
+                              <Button type="button" variant={searchType === 'web' ? 'secondary' : 'ghost'} onClick={() => setSearchType('web')} className="rounded-full">Web Search</Button>
+                              <Button type="button" variant={searchType === 'deep' ? 'secondary' : 'ghost'} onClick={() => setSearchType('deep')} className="rounded-full">Deep Research</Button>
                           </div>
                       </form>
                   </Form>
-              </div>
-
-              <div className="mt-12 text-center max-w-3xl">
-                <h2 className="text-xl font-bold">InsightForge: AI For Researchers, AI Report Generator</h2>
-                <p className="text-muted-foreground mt-2">
-                  InsightForge leverages cutting-edge AI models, including OpenAI 4o-mini, GPT-4o, and Gemini, to power its deep research agent and AI report generator, delivering accurate reports and actionable insights for researchers.
-                </p>
               </div>
             </div>
 
@@ -283,7 +291,7 @@ export default function Home() {
 
             {report && !isLoading && (
               <div className="py-12 max-w-4xl mx-auto">
-                <ReportDisplay report={report} onReportUpdate={handleReportUpdate} />
+                <ReportDisplay report={report} onReportUpdate={handleReportUpdate} onExportPdf={handleExportPdf} />
               </div>
             )}
             
@@ -295,15 +303,15 @@ export default function Home() {
                           variant="outline"
                           size="sm"
                           onClick={handleClearHistory}
-                          className="rounded-full"
                       >
                            <Trash2 className="mr-2 h-4 w-4" />
                           Delete History
                       </Button>
                   </div>
-                  <div className="border rounded-lg">
+                  <div className="border rounded-lg bg-background">
                       <div className="flex flex-col">
                           {history.map((topic, index) => (
+                            <>
                               <button
                                   key={`${topic}-${index}`}
                                   className="w-full text-left p-4 hover:bg-muted/50 transition-colors"
@@ -311,6 +319,8 @@ export default function Home() {
                               >
                                   <span className="truncate">{topic}</span>
                               </button>
+                              {index < history.length - 1 && <Separator />}
+                             </>
                           ))}
                       </div>
                   </div>
