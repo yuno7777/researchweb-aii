@@ -253,11 +253,26 @@ export default function Home() {
     },
   ];
 
+  const libraryFeatures = [
+    {
+      title: "Research Reports",
+      description: "In-depth insights tailored to your queries, powered by real-time web and data analysis."
+    },
+    {
+      title: "Projects",
+      description: "Collaborate on tasks with structured AI assistance, from brainstorming to execution."
+    },
+    {
+      title: "Chat History",
+      description: "Seamless access to our past conversations for context and continuity."
+    }
+  ];
+
   return (
     <div className="flex min-h-screen w-full flex-col bg-background text-foreground" suppressHydrationWarning>
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
-            <h1 className="font-sans text-2xl font-semibold tracking-wide text-primary">InsightForge</h1>
+            <h1 className="font-sans text-xl font-semibold tracking-wider text-primary">InsightForge</h1>
             <nav className="hidden items-center gap-6 text-sm font-medium md:flex">
                 {navLinks.map(link => <a key={link.name} href={link.href} className="text-muted-foreground transition-colors hover:text-foreground">{link.name}</a>)}
             </nav>
@@ -322,7 +337,7 @@ export default function Home() {
               </div>
             </div>
             
-            <div id="reports">
+            <div id="report-output">
               {isLoading && <div className="py-12"><ReportSkeleton /></div>}
 
               {report && !isLoading && (
@@ -410,9 +425,48 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        <section id="reports" className="w-full py-20 md:py-32 bg-background relative overflow-hidden">
+          <div
+              className="absolute inset-y-0 right-0 -z-10 w-1/2"
+              style={{
+                  backgroundImage:
+                  'radial-gradient(circle at 100% 50%, hsl(var(--primary) / 0.1), transparent 50%)',
+              }}
+          />
+          <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center px-4 md:px-6">
+            <div className="space-y-4">
+              <h2 className="font-serif text-4xl tracking-tight md:text-6xl">
+                Your Research Library,
+                <br />
+                <span className="text-primary">Reimagined.</span>
+              </h2>
+            </div>
+            <div className="space-y-4 text-right">
+              <p className="text-muted-foreground">
+                Everything you ask.
+                <br />
+                Everything you get.
+                <br />
+                Neatly organized under:
+              </p>
+            </div>
+            <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-x-12 gap-y-8 mt-12">
+              {libraryFeatures.map((feature) => (
+                <div key={feature.title} className="space-y-4">
+                  <h3 className="text-xl font-semibold text-primary">{feature.title}</h3>
+                  <Separator />
+                  <p className="text-muted-foreground">{feature.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
       </main>
     </div>
   );
 
     
+
 
