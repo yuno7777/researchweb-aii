@@ -12,10 +12,10 @@ interface ScrollAnimationProps {
 
 export function ScrollAnimation({ children, className, delay = 0 }: ScrollAnimationProps) {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px 0px" });
+  const isInView = useInView(ref, { once: true, margin: "-50px" });
 
   const variants = {
-    hidden: { opacity: 0, y: 30 },
+    hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 },
   };
 
@@ -25,7 +25,7 @@ export function ScrollAnimation({ children, className, delay = 0 }: ScrollAnimat
       initial="hidden"
       animate={isInView ? "visible" : "hidden"}
       variants={variants}
-      transition={{ duration: 0.6, delay }}
+      transition={{ duration: 0.8, delay }}
       className={cn(className)}
     >
       {children}
