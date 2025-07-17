@@ -2,6 +2,7 @@
 
 'use client';
 
+import React from 'react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -362,16 +363,15 @@ export default function Home() {
                     <div className="border rounded-lg bg-background">
                         <div className="flex flex-col">
                             {history.map((topic, index) => (
-                              <>
+                              <React.Fragment key={`${topic}-${index}`}>
                                 <button
-                                    key={`${topic}-${index}`}
                                     className="w-full text-left p-4 hover:bg-muted/50 transition-colors"
                                     onClick={() => handleSelectTopic(topic)}
                                 >
                                     <span className="truncate">{topic}</span>
                                 </button>
                                 {index < history.length - 1 && <Separator />}
-                                </>
+                                </React.Fragment>
                             ))}
                         </div>
                     </div>
@@ -468,5 +468,6 @@ export default function Home() {
   );
 
     
+
 
 
