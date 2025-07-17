@@ -7,7 +7,7 @@ import { useLocalStorage } from "@/hooks/use-local-storage";
 import { Button } from "@/components/ui/button";
 
 export function ThemeToggle() {
-  const [theme, setTheme] = useLocalStorage<"light" | "dark">("theme", "dark");
+  const [theme, setTheme] = useLocalStorage<"light" | "dark">("theme", "light");
 
   useEffect(() => {
     const isDark = theme === 'dark';
