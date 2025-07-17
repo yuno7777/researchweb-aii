@@ -10,6 +10,7 @@ export function ThemeToggle() {
   const [theme, setTheme] = useLocalStorage<"light" | "dark">("theme", "light");
 
   useEffect(() => {
+    // This effect now correctly handles the initial theme setting on the client
     const isDark = theme === 'dark';
     document.documentElement.classList.toggle('dark', isDark);
     document.documentElement.classList.toggle('light', !isDark);
