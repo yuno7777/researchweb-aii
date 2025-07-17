@@ -162,9 +162,6 @@ export default function Home() {
 
         sectionOrder.forEach(sectionKey => {
             if (report[sectionKey]) {
-                const sectionContent = report[sectionKey];
-                const sectionTitleText = sectionTitles[sectionKey];
-                
                 pdf.setFont('helvetica', 'bold');
                 pdf.setFontSize(16);
                 pdf.setTextColor(49, 53, 57);
@@ -175,6 +172,9 @@ export default function Home() {
                     pdf.setFontSize(16);
                     pdf.setTextColor(49, 53, 57);
                 }
+                
+                const sectionContent = report[sectionKey];
+                const sectionTitleText = sectionTitles[sectionKey];
 
                 pdf.text(sectionTitleText, pageMargin, y);
                 y += 7;
@@ -218,12 +218,12 @@ export default function Home() {
   const navLinks = ["Features", "How It Works", "Reports", "Pricing", "FAQ"];
 
   const features = [
-    { icon: <BookOpen />, text: "Learns your style", gridArea: "1 / 1 / 2 / 2" },
-    { icon: <FileText />, text: "Creates draft reports", gridArea: "1 / 3 / 2 / 4" },
-    { icon: <Hourglass />, text: "Respects your time", gridArea: "2 / 1 / 3 / 2" },
-    { icon: <ListEnd />, text: "Summarizes & compiles", gridArea: "2 / 3 / 3 / 4" },
-    { icon: <Lightbulb />, text: "Understands your asks", gridArea: "3 / 1 / 4 / 2" },
-    { icon: <CheckCircle2 />, text: "Finds verified sources", gridArea: "3 / 3 / 4 / 4" },
+    { icon: <BookOpen />, text: "Learns your style" },
+    { icon: <FileText />, text: "Creates draft reports" },
+    { icon: <Hourglass />, text: "Respects your time" },
+    { icon: <ListEnd />, text: "Summarizes & compiles" },
+    { icon: <Lightbulb />, text: "Understands your asks" },
+    { icon: <CheckCircle2 />, text: "Finds verified sources" },
   ];
 
   return (
@@ -337,23 +337,25 @@ export default function Home() {
         </section>
 
         <section className="w-full py-20 md:py-32">
-          <div className="container mx-auto px-4 md:px-6">
-            <div className="grid grid-cols-[1fr_auto_1fr] grid-rows-3 items-center gap-x-8 gap-y-4 md:gap-x-16">
-              {features.map((feature, index) => (
-                <div key={index} className="flex items-center gap-3" style={{ gridArea: feature.gridArea }}>
-                  {feature.icon}
-                  <span className="text-muted-foreground">{feature.text}</span>
-                </div>
-              ))}
-              <div className="text-center" style={{ gridArea: '1 / 2 / 4 / 3' }}>
-                <h3 className="font-serif text-3xl md:text-5xl tracking-tight">
-                  Too many
-                  <br />
-                  research actions
-                  <br />
-                  to <span className="text-primary">handle?</span>
+          <div className="container mx-auto flex h-[500px] items-center justify-center px-4 md:px-6">
+            <div className="relative flex h-full w-full max-w-xl items-center justify-center">
+                <h3 className="relative z-10 text-center font-serif text-3xl tracking-tight md:text-5xl">
+                    Too many
+                    <br />
+                    research actions
+                    <br />
+                    to <span className="text-primary">handle?</span>
                 </h3>
-              </div>
+                {features.map((feature, index) => (
+                    <div
+                        key={index}
+                        className="absolute flex items-center gap-3 rounded-full border bg-card p-3 shadow-md animate-revolve"
+                        style={{ animationDelay: `${index * 3}s` }}
+                    >
+                        {feature.icon}
+                        <span className="text-muted-foreground">{feature.text}</span>
+                    </div>
+                ))}
             </div>
           </div>
         </section>
