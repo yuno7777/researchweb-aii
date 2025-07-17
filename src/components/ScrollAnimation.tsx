@@ -12,7 +12,7 @@ interface ScrollAnimationProps {
 
 export function ScrollAnimation({ children, className, delay = 0 }: ScrollAnimationProps) {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: '-100px 0px' });
+  const isInView = useInView(ref, { margin: '-100px 0px' });
 
   const variants = {
     hidden: { opacity: 0, y: 50 },
