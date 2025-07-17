@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { jsPDF } from 'jspdf';
-import { ArrowUp, Trash2 } from 'lucide-react';
+import { ArrowUp, Menu, Trash2 } from 'lucide-react';
 
 import type { GenerateReportOutput } from '@/ai/flows/generate-report';
 import { useLocalStorage } from '@/hooks/use-local-storage';
@@ -23,6 +23,7 @@ import { Separator } from '@/components/ui/separator';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { GradientText } from '@/components/GradientText';
 import { HomePageContent } from '@/components/HomePageContent';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const formSchema = z.object({
   topic: z.string().min(3, { message: "Topic must be at least 3 characters long." }).max(100, { message: "Topic must be at most 100 characters long." }),
@@ -34,7 +35,7 @@ export default function Home() {
   const [report, setReport] = useState<ReportData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [history, setHistory] = useLocalStorage<string[]>('report-history', []);
-  const [searchType, setSearchType] = useState<'web' | 'deep'>('web');
+  const [searchType, setSearchType] = useState<'web' | 'deep' | 'concise'>('web');
   const { toast } = useToast();
   
   const handleSelectTopic = (topic: string) => {
@@ -285,8 +286,21 @@ export default function Home() {
                           />
 
                           <div className="flex items-center justify-center gap-4 text-sm">
+                            <TooltipProvider>
                               <Button type="button" variant={searchType === 'web' ? 'secondary' : 'ghost'} onClick={() => setSearchType('web')} className="rounded-full">Web Search</Button>
                               <Button type="button" variant={searchType === 'deep' ? 'secondary' : 'ghost'} onClick={() => setSearchType('deep')} className="rounded-full">Deep Research</Button>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button type="button" variant={searchType === 'concise' ? 'secondary' : 'ghost'} onClick={() => setSearchType('concise')} className="rounded-full">
+                                    <Menu className="mr-2 h-4 w-4" />
+                                    Concise Response
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Concise search mode: Provides concise, fact-focused responses using internet sources</p>
+                                </TooltipContent>
+                              </Tooltip>
+                              </TooltipProvider>
                           </div>
                       </form>
                   </Form>
@@ -342,3 +356,5 @@ export default function Home() {
   );
 
 }
+
+    
