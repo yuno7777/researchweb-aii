@@ -286,7 +286,7 @@ export default function Home() {
         '10 Research Credits per month',
         '5 Deep Research Requests',
         '5 Web Searches',
-        '5 GPT-4o Usage',
+        '5 Gemini 2.5 Pro Usage',
         '2 AI-Generated Research Reports per month',
         '1 Project Workspaces'
       ],
@@ -300,7 +300,7 @@ export default function Home() {
         'Unlimited Research Credits per month',
         '50 Deep Research Requests',
         'Unlimited Web Searches',
-        'Unlimited GPT-4o Usage',
+        'Unlimited Gemini 2.5 Pro Usage',
         '100 AI-Generated Research Reports per month',
         '20 Project Workspaces',
         'Access to Premium AI Models',
