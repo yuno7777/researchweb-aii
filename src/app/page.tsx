@@ -24,6 +24,7 @@ import { Separator } from '@/components/ui/separator';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { GradientText } from '@/components/GradientText';
 import { cn } from '@/lib/utils';
+import { ScrollAnimation } from '@/components/ScrollAnimation';
 
 const formSchema = z.object({
   topic: z.string().min(3, { message: "Topic must be at least 3 characters long." }).max(100, { message: "Topic must be at most 100 characters long." }),
@@ -417,128 +418,142 @@ export default function Home() {
         </section>
 
         <section id="features" className="w-full py-20 md:py-32 bg-background">
-          <div className="container mx-auto flex h-[500px] items-center justify-center px-4 md:px-6">
-            <div className="relative flex h-full w-full max-w-xl items-center justify-center">
-                <h3 className="relative z-10 text-center font-sans text-3xl tracking-tight md:text-5xl">
-                    Too many
-                    <br />
-                    research actions
-                    <br />
-                    to <span className="text-primary">handle?</span>
-                </h3>
-                {features.map((feature, index) => (
-                    <div
-                        key={index}
-                        className="absolute flex items-center gap-3 rounded-full border bg-card p-3 shadow-md animate-revolve"
-                        style={{ animationDelay: `${index * 3}s` }}
-                    >
-                        {feature.icon}
-                        <span className="text-muted-foreground">{feature.text}</span>
-                    </div>
-                ))}
+          <ScrollAnimation>
+            <div className="container mx-auto flex h-[500px] items-center justify-center px-4 md:px-6">
+              <div className="relative flex h-full w-full max-w-xl items-center justify-center">
+                  <h3 className="relative z-10 text-center font-sans text-3xl tracking-tight md:text-5xl">
+                      Too many
+                      <br />
+                      research actions
+                      <br />
+                      to <span className="text-primary">handle?</span>
+                  </h3>
+                  {features.map((feature, index) => (
+                      <div
+                          key={index}
+                          className="absolute flex items-center gap-3 rounded-full border bg-card p-3 shadow-md animate-revolve"
+                          style={{ animationDelay: `${index * 3}s` }}
+                      >
+                          {feature.icon}
+                          <span className="text-muted-foreground">{feature.text}</span>
+                      </div>
+                  ))}
+              </div>
             </div>
-          </div>
+          </ScrollAnimation>
         </section>
 
         <section id="how-it-works" className="w-full py-20 md:py-32 bg-muted/20">
-          <div className="container mx-auto px-4 md:px-6">
-            <div className="mx-auto max-w-5xl text-center space-y-4">
-              <h2 className="font-serif text-3xl tracking-tight md:text-5xl">
-                <GradientText>From Chat to Research Report, <span className="text-primary !bg-none">Instantly!</span></GradientText>
-              </h2>
-              <p className="max-w-3xl mx-auto text-lg text-muted-foreground">
-                Ever had a brilliant question snowball into something bigger? InsightForge doesn&apos;t just answer - it documents the journey:
-              </p>
+          <ScrollAnimation>
+            <div className="container mx-auto px-4 md:px-6">
+              <div className="mx-auto max-w-5xl text-center space-y-4">
+                <h2 className="font-serif text-3xl tracking-tight md:text-5xl">
+                  <GradientText>From Chat to Research Report, <span className="text-primary !bg-none">Instantly!</span></GradientText>
+                </h2>
+                <p className="max-w-3xl mx-auto text-lg text-muted-foreground">
+                  Ever had a brilliant question snowball into something bigger? InsightForge doesn&apos;t just answer - it documents the journey:
+                </p>
+              </div>
+              <div className="mt-16 grid grid-cols-1 gap-x-8 gap-y-12 md:grid-cols-4">
+                {processSteps.map((step, index) => (
+                  <ScrollAnimation key={index} delay={index * 0.1}>
+                    <div className="flex flex-col items-start text-left">
+                      <p className="font-serif text-7xl text-muted-foreground/50">0{index + 1}</p>
+                      <h3 className="mt-4 text-xl font-semibold text-primary">{step.title}</h3>
+                      <p className="mt-2 text-base text-muted-foreground">{step.description}</p>
+                    </div>
+                  </ScrollAnimation>
+                ))}
+              </div>
             </div>
-            <div className="mt-16 grid grid-cols-1 gap-x-8 gap-y-12 md:grid-cols-4">
-              {processSteps.map((step, index) => (
-                <div key={index} className="flex flex-col items-start text-left">
-                  <p className="font-serif text-7xl text-muted-foreground/50">0{index + 1}</p>
-                  <h3 className="mt-4 text-xl font-semibold text-primary">{step.title}</h3>
-                  <p className="mt-2 text-base text-muted-foreground">{step.description}</p>
-                </div>
-              ))}
-            </div>
-          </div>
+          </ScrollAnimation>
         </section>
 
         <section id="reports" className="w-full py-20 md:py-32 bg-background relative overflow-hidden">
-          <div
-              className="absolute inset-y-0 right-0 -z-10 w-1/2"
-              style={{
-                  backgroundImage:
-                  'radial-gradient(circle at 100% 50%, hsl(var(--primary) / 0.1), transparent 50%)',
-              }}
-          />
-          <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center px-4 md:px-6">
-            <div className="space-y-4">
-              <h2 className="font-serif text-4xl tracking-tight md:text-6xl">
-                Your Research Library,
-                <br />
-                <span className="text-primary">Reimagined.</span>
-              </h2>
+          <ScrollAnimation>
+            <div
+                className="absolute inset-y-0 right-0 -z-10 w-1/2"
+                style={{
+                    backgroundImage:
+                    'radial-gradient(circle at 100% 50%, hsl(var(--primary) / 0.1), transparent 50%)',
+                }}
+            />
+            <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center px-4 md:px-6">
+              <div className="space-y-4">
+                <h2 className="font-serif text-4xl tracking-tight md:text-6xl">
+                  Your Research Library,
+                  <br />
+                  <span className="text-primary">Reimagined.</span>
+                </h2>
+              </div>
+              <div className="space-y-4 text-right">
+                <p className="text-muted-foreground">
+                  Everything you ask.
+                  <br />
+                  Everything you get.
+                  <br />
+                  Neatly organized under:
+                </p>
+              </div>
+              <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-x-12 gap-y-8 mt-12">
+                {libraryFeatures.map((feature, index) => (
+                  <ScrollAnimation key={feature.title} delay={index * 0.1}>
+                    <div className="space-y-4">
+                      <h3 className="text-xl font-semibold text-primary">{feature.title}</h3>
+                      <Separator />
+                      <p className="text-muted-foreground">{feature.description}</p>
+                    </div>
+                  </ScrollAnimation>
+                ))}
+              </div>
             </div>
-            <div className="space-y-4 text-right">
-              <p className="text-muted-foreground">
-                Everything you ask.
-                <br />
-                Everything you get.
-                <br />
-                Neatly organized under:
-              </p>
-            </div>
-            <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-x-12 gap-y-8 mt-12">
-              {libraryFeatures.map((feature) => (
-                <div key={feature.title} className="space-y-4">
-                  <h3 className="text-xl font-semibold text-primary">{feature.title}</h3>
-                  <Separator />
-                  <p className="text-muted-foreground">{feature.description}</p>
-                </div>
-              ))}
-            </div>
-          </div>
+          </ScrollAnimation>
         </section>
 
         <section id="pricing" className="w-full py-20 md:py-32 bg-muted/20">
-          <div className="container mx-auto px-4 md:px-6">
-            <div className="mx-auto max-w-5xl text-center space-y-4">
-              <h2 className="font-serif text-3xl tracking-tight md:text-5xl">
-                <GradientText>Flexible Plans for Every Need</GradientText>
-              </h2>
-              <p className="max-w-3xl mx-auto text-lg text-muted-foreground">
-                Choose the plan that's right for you and unlock the full power of AI-driven research.
-              </p>
-            </div>
-            <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-              {[pricingPlans.free, pricingPlans.pro].map((plan, index) => (
-                <div key={plan.title} className={cn("rounded-xl p-8 flex flex-col", index === 0 ? "bg-card" : "bg-card border-2 border-primary shadow-lg")}>
-                  <div className="flex-grow">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="text-2xl font-bold">{plan.title}</h3>
-                        <p className="text-muted-foreground mt-1">{plan.description}</p>
+          <ScrollAnimation>
+            <div className="container mx-auto px-4 md:px-6">
+              <div className="mx-auto max-w-5xl text-center space-y-4">
+                <h2 className="font-serif text-3xl tracking-tight md:text-5xl">
+                  <GradientText>Flexible Plans for Every Need</GradientText>
+                </h2>
+                <p className="max-w-3xl mx-auto text-lg text-muted-foreground">
+                  Choose the plan that's right for you and unlock the full power of AI-driven research.
+                </p>
+              </div>
+              <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                {[pricingPlans.free, pricingPlans.pro].map((plan, index) => (
+                  <ScrollAnimation key={plan.title} delay={index * 0.1}>
+                    <div className={cn("rounded-xl p-8 flex flex-col h-full", index === 0 ? "bg-card" : "bg-card border-2 border-primary shadow-lg")}>
+                      <div className="flex-grow">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <h3 className="text-2xl font-bold">{plan.title}</h3>
+                            <p className="text-muted-foreground mt-1">{plan.description}</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-4xl font-bold text-primary">{plan.price}</p>
+                            <p className="text-muted-foreground">month</p>
+                          </div>
+                        </div>
+                        <ul className="mt-8 space-y-4">
+                          {plan.features.map((feature) => (
+                            <li key={feature} className="flex items-center gap-3">
+                              <Check className="h-5 w-5 text-primary" />
+                              <span>{feature}</span>
+                            </li>
+                          ))}
+                        </ul>
                       </div>
-                      <div className="text-right">
-                        <p className="text-4xl font-bold text-primary">{plan.price}</p>
-                        <p className="text-muted-foreground">month</p>
+                      <div className="mt-8">
+                        <p className="text-sm text-muted-foreground">{plan.footer}</p>
                       </div>
                     </div>
-                    <ul className="mt-8 space-y-4">
-                      {plan.features.map((feature) => (
-                        <li key={feature} className="flex items-center gap-3">
-                          <Check className="h-5 w-5 text-primary" />
-                          <span>{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div className="mt-8">
-                    <p className="text-sm text-muted-foreground">{plan.footer}</p>
-                  </div>
-                </div>
-              ))}
+                  </ScrollAnimation>
+                ))}
+              </div>
             </div>
-          </div>
+          </ScrollAnimation>
         </section>
 
       </main>
