@@ -9,6 +9,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { jsPDF } from 'jspdf';
 import { ArrowUp, Trash2, BookOpen, FileText, ListEnd, CheckCircle2, Lightbulb, Hourglass, Check, Plus } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 import type { GenerateReportOutput } from '@/ai/flows/generate-report';
 import { useLocalStorage } from '@/hooks/use-local-storage';
@@ -453,16 +454,27 @@ export default function Home() {
                       <br />
                       to <span className="text-primary">handle?</span>
                   </h3>
-                  {features.map((feature, index) => (
-                      <div
-                          key={index}
-                          className="absolute flex items-center gap-3 rounded-full border bg-card p-3 shadow-md animate-revolve"
-                          style={{ animationDelay: `${index * 3}s` }}
-                      >
-                          {feature.icon}
-                          <span className="text-muted-foreground">{feature.text}</span>
-                      </div>
-                  ))}
+                  <motion.div 
+                    className="absolute w-full h-full"
+                    animate={{ rotate: 360 }}
+                    transition={{ ease: "linear", duration: 18, repeat: Infinity }}
+                  >
+                    {features.map((feature, index) => {
+                      const angle = (index / features.length) * 360;
+                      return (
+                        <div
+                            key={index}
+                            className="absolute flex items-center gap-3 rounded-full border bg-card p-3 shadow-md"
+                            style={{ 
+                              transform: `rotate(${angle}deg) translateX(200px) rotate(-${angle}deg)` 
+                            }}
+                        >
+                            {feature.icon}
+                            <span className="text-muted-foreground">{feature.text}</span>
+                        </div>
+                      )
+                    })}
+                  </motion.div>
               </div>
             </div>
           </ScrollAnimation>
