@@ -41,12 +41,6 @@ export default function Home() {
   const { toast } = useToast();
   const pageTopRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (pageTopRef.current) {
-        pageTopRef.current.scrollIntoView({ behavior: 'auto' });
-    }
-  }, []);
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
