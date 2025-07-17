@@ -353,12 +353,7 @@ export default function Home() {
         <section className="container mx-auto px-4 md:px-6">
             <div className="relative flex min-h-[calc(100vh-12rem)] flex-col items-center justify-center text-center">
               <div
-                  className="absolute inset-0 -z-10"
-                  style={{
-                      backgroundImage:
-                      'radial-gradient(circle at top left, hsl(var(--primary) / 0.1), transparent 30%),' +
-                      'radial-gradient(circle at bottom right, hsl(var(--accent) / 0.1), transparent 30%)',
-                  }}
+                  className="absolute inset-0 -z-10 bg-gradient-to-r from-purple-200/20 via-green-100/20 to-lime-200/20 dark:from-purple-900/20 dark:via-green-900/20 dark:to-lime-900/20"
               />
               <div className="max-w-3xl space-y-4">
                   <h2 className="font-sans text-3xl font-bold tracking-tight md:text-5xl">
