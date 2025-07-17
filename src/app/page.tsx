@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState } from 'react';
@@ -245,7 +244,7 @@ export default function Home() {
                   }}
               />
               <div className="max-w-3xl space-y-4">
-                  <h2 className="font-serif text-4xl font-bold tracking-tight md:text-6xl">
+                  <h2 className="font-sans text-3xl font-bold tracking-tight md:text-5xl">
                     Generate In-depth Reports with AI
                   </h2>
                   <p className="text-lg text-muted-foreground">
