@@ -281,7 +281,7 @@ export default function Home() {
     free: {
       title: 'Free Plan',
       description: 'Perfect for light explorers.',
-      price: '$0',
+      price: '₹0',
       features: [
         '10 Research Credits per month',
         '5 Deep Research Requests',
@@ -295,7 +295,7 @@ export default function Home() {
     pro: {
       title: 'Pro Plan',
       description: 'For serious researchers and innovation teams.',
-      price: '$19',
+      price: '₹250',
       features: [
         'Unlimited Research Credits per month',
         '50 Deep Research Requests',
