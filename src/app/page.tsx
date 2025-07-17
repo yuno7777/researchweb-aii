@@ -25,6 +25,7 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import { GradientText } from '@/components/GradientText';
 import { cn } from '@/lib/utils';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { ScrollAnimation } from '@/components/ScrollAnimation';
 
 const formSchema = z.object({
   topic: z.string().min(3, { message: "Topic must be at least 3 characters long." }).max(100, { message: "Topic must be at most 100 characters long." }),
@@ -234,32 +235,32 @@ export default function Home() {
 
   const features = [
     {
-      icon: <BrainCircuit className="w-8 h-8 text-primary" />,
+      icon: <BrainCircuit className="h-8 w-8 text-primary" />,
       title: "AI-Powered Analysis",
       description: "Leverage generative AI to analyze complex topics and produce structured, insightful report sections from a single prompt.",
     },
     {
-      icon: <FileText className="w-8 h-8 text-primary" />,
+      icon: <FileText className="h-8 w-8 text-primary" />,
       title: "Structured Reports",
       description: "Automatically generate reports with standard sections like Introduction, History, Benefits, and Challenges for a comprehensive overview.",
     },
     {
-      icon: <Search className="w-8 h-8 text-primary" />,
+      icon: <Search className="h-8 w-8 text-primary" />,
       title: "Deep Research",
       description: "Go beyond surface-level searches. Our Deep Research mode performs iterative analysis to uncover verified, in-depth insights.",
     },
     {
-      icon: <BookOpen className="w-8 h-8 text-primary" />,
+      icon: <BookOpen className="h-8 w-8 text-primary" />,
       title: "In-Place Editing",
       description: "Refine and customize your generated report directly in the browser with a simple, intuitive editor for each section.",
     },
     {
-      icon: <Bot className="w-8 h-8 text-primary" />,
+      icon: <Bot className="h-8 w-8 text-primary" />,
       title: "Intelligent Summaries",
       description: "Quickly get the gist of any topic. The AI compiles and summarizes key findings into executive-ready summaries.",
     },
     {
-      icon: <ListEnd className="w-8 h-8 text-primary" />,
+      icon: <ListEnd className="h-8 w-8 text-primary" />,
       title: "Query History",
       description: "Never lose your train of thought. Access your previous research topics and regenerate reports with a single click.",
     },
@@ -470,7 +471,7 @@ export default function Home() {
         </section>
 
         <section id="features" className="w-full py-20 md:py-32 bg-background">
-          
+          <ScrollAnimation>
             <div className="container mx-auto px-4 md:px-6">
                 <div className="mx-auto max-w-5xl text-center space-y-4 mb-16">
                     <h2 className="font-serif text-3xl tracking-tight md:text-5xl">
@@ -495,11 +496,11 @@ export default function Home() {
                     ))}
                 </div>
             </div>
-          
+          </ScrollAnimation>
         </section>
 
         <section id="how-it-works" className="w-full py-20 md:py-32 bg-muted/20">
-          
+          <ScrollAnimation>
             <div className="container mx-auto px-4 md:px-6">
               <div className="mx-auto max-w-5xl text-center space-y-4">
                 <h2 className="font-serif text-3xl tracking-tight md:text-5xl">
@@ -521,11 +522,11 @@ export default function Home() {
                 ))}
               </div>
             </div>
-          
+          </ScrollAnimation>
         </section>
 
         <section id="reports" className="w-full py-20 md:py-32 bg-background relative overflow-hidden">
-          
+          <ScrollAnimation>
             <div
                 className="absolute inset-y-0 right-0 -z-10 w-1/2"
                 style={{
@@ -562,11 +563,11 @@ export default function Home() {
                 ))}
               </div>
             </div>
-          
+          </ScrollAnimation>
         </section>
 
         <section id="pricing" className="w-full py-20 md:py-32 bg-muted/20">
-          
+          <ScrollAnimation>
             <div className="container mx-auto px-4 md:px-6">
               <div className="mx-auto max-w-5xl text-center space-y-4">
                 <h2 className="font-serif text-3xl tracking-tight md:text-5xl">
@@ -608,11 +609,11 @@ export default function Home() {
                 ))}
               </div>
             </div>
-          
+          </ScrollAnimation>
         </section>
 
         <section id="faq" className="w-full py-20 md:py-32 bg-background">
-          
+          <ScrollAnimation>
             <div className="container mx-auto max-w-4xl px-4 md:px-6">
                 <h2 className="text-center font-serif text-3xl tracking-tight md:text-5xl mb-12">
                   <GradientText>Frequently Asked Questions</GradientText>
@@ -630,7 +631,7 @@ export default function Home() {
                   ))}
                 </Accordion>
             </div>
-          
+          </ScrollAnimation>
         </section>
 
       </main>
