@@ -373,7 +373,7 @@ export default function Home() {
 
 
   return (
-    <div id="home" className="flex min-h-screen w-full flex-col bg-background text-foreground">
+    <div id="home" className="flex min-h-screen w-full flex-col bg-background text-foreground" suppressHydrationWarning>
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
             <a href="#home">
