@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { jsPDF } from 'jspdf';
-import { ArrowUp, Trash2 } from 'lucide-react';
+import { ArrowUp, Trash2, BookOpen, FileText, ListEnd, CheckCircle2, Lightbulb, Hourglass } from 'lucide-react';
 
 import type { GenerateReportOutput } from '@/ai/flows/generate-report';
 import { useLocalStorage } from '@/hooks/use-local-storage';
@@ -86,7 +86,6 @@ export default function Home() {
 
     const capitalizeTitle = (title: string) => {
       if (!title) return '';
-      // A simple regex to find words and capitalize them
       return title.replace(/\b\w/g, char => char.toUpperCase());
     };
     
@@ -166,16 +165,12 @@ export default function Home() {
                 const sectionContent = report[sectionKey];
                 const sectionTitleText = sectionTitles[sectionKey];
                 
-                // Store current font state before changing it for the title
-                const currentFont = { style: pdf.getFont().fontStyle, size: pdf.getFontSize(), color: pdf.getTextColor() };
-                
                 pdf.setFont('helvetica', 'bold');
                 pdf.setFontSize(16);
                 pdf.setTextColor(49, 53, 57);
 
                 if (y + 25 > pageHeight - pageMargin) { 
                     addPageWithHeaderFooter();
-                    // Re-apply font style for title after page break
                     pdf.setFont('helvetica', 'bold');
                     pdf.setFontSize(16);
                     pdf.setTextColor(49, 53, 57);
@@ -189,18 +184,16 @@ export default function Home() {
                 pdf.line(pageMargin, y, contentWidth + pageMargin, y);
                 y += 8;
                 
-                // Restore font for body content
                 pdf.setFont('helvetica', 'normal');
                 pdf.setFontSize(12);
                 pdf.setTextColor(33, 37, 41);
                 
                 const contentLines = pdf.splitTextToSize(sectionContent, contentWidth);
-                const lineHeight = 8; // Increased line height
+                const lineHeight = 8; 
 
                 contentLines.forEach((line: string) => {
                     if (y + lineHeight > pageHeight - pageMargin) {
                         addPageWithHeaderFooter();
-                        // Restore font for body content after page break
                         pdf.setFont('helvetica', 'normal');
                         pdf.setFontSize(12);
                         pdf.setTextColor(33, 37, 41);
@@ -224,6 +217,15 @@ export default function Home() {
 
   const navLinks = ["Features", "How It Works", "Reports", "Pricing", "FAQ"];
 
+  const features = [
+    { icon: <BookOpen />, text: "Learns your style", gridArea: "1 / 1 / 2 / 2" },
+    { icon: <FileText />, text: "Creates draft reports", gridArea: "1 / 3 / 2 / 4" },
+    { icon: <Hourglass />, text: "Respects your time", gridArea: "2 / 1 / 3 / 2" },
+    { icon: <ListEnd />, text: "Summarizes & compiles", gridArea: "2 / 3 / 3 / 4" },
+    { icon: <Lightbulb />, text: "Understands your asks", gridArea: "3 / 1 / 4 / 2" },
+    { icon: <CheckCircle2 />, text: "Finds verified sources", gridArea: "3 / 3 / 4 / 4" },
+  ];
+
   return (
     <div className="flex min-h-screen w-full flex-col bg-background text-foreground" suppressHydrationWarning>
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -240,7 +242,7 @@ export default function Home() {
       </header>
 
       <main className="flex-1">
-        <div className="container mx-auto px-4 md:px-6">
+        <section className="container mx-auto px-4 md:px-6">
             <div className="relative flex min-h-[calc(100vh-12rem)] flex-col items-center justify-center text-center">
               <div
                   className="absolute inset-0 -z-10"
@@ -332,7 +334,29 @@ export default function Home() {
                   </div>
               </div>
             )}
-        </div>
+        </section>
+
+        <section className="w-full py-20 md:py-32">
+          <div className="container mx-auto px-4 md:px-6">
+            <div className="grid grid-cols-[1fr_auto_1fr] grid-rows-3 items-center gap-x-8 gap-y-4 md:gap-x-16">
+              {features.map((feature, index) => (
+                <div key={index} className="flex items-center gap-3" style={{ gridArea: feature.gridArea }}>
+                  {feature.icon}
+                  <span className="text-muted-foreground">{feature.text}</span>
+                </div>
+              ))}
+              <div className="text-center" style={{ gridArea: '1 / 2 / 4 / 3' }}>
+                <h3 className="font-serif text-3xl md:text-5xl tracking-tight">
+                  Too many
+                  <br />
+                  research actions
+                  <br />
+                  to <span className="text-primary">handle?</span>
+                </h3>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
     </div>
   );
