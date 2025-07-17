@@ -8,7 +8,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { jsPDF } from 'jspdf';
-import { ArrowUp, Trash2, BookOpen, FileText, ListEnd, CheckCircle2, Lightbulb, Hourglass, Check } from 'lucide-react';
+import { ArrowUp, Trash2, BookOpen, FileText, ListEnd, CheckCircle2, Lightbulb, Hourglass, Check, Plus } from 'lucide-react';
 
 import type { GenerateReportOutput } from '@/ai/flows/generate-report';
 import { useLocalStorage } from '@/hooks/use-local-storage';
@@ -25,6 +25,7 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import { GradientText } from '@/components/GradientText';
 import { cn } from '@/lib/utils';
 import { ScrollAnimation } from '@/components/ScrollAnimation';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 const formSchema = z.object({
   topic: z.string().min(3, { message: "Topic must be at least 3 characters long." }).max(100, { message: "Topic must be at most 100 characters long." }),
@@ -225,7 +226,7 @@ export default function Home() {
     { name: "How It Works", href: "#how-it-works" },
     { name: "Reports", href: "#reports" },
     { name: "Pricing", href: "#pricing" },
-    { name: "FAQ", href: "#" },
+    { name: "FAQ", href: "#faq" },
   ];
 
   const features = [
@@ -304,6 +305,33 @@ export default function Home() {
       footer: 'Push the boundaries of discovery without limits.'
     }
   };
+
+  const faqItems = [
+    {
+      question: "What is InsightForge?",
+      answer: "InsightForge is an AI-powered research assistant designed to help you generate comprehensive, well-structured reports on any topic. It uses advanced AI to gather, analyze, and present information, saving you time and effort."
+    },
+    {
+      question: "How do I get started with InsightForge?",
+      answer: "Getting started is simple! Just type a topic into the search bar on the homepage and click the generate button. Our AI will then create a detailed report for you in seconds. You can then edit, save, or export the report as needed."
+    },
+    {
+      question: "What types of reports can I create?",
+      answer: "You can create a wide variety of reports on virtually any subject, from scientific research and market analysis to historical summaries and technical papers. The AI is designed to be versatile and can adapt to different content requirements."
+    },
+    {
+      question: "Is InsightForge free to use?",
+      answer: "Yes, we offer a free plan with a generous number of credits per month, which is perfect for casual users and exploring the platform. For more intensive research needs, our Pro plan offers unlimited access and advanced features."
+    },
+    {
+      question: "Can I use InsightForge on mobile devices?",
+      answer: "Absolutely! InsightForge is fully responsive and works seamlessly on desktops, tablets, and mobile phones. You can conduct research and generate reports from anywhere, at any time."
+    },
+    {
+      question: "How does the deep research assistant work?",
+      answer: "The deep research feature performs an iterative and in-depth analysis of web and data sources. It goes beyond a simple search to synthesize information, identify key trends, and provide verified insights, ensuring your reports are both comprehensive and reliable."
+    }
+  ];
 
 
   return (
@@ -556,14 +584,30 @@ export default function Home() {
           </ScrollAnimation>
         </section>
 
+        <section id="faq" className="w-full py-20 md:py-32 bg-background">
+          <ScrollAnimation>
+            <div className="container mx-auto max-w-4xl px-4 md:px-6">
+                <h2 className="text-center font-serif text-3xl tracking-tight md:text-5xl mb-12">
+                  <GradientText>Frequently Asked Questions</GradientText>
+                </h2>
+                <Accordion type="single" collapsible className="w-full">
+                  {faqItems.map((item, index) => (
+                      <AccordionItem value={`item-${index}`} key={index}>
+                        <AccordionTrigger className="text-lg text-left hover:no-underline">
+                          {item.question}
+                        </AccordionTrigger>
+                        <AccordionContent className="text-base text-muted-foreground">
+                          {item.answer}
+                        </AccordionContent>
+                      </AccordionItem>
+                  ))}
+                </Accordion>
+            </div>
+          </ScrollAnimation>
+        </section>
+
       </main>
     </div>
   );
 
-    
-
-
-
-
-
-    
+}
