@@ -8,7 +8,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { jsPDF } from 'jspdf';
-import { ArrowUp, Trash2, BookOpen, FileText, ListEnd, CheckCircle2, Lightbulb, Hourglass, Check, Plus } from 'lucide-react';
+import { ArrowUp, Trash2, BookOpen, FileText, ListEnd, CheckCircle2, Lightbulb, Hourglass, Check, Plus, Bot, Search, BrainCircuit } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 import type { GenerateReportOutput } from '@/ai/flows/generate-report';
@@ -231,12 +231,36 @@ export default function Home() {
   ];
 
   const features = [
-    { icon: <BookOpen />, text: "Learns your style" },
-    { icon: <FileText />, text: "Creates draft reports" },
-    { icon: <Hourglass />, text: "Respects your time" },
-    { icon: <ListEnd />, text: "Summarizes & compiles" },
-    { icon: <Lightbulb />, text: "Understands your asks" },
-    { icon: <CheckCircle2 />, text: "Finds verified sources" },
+    {
+      icon: <BrainCircuit className="w-8 h-8 text-primary" />,
+      title: "AI-Powered Analysis",
+      description: "Leverage generative AI to analyze complex topics and produce structured, insightful report sections from a single prompt.",
+    },
+    {
+      icon: <FileText className="w-8 h-8 text-primary" />,
+      title: "Structured Reports",
+      description: "Automatically generate reports with standard sections like Introduction, History, Benefits, and Challenges for a comprehensive overview.",
+    },
+    {
+      icon: <Search className="w-8 h-8 text-primary" />,
+      title: "Deep Research",
+      description: "Go beyond surface-level searches. Our Deep Research mode performs iterative analysis to uncover verified, in-depth insights.",
+    },
+    {
+      icon: <BookOpen className="w-8 h-8 text-primary" />,
+      title: "In-Place Editing",
+      description: "Refine and customize your generated report directly in the browser with a simple, intuitive editor for each section.",
+    },
+    {
+      icon: <Bot className="w-8 h-8 text-primary" />,
+      title: "Intelligent Summaries",
+      description: "Quickly get the gist of any topic. The AI compiles and summarizes key findings into executive-ready summaries.",
+    },
+    {
+      icon: <ListEnd className="w-8 h-8 text-primary" />,
+      title: "Query History",
+      description: "Never lose your train of thought. Access your previous research topics and regenerate reports with a single click.",
+    },
   ];
 
   const processSteps = [
@@ -445,37 +469,29 @@ export default function Home() {
 
         <section id="features" className="w-full py-20 md:py-32 bg-background">
           <ScrollAnimation>
-            <div className="container mx-auto flex h-[500px] items-center justify-center px-4 md:px-6">
-              <div className="relative flex h-full w-full max-w-xl items-center justify-center">
-                  <h3 className="relative z-10 text-center font-sans text-3xl tracking-tight md:text-5xl">
-                      Too many
-                      <br />
-                      research actions
-                      <br />
-                      to <span className="text-primary">handle?</span>
-                  </h3>
-                  <motion.div 
-                    className="absolute w-full h-full"
-                    animate={{ rotate: 360 }}
-                    transition={{ ease: "linear", duration: 18, repeat: Infinity }}
-                  >
-                    {features.map((feature, index) => {
-                      const angle = (index / features.length) * 360;
-                      return (
-                        <div
-                            key={index}
-                            className="absolute flex items-center gap-3 rounded-full border bg-card p-3 shadow-md"
-                            style={{ 
-                              transform: `rotate(${angle}deg) translateX(200px) rotate(-${angle}deg)` 
-                            }}
-                        >
-                            {feature.icon}
-                            <span className="text-muted-foreground">{feature.text}</span>
+            <div className="container mx-auto px-4 md:px-6">
+                <div className="mx-auto max-w-5xl text-center space-y-4 mb-16">
+                    <h2 className="font-serif text-3xl tracking-tight md:text-5xl">
+                        <GradientText>An AI Research Assistant That Works For You</GradientText>
+                    </h2>
+                    <p className="max-w-3xl mx-auto text-lg text-muted-foreground">
+                        From automated report generation to in-depth analysis, InsightForge provides the tools you need to accelerate your research workflow.
+                    </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {features.map((feature, index) => (
+                      <ScrollAnimation key={index} delay={index * 0.1}>
+                        <div className="group relative rounded-xl p-px bg-gradient-to-br from-border to-transparent hover:from-primary/50 hover:to-transparent">
+                            <div className="h-full w-full rounded-[11px] bg-card p-6 space-y-4">
+                                {feature.icon}
+                                <h3 className="text-xl font-bold">{feature.title}</h3>
+                                <p className="text-muted-foreground">{feature.description}</p>
+                            </div>
                         </div>
-                      )
-                    })}
-                  </motion.div>
-              </div>
+                      </ScrollAnimation>
+                    ))}
+                </div>
             </div>
           </ScrollAnimation>
         </section>
