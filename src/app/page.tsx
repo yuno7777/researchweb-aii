@@ -24,7 +24,6 @@ import { Separator } from '@/components/ui/separator';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { GradientText } from '@/components/GradientText';
 import { cn } from '@/lib/utils';
-import { ScrollAnimation } from '@/components/ScrollAnimation';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 const formSchema = z.object({
@@ -471,7 +470,7 @@ export default function Home() {
         </section>
 
         <section id="features" className="w-full py-20 md:py-32 bg-background">
-          <ScrollAnimation>
+          
             <div className="container mx-auto px-4 md:px-6">
                 <div className="mx-auto max-w-5xl text-center space-y-4 mb-16">
                     <h2 className="font-serif text-3xl tracking-tight md:text-5xl">
@@ -484,23 +483,23 @@ export default function Home() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {features.map((feature, index) => (
-                      <ScrollAnimation key={index} delay={index * 0.1}>
-                        <div className="group relative rounded-xl p-px bg-gradient-to-br from-border to-transparent hover:from-primary/50 hover:to-transparent">
+                      
+                        <div key={index} className="group relative rounded-xl p-px bg-gradient-to-br from-border to-transparent hover:from-primary/50 hover:to-transparent">
                             <div className="h-full w-full rounded-[11px] bg-card p-6 space-y-4">
                                 {feature.icon}
                                 <h3 className="text-xl font-bold">{feature.title}</h3>
                                 <p className="text-muted-foreground">{feature.description}</p>
                             </div>
                         </div>
-                      </ScrollAnimation>
+                      
                     ))}
                 </div>
             </div>
-          </ScrollAnimation>
+          
         </section>
 
         <section id="how-it-works" className="w-full py-20 md:py-32 bg-muted/20">
-          <ScrollAnimation>
+          
             <div className="container mx-auto px-4 md:px-6">
               <div className="mx-auto max-w-5xl text-center space-y-4">
                 <h2 className="font-serif text-3xl tracking-tight md:text-5xl">
@@ -512,21 +511,21 @@ export default function Home() {
               </div>
               <div className="mt-16 grid grid-cols-1 gap-x-8 gap-y-12 md:grid-cols-4">
                 {processSteps.map((step, index) => (
-                  <ScrollAnimation key={index} delay={index * 0.1}>
-                    <div className="flex flex-col items-start text-left">
+                  
+                    <div key={index} className="flex flex-col items-start text-left">
                       <p className="font-serif text-7xl text-muted-foreground/50">0{index + 1}</p>
                       <h3 className="mt-4 text-xl font-semibold text-primary">{step.title}</h3>
                       <p className="mt-2 text-base text-muted-foreground">{step.description}</p>
                     </div>
-                  </ScrollAnimation>
+                  
                 ))}
               </div>
             </div>
-          </ScrollAnimation>
+          
         </section>
 
         <section id="reports" className="w-full py-20 md:py-32 bg-background relative overflow-hidden">
-          <ScrollAnimation>
+          
             <div
                 className="absolute inset-y-0 right-0 -z-10 w-1/2"
                 style={{
@@ -553,21 +552,21 @@ export default function Home() {
               </div>
               <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-x-12 gap-y-8 mt-12">
                 {libraryFeatures.map((feature, index) => (
-                  <ScrollAnimation key={feature.title} delay={index * 0.1}>
-                    <div className="space-y-4">
+                  
+                    <div key={feature.title} className="space-y-4">
                       <h3 className="text-xl font-semibold text-primary">{feature.title}</h3>
                       <Separator />
                       <p className="text-muted-foreground">{feature.description}</p>
                     </div>
-                  </ScrollAnimation>
+                  
                 ))}
               </div>
             </div>
-          </ScrollAnimation>
+          
         </section>
 
         <section id="pricing" className="w-full py-20 md:py-32 bg-muted/20">
-          <ScrollAnimation>
+          
             <div className="container mx-auto px-4 md:px-6">
               <div className="mx-auto max-w-5xl text-center space-y-4">
                 <h2 className="font-serif text-3xl tracking-tight md:text-5xl">
@@ -579,8 +578,8 @@ export default function Home() {
               </div>
               <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
                 {[pricingPlans.free, pricingPlans.pro].map((plan, index) => (
-                  <ScrollAnimation key={plan.title} delay={index * 0.1}>
-                    <div className={cn("rounded-xl p-8 flex flex-col h-full", index === 0 ? "bg-card" : "bg-card border-2 border-primary shadow-lg")}>
+                  
+                    <div key={plan.title} className={cn("rounded-xl p-8 flex flex-col h-full", index === 0 ? "bg-card" : "bg-card border-2 border-primary shadow-lg")}>
                       <div className="flex-grow">
                         <div className="flex justify-between items-start">
                           <div>
@@ -605,15 +604,15 @@ export default function Home() {
                         <p className="text-sm text-muted-foreground">{plan.footer}</p>
                       </div>
                     </div>
-                  </ScrollAnimation>
+                  
                 ))}
               </div>
             </div>
-          </ScrollAnimation>
+          
         </section>
 
         <section id="faq" className="w-full py-20 md:py-32 bg-background">
-          <ScrollAnimation>
+          
             <div className="container mx-auto max-w-4xl px-4 md:px-6">
                 <h2 className="text-center font-serif text-3xl tracking-tight md:text-5xl mb-12">
                   <GradientText>Frequently Asked Questions</GradientText>
@@ -631,7 +630,7 @@ export default function Home() {
                   ))}
                 </Accordion>
             </div>
-          </ScrollAnimation>
+          
         </section>
 
       </main>
