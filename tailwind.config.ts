@@ -17,8 +17,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Manrope', 'sans-serif'],
-        serif: ['Playfair Display', 'serif'],
+        sans: ['Inter', 'sans-serif'],
+        serif: ['Inter', 'sans-serif'],
       },
       colors: {
         background: 'hsl(var(--background))',

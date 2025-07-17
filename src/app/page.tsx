@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { jsPDF } from 'jspdf';
-import { ArrowUp, Trash2, BookOpen, FileText, ListEnd, CheckCircle2, Lightbulb, Hourglass, Check, Plus, Bot, Search, BrainCircuit } from 'lucide-react';
+import { ArrowUp, Trash2, BookOpen, FileText, ListEnd, CheckCircle2, Lightbulb, Hourglass, Check, Plus, Bot, Search, BrainCircuit, Mic, FileDigit, Code } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 import type { GenerateReportOutput } from '@/ai/flows/generate-report';
@@ -242,12 +242,12 @@ export default function Home() {
     {
       icon: <FileText className="h-8 w-8 text-primary" />,
       title: "Structured Reports",
-      description: "Automatically generate reports with standard sections like Introduction, History, Benefits, and Challenges for a comprehensive overview.",
+      description: "Automatically generate reports with standard sections like Introduction, History, Benefits, and Challenges.",
     },
     {
       icon: <Search className="h-8 w-8 text-primary" />,
       title: "Deep Research",
-      description: "Go beyond surface-level searches. Our Deep Research mode performs iterative analysis to uncover verified, in-depth insights.",
+      description: "Go beyond surface-level searches. Our Deep Research mode performs iterative analysis to uncover verified insights.",
     },
     {
       icon: <BookOpen className="h-8 w-8 text-primary" />,
@@ -255,14 +255,24 @@ export default function Home() {
       description: "Refine and customize your generated report directly in the browser with a simple, intuitive editor for each section.",
     },
     {
-      icon: <Bot className="h-8 w-8 text-primary" />,
-      title: "Intelligent Summaries",
-      description: "Quickly get the gist of any topic. The AI compiles and summarizes key findings into executive-ready summaries.",
+      icon: <FileDigit className="h-8 w-8 text-primary" />,
+      title: 'PDF & TXT Exports',
+      description: 'Export your finalized reports in multiple formats, including selectable-text PDFs and plain text files for easy sharing.',
+    },
+    {
+      icon: <Mic className="h-8 w-8 text-primary" />,
+      title: 'Voice-to-Text',
+      description: 'Dictate your research queries or edit reports using your voice, offering a hands-free and accessible way to work.',
     },
     {
       icon: <ListEnd className="h-8 w-8 text-primary" />,
-      title: "Query History",
-      description: "Never lose your train of thought. Access your previous research topics and regenerate reports with a single click.",
+      title: 'Query History',
+      description: 'Never lose your train of thought. Access your previous research topics and regenerate reports with a single click.',
+    },
+    {
+      icon: <Code className="h-8 w-8 text-primary" />,
+      title: 'Developer Focused',
+      description: 'Built with developers in mind, offering a flexible and extensible platform for custom research workflows.',
     },
   ];
 
@@ -474,7 +484,7 @@ export default function Home() {
           <ScrollAnimation>
             <div className="container mx-auto px-4 md:px-6">
                 <div className="mx-auto max-w-5xl text-center space-y-4 mb-16">
-                    <h2 className="font-serif text-3xl tracking-tight md:text-5xl">
+                    <h2 className="font-sans text-3xl tracking-tight md:text-5xl">
                         <GradientText>An AI Research Assistant That Works For You</GradientText>
                     </h2>
                     <p className="max-w-3xl mx-auto text-lg text-muted-foreground">
@@ -482,18 +492,22 @@ export default function Home() {
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {features.map((feature, index) => (
-                      
-                        <div key={index} className="group relative rounded-xl p-px bg-gradient-to-br from-border to-transparent hover:from-primary/50 hover:to-transparent">
-                            <div className="h-full w-full rounded-[11px] bg-card p-6 space-y-4">
-                                {feature.icon}
-                                <h3 className="text-xl font-bold">{feature.title}</h3>
-                                <p className="text-muted-foreground">{feature.description}</p>
-                            </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                  {features.map((feature, index) => (
+                    <div
+                      key={index}
+                      className="group relative rounded-xl p-px transition-all duration-300 bg-zinc-900/50 hover:bg-zinc-800"
+                    >
+                      <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-primary/20 via-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      <div className="relative h-full w-full rounded-[11px] bg-card p-6 space-y-4">
+                        <div className="flex items-center gap-4">
+                          {feature.icon}
+                          <h3 className="text-lg font-bold">{feature.title}</h3>
                         </div>
-                      
-                    ))}
+                        <p className="text-muted-foreground">{feature.description}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
             </div>
           </ScrollAnimation>
@@ -503,7 +517,7 @@ export default function Home() {
           <ScrollAnimation>
             <div className="container mx-auto px-4 md:px-6">
               <div className="mx-auto max-w-5xl text-center space-y-4">
-                <h2 className="font-serif text-3xl tracking-tight md:text-5xl">
+                <h2 className="font-sans text-3xl tracking-tight md:text-5xl">
                   <GradientText>From Chat to Research Report, <span className="text-primary !bg-none">Instantly!</span></GradientText>
                 </h2>
                 <p className="max-w-3xl mx-auto text-lg text-muted-foreground">
@@ -514,7 +528,7 @@ export default function Home() {
                 {processSteps.map((step, index) => (
                   
                     <div key={index} className="flex flex-col items-start text-left">
-                      <p className="font-serif text-7xl text-muted-foreground/50">0{index + 1}</p>
+                      <p className="font-sans text-7xl text-muted-foreground/50">0{index + 1}</p>
                       <h3 className="mt-4 text-xl font-semibold text-primary">{step.title}</h3>
                       <p className="mt-2 text-base text-muted-foreground">{step.description}</p>
                     </div>
@@ -536,7 +550,7 @@ export default function Home() {
             />
             <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center px-4 md:px-6">
               <div className="space-y-4">
-                <h2 className="font-serif text-4xl tracking-tight md:text-6xl">
+                <h2 className="font-sans text-4xl tracking-tight md:text-6xl">
                   Your Research Library,
                   <br />
                   <span className="text-primary">Reimagined.</span>
@@ -570,7 +584,7 @@ export default function Home() {
           <ScrollAnimation>
             <div className="container mx-auto px-4 md:px-6">
               <div className="mx-auto max-w-5xl text-center space-y-4">
-                <h2 className="font-serif text-3xl tracking-tight md:text-5xl">
+                <h2 className="font-sans text-3xl tracking-tight md:text-5xl">
                   <GradientText>Flexible Plans for Every Need</GradientText>
                 </h2>
                 <p className="max-w-3xl mx-auto text-lg text-muted-foreground">
@@ -615,7 +629,7 @@ export default function Home() {
         <section id="faq" className="w-full py-20 md:py-32 bg-background">
           <ScrollAnimation>
             <div className="container mx-auto max-w-4xl px-4 md:px-6">
-                <h2 className="text-center font-serif text-3xl tracking-tight md:text-5xl mb-12">
+                <h2 className="text-center font-sans text-3xl tracking-tight md:text-5xl mb-12">
                   <GradientText>Frequently Asked Questions</GradientText>
                 </h2>
                 <Accordion type="single" collapsible className="w-full">
