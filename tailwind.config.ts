@@ -85,10 +85,10 @@ export default {
           },
         },
         'revolve': {
-          '0%': { transform: 'translateY(-200px) translateX(0px) rotate(0deg) translateX(150px) rotate(0deg)', opacity: '0' },
+          '0%': { transform: 'translateY(0px) translateX(0px) rotate(0deg) translateX(200px) rotate(0deg)', opacity: '0' },
           '15%': { opacity: '1' },
           '85%': { opacity: '1' },
-          '100%': { transform: 'translateY(-200px) translateX(0px) rotate(360deg) translateX(150px) rotate(-360deg)', opacity: '0' },
+          '100%': { transform: 'translateY(0px) translateX(0px) rotate(360deg) translateX(200px) rotate(-360deg)', opacity: '0' },
         },
       },
       animation: {
