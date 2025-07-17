@@ -86,7 +86,6 @@ export function ReportDisplay({ report, onReportUpdate, onExportPdf }: ReportDis
                           value={editContent}
                           onChange={(e) => setEditContent(e.target.value)}
                           className="min-h-[300px] text-base leading-relaxed rounded-lg"
-                          autoFocus
                       />
                       <div className="flex justify-end space-x-2">
                           <Button variant="ghost" size="sm" onClick={handleCancelClick} className="rounded-full"><X className="mr-2 h-4 w-4" />Cancel</Button>
