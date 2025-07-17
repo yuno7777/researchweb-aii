@@ -39,7 +39,10 @@ export default function Home() {
   const [history, setHistory] = useLocalStorage<string[]>('report-history', []);
   const [searchType, setSearchType] = useState<'web' | 'deep'>('web');
   const { toast } = useToast();
-  const pageTopRef = useRef<HTMLDivElement>(null);
+  
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -360,7 +363,7 @@ export default function Home() {
 
 
   return (
-    <div ref={pageTopRef} id="home" className="flex min-h-screen w-full flex-col bg-background text-foreground">
+    <div id="home" className="flex min-h-screen w-full flex-col bg-background text-foreground">
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
             <a href="#home">
