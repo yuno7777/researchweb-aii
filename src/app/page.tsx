@@ -26,6 +26,7 @@ import { HomePageContent } from '@/components/HomePageContent';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { ConciseReportDisplay } from '@/components/ConciseReportDisplay';
 
 const formSchema = z.object({
   topic: z.string().min(3, { message: "Topic must be at least 3 characters long." }).max(100, { message: "Topic must be at most 100 characters long." }),
@@ -92,11 +93,13 @@ export default function Home() {
         let pageNum = 1;
 
         const addPageHeaderAndFooter = () => {
-            pdf.setFontSize(9);
-            pdf.setFont('helvetica', 'italic');
-            pdf.setTextColor(150);
-            pdf.text(`Page ${pageNum}`, pdf.internal.pageSize.getWidth() / 2, pageHeight - 10, { align: 'center' });
-            pdf.setTextColor(0);
+            if (pageNum > 1) {
+              pdf.setFontSize(9);
+              pdf.setFont('helvetica', 'italic');
+              pdf.setTextColor(150);
+              pdf.text(`Page ${pageNum}`, pdf.internal.pageSize.getWidth() / 2, pageHeight - 10, { align: 'center' });
+              pdf.setTextColor(0);
+            }
         };
 
         const addPageWithHeaderFooter = () => {
@@ -182,10 +185,39 @@ export default function Home() {
           y += sectionTitleMargin; // Space after section
         };
         
+        const parseAndAddDeepReport = (reportText: string) => {
+          const subtitleRegex = /###\s*(.*?)(?:\s*|\n|:)/gi;
+          const sections = reportText.split(subtitleRegex);
+          // The first element is the text before the first subtitle, which we can ignore if it's empty.
+          if (sections[0].trim() === '') {
+            sections.shift();
+          }
+          
+          for (let i = 0; i < sections.length; i += 2) {
+              const title = sections[i].trim();
+              let content = sections[i + 1] ? sections[i+1].trim() : '';
+
+              const lines = content.split('\n').filter(line => line.trim() !== '');
+              const formattedContent: string[] = [];
+              lines.forEach(line => {
+                let cleanLine = line.replace(/\*\*(.*?)\*\*/g, '$1'); // Just remove bold markdown for PDF
+                // Handle list items
+                if (cleanLine.match(/^\s*([*•-])\s/)) {
+                  cleanLine = '• ' + cleanLine.replace(/^\s*([*•-])\s/, '');
+                } else if (cleanLine.match(/^\s*\d+\.\s/)) {
+                  cleanLine = '  ' + cleanLine; // Indent numbered items
+                }
+                formattedContent.push(cleanLine);
+              });
+
+              addSection(title, formattedContent.join('\n'));
+          }
+        };
+
         if (report) {
             addPageWithHeaderFooter();
 
-            if ('summary' in report && 'keyPoints' in report) { 
+            if (isConciseReport(report)) {
                  addSection('Summary', report.summary);
                  addSection('Key Points', report.keyPoints);
             } else if (isStandardReport(report)) {
@@ -488,24 +520,8 @@ export default function Home() {
                     </div>
                 {isConciseReport(report) ? (
                     <Card>
-                        <CardHeader>
-                            <CardTitle>Concise Report</CardTitle>
-                             <CardDescription>A brief summary and key takeaways about "{form.getValues('topic')}".</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-6">
-                            <div>
-                                <h3 className="font-semibold text-lg mb-2">Summary</h3>
-                                <p className="text-base text-muted-foreground leading-relaxed whitespace-pre-wrap">{report.summary}</p>
-                            </div>
-                            <Separator />
-                            <div>
-                                <h3 className="font-semibold text-lg mb-2">Key Points</h3>
-                                <ul className="space-y-2 list-disc list-inside text-muted-foreground">
-                                    {report.keyPoints.map((point, index) => (
-                                        <li key={index}>{point}</li>
-                                    ))}
-                                </ul>
-                            </div>
+                        <CardContent className="p-0">
+                           <ConciseReportDisplay report={report} onReportUpdate={handleReportUpdate} topic={form.getValues('topic')} />
                         </CardContent>
                     </Card>
                 ) : isDeepReport(report) ? (
@@ -515,7 +531,9 @@ export default function Home() {
                             <CardDescription>A deep-dive report about "{form.getValues('topic')}".</CardDescription>
                         </CardHeader>
                         <CardContent>
-                            {renderFormattedReport(report.report)}
+                            <div className="prose dark:prose-invert max-w-none">
+                                {renderFormattedReport(report.report)}
+                            </div>
                         </CardContent>
                     </Card>
                 ) : isStandardReport(report) ? (
