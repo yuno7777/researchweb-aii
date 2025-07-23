@@ -30,7 +30,7 @@ const StandardReportSchema = z.object({
 
 const ConciseReportSchema = z.object({
     summary: z.string().describe("A detailed, 300-word summary of the topic."),
-    keyPoints: z.array(z.string()).describe("A list of 3-5 key takeaways or bullet points about the topic."),
+    keyPoints: z.array(z.string()).describe("A list of 10-15 key takeaways or bullet points about the topic."),
 });
 
 const GenerateReportOutputSchema = z.object({
@@ -86,7 +86,7 @@ const conciseReportPrompt = ai.definePrompt({
     prompt: `You are an AI assistant specializing in creating concise yet comprehensive summaries. For the topic "{{{topic}}}", please provide the following:
 
 1.  A detailed summary of the topic, approximately 300 words in length.
-2.  A list of 3-5 key takeaways presented as bullet points.
+2.  A list of 10-15 key takeaways presented as bullet points.
 `,
 });
 
