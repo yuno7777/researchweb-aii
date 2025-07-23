@@ -16,7 +16,7 @@ const sectionsSchema = z.enum([
     "introduction",
     "history",
     "benefits",
-    "challenges",
+"challenges",
     "currentTrends",
     "futureScope"
 ]);
