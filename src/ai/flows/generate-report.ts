@@ -67,15 +67,17 @@ const deepResearchPrompt = ai.definePrompt({
     output: { schema: StandardReportSchema },
     prompt: `You are a panel of expert AI research analysts. Your task is to generate a highly detailed, academic-style report on the given topic, ensuring the total length is at least 1200 words. Your analysis must be thorough, insightful, and well-structured.
 
-For the topic "{{{topic}}}", provide an exhaustive and in-depth explanation for each of the following sections:
+IMPORTANT: Your response must be a valid JSON object that strictly adheres to the provided output schema.
 
-- Title: A concise and engaging title for the report.
-- Introduction: A compelling introduction that clearly defines the topic, explains its significance, and gives a detailed overview of what the report will cover. This should be a substantial section.
-- History: An in-depth look at the historical background of the topic, covering its origins, key milestones, and evolution.
-- Benefits: A detailed explanation of the topic's benefits, supported by examples or data. Discuss the positive impacts on society, industry, or individuals.
-- Challenges: A thorough analysis of the problems, difficulties, and criticisms related to the topic, including ethical, technical, or social hurdles.
-- Current Trends: A detailed analysis of the latest trends, recent research, and current events shaping the topic.
-- Future Scope: A thoughtful forecast of the topic's future, including potential innovations and long-term implications over the next decade.
+For the topic "{{{topic}}}", provide an exhaustive and in-depth explanation for each of the following JSON keys:
+
+- title: A concise and engaging title for the report.
+- introduction: A compelling introduction that clearly defines the topic, explains its significance, and gives a detailed overview of what the report will cover. This should be a substantial section.
+- history: An in-depth look at the historical background of the topic, covering its origins, key milestones, and evolution.
+- benefits: A detailed explanation of the topic's benefits, supported by examples or data. Discuss the positive impacts on society, industry, or individuals.
+- challenges: A thorough analysis of the problems, difficulties, and criticisms related to the topic, including ethical, technical, or social hurdles.
+- currentTrends: A detailed analysis of the latest trends, recent research, and current events shaping the topic.
+- futureScope: A thoughtful forecast of the topic's future, including potential innovations and long-term implications over the next decade.
 `,
 });
 
