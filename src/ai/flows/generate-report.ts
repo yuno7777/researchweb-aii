@@ -29,7 +29,8 @@ const StandardReportSchema = z.object({
 });
 
 const ConciseReportSchema = z.object({
-    conciseReport: z.string().describe("A single, dense paragraph summarizing the topic in a concise and easily digestible format."),
+    summary: z.string().describe("A detailed, 300-word summary of the topic."),
+    keyPoints: z.array(z.string()).describe("A list of 3-5 key takeaways or bullet points about the topic."),
 });
 
 const GenerateReportOutputSchema = z.object({
@@ -82,9 +83,10 @@ const conciseReportPrompt = ai.definePrompt({
     name: 'conciseReportPrompt',
     input: { schema: GenerateReportInputSchema },
     output: { schema: ConciseReportSchema },
-    prompt: `You are an AI assistant specializing in creating concise summaries. Your task is to generate a single, dense paragraph that summarizes the given topic. The summary should be easily digestible and capture the most critical aspects of the topic.
+    prompt: `You are an AI assistant specializing in creating concise yet comprehensive summaries. For the topic "{{{topic}}}", please provide the following:
 
-Topic: "{{{topic}}}"
+1.  A detailed summary of the topic, approximately 300 words in length.
+2.  A list of 3-5 key takeaways presented as bullet points.
 `,
 });
 

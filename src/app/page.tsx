@@ -187,7 +187,10 @@ export default function Home() {
 
 
         if (report) {
-            if ('conciseReport' in report) {
+            if ('summary' in report && 'keyPoints' in report) {
+                 addSection('Summary', report.summary);
+                 addSection('Key Points', report.keyPoints);
+            } else if ('conciseReport' in report) {
                  addSection('Concise Report', report.conciseReport);
             } else {
                 const sectionOrder: (keyof typeof report)[] = ['introduction', 'history', 'benefits', 'challenges', 'currentTrends', 'futureScope'];
@@ -257,8 +260,8 @@ export default function Home() {
     setIsLoading(false);
   };
 
-  const isConciseReport = (report: ReportData | null): report is { conciseReport: string } => {
-    return report !== null && 'conciseReport' in report;
+  const isConciseReport = (report: ReportData | null): report is { summary: string; keyPoints: string[] } => {
+    return report !== null && 'summary' in report && 'keyPoints' in report;
   };
 
   return (
@@ -359,19 +362,25 @@ export default function Home() {
                                 <p>Enable Deep Research for extensive academic-style analysis (2000+ words)</p>
                             </TooltipContent>
                         </Tooltip>
-
-                      <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setSearchType('concise')}
-                          className={cn(
-                              "rounded-full",
-                              searchType === 'concise' && 'bg-muted text-foreground'
-                          )}
-                      >
-                          <List className="h-4 w-4 mr-2" />
-                          Concise Response
-                      </Button>
+                      <Tooltip>
+                          <TooltipTrigger asChild>
+                              <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => setSearchType('concise')}
+                                  className={cn(
+                                      "rounded-full",
+                                      searchType === 'concise' && 'bg-muted text-foreground'
+                                  )}
+                              >
+                                  <List className="h-4 w-4 mr-2" />
+                                  Concise Response
+                              </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Concise search mode: Provides concise, fact-focused responses using internet sources</p>
+                          </TooltipContent>
+                      </Tooltip>
                     </TooltipProvider>
                   </div>
               </div>
@@ -387,8 +396,20 @@ export default function Home() {
                             <CardHeader>
                                 <CardTitle>Concise Report</CardTitle>
                             </CardHeader>
-                            <CardContent>
-                                <p className="text-base text-muted-foreground leading-relaxed whitespace-pre-wrap">{report.conciseReport}</p>
+                            <CardContent className="space-y-6">
+                                <div>
+                                    <h3 className="font-semibold text-lg mb-2">Summary</h3>
+                                    <p className="text-base text-muted-foreground leading-relaxed whitespace-pre-wrap">{report.summary}</p>
+                                </div>
+                                <Separator />
+                                <div>
+                                    <h3 className="font-semibold text-lg mb-2">Key Points</h3>
+                                    <ul className="space-y-2 list-disc list-inside text-muted-foreground">
+                                        {report.keyPoints.map((point, index) => (
+                                            <li key={index}>{point}</li>
+                                        ))}
+                                    </ul>
+                                </div>
                             </CardContent>
                         </Card>
                     </div>
