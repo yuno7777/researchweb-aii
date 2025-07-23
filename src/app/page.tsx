@@ -268,6 +268,45 @@ export default function Home() {
   const isDeepReport = (report: ReportData | null): report is { title: string; report: string } => {
       return report !== null && 'report' in report && typeof report.report === 'string';
   };
+  
+  const renderFormattedReport = (reportText: string) => {
+    const subtitles = [
+        "Introduction", "Historical Background", "History", "Key Benefits", "Benefits", 
+        "Challenges and Criticisms", "Challenges", "Current Trends", "Future Scope"
+    ];
+    // Create a regex that finds any of the subtitles at the beginning of a line
+    const regex = new RegExp(`^(${subtitles.join('|')}):?`, 'gm');
+    
+    // Split the text by the subtitles to create sections
+    const sections = reportText.split(regex);
+    
+    const content = [];
+    // The first element is the text before the first subtitle, which might be empty
+    if (sections[0] && sections[0].trim()) {
+        content.push(
+            <p key="intro-text" className="text-base text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                {sections[0].trim()}
+            </p>
+        );
+    }
+
+    // Iterate over the rest of the sections array, which will be [subtitle, content, subtitle, content, ...]
+    for (let i = 1; i < sections.length; i += 2) {
+        const subtitle = sections[i];
+        const text = sections[i+1];
+        if (subtitle && text) {
+            content.push(
+                <div key={subtitle}>
+                    <h3 className="text-xl font-bold mt-6 mb-2">{subtitle}</h3>
+                    <p className="text-base text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                        {text.trim()}
+                    </p>
+                </div>
+            );
+        }
+    }
+    return content;
+};
 
   return (
     <div id="home" className="flex min-h-screen w-full flex-col bg-background text-foreground" suppressHydrationWarning>
@@ -425,7 +464,7 @@ export default function Home() {
                                 <CardTitle>{report.title}</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-6">
-                                <p className="text-base text-muted-foreground leading-relaxed whitespace-pre-wrap">{report.report}</p>
+                                {renderFormattedReport(report.report)}
                             </CardContent>
                         </Card>
                     </div>
@@ -474,3 +513,5 @@ export default function Home() {
     </div>
   );
 }
+
+    
