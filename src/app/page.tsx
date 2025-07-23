@@ -201,7 +201,7 @@ export default function Home() {
                     pdf.setFont('helvetica', 'bold');
                     pdf.setFontSize(16);
                     pdf.setTextColor(49, 53, 57);
-                    pdf.text(subtitleMatch[1].trim(), pageMargin, y);
+                    pdf.text(subtitleMatch[1].trim().replace(boldRegex, '$1'), pageMargin, y);
                     y += 10;
                     return;
                 }
