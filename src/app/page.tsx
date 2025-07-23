@@ -188,7 +188,7 @@ export default function Home() {
             const boldRegex = /\*\*(.*?)\*\*/g;
             const bulletRegex = /^\s*([*•-])\s(.*)/;
             const numberedListRegex = /^\s*(\d+)\.\s(.*)/;
-            const lineHeight = 8;
+            const lineHeight = 7;
 
             const checkPageBreak = (neededHeight: number) => {
                 if (y + neededHeight > pageHeight - pageMargin) {
@@ -211,6 +211,7 @@ export default function Home() {
                 const subtitleMatch = line.match(subtitleRegex);
                 if (subtitleMatch) {
                     checkPageBreak(15);
+                    y += 5; // Extra space before subtitle
                     pdf.setFont('helvetica', 'bold');
                     pdf.setFontSize(16);
                     pdf.setTextColor(49, 53, 57);
@@ -222,12 +223,13 @@ export default function Home() {
                 const bulletMatch = line.match(bulletRegex);
                 if (bulletMatch) {
                     checkPageBreak(lineHeight);
-                    pdf.setFont('helvetica', 'normal');
-                    pdf.setFontSize(12);
-                    pdf.setTextColor(33, 37, 41);
-                    const contentLines = pdf.splitTextToSize(`• ${bulletMatch[2]}`, contentWidth - 5);
-                    contentLines.forEach((splitLine: string) => {
+                    const bulletContent = bulletMatch[2];
+                    const contentLines = pdf.splitTextToSize(`• ${bulletContent.replace(boldRegex, '$1')}`, contentWidth - 5);
+                     contentLines.forEach((splitLine: string) => {
                         checkPageBreak(lineHeight);
+                        pdf.setFont('helvetica', 'normal');
+                        pdf.setFontSize(12);
+                        pdf.setTextColor(33, 37, 41);
                         pdf.text(splitLine, pageMargin + 5, y);
                         y += lineHeight;
                     });
@@ -237,12 +239,13 @@ export default function Home() {
                 const numberedMatch = line.match(numberedListRegex);
                  if (numberedMatch) {
                     checkPageBreak(lineHeight);
-                    pdf.setFont('helvetica', 'normal');
-                    pdf.setFontSize(12);
-                    pdf.setTextColor(33, 37, 41);
-                    const contentLines = pdf.splitTextToSize(`${numberedMatch[1]}. ${numberedMatch[2]}`, contentWidth - 5);
+                    const numberedContent = numberedMatch[2];
+                    const contentLines = pdf.splitTextToSize(`${numberedMatch[1]}. ${numberedContent.replace(boldRegex, '$1')}`, contentWidth - 5);
                     contentLines.forEach((splitLine: string) => {
                         checkPageBreak(lineHeight);
+                         pdf.setFont('helvetica', 'normal');
+                        pdf.setFontSize(12);
+                        pdf.setTextColor(33, 37, 41);
                         pdf.text(splitLine, pageMargin + 5, y);
                         y += lineHeight;
                     });
@@ -255,16 +258,7 @@ export default function Home() {
                 pdf.setFontSize(12);
                 pdf.setTextColor(33, 37, 41);
 
-                const parts = line.split(boldRegex);
-                let currentX = pageMargin;
-
-                const styledLine = parts.map(part => ({
-                    text: part,
-                    isBold: line.includes(`**${part}**`)
-                }));
-
-                const fullLineText = line.replace(boldRegex, '$1');
-                const textLines = pdf.splitTextToSize(fullLineText, contentWidth);
+                const textLines = pdf.splitTextToSize(line.replace(boldRegex, '$1'), contentWidth);
                 
                 textLines.forEach((textLine:string) => {
                     checkPageBreak(lineHeight);
@@ -358,7 +352,7 @@ export default function Home() {
       return report !== null && 'report' in report && typeof report.report === 'string';
   };
   
-  const renderFormattedReport = (reportText: string) => {
+const renderFormattedReport = (reportText: string) => {
     const subtitleRegex = /^###\s*(.*?)(?:\s*:)?$/i;
     const boldRegex = /\*\*(.*?)\*\*/g;
     const bulletRegex = /^\s*([*•-])\s(.*)/;
@@ -373,7 +367,7 @@ export default function Home() {
             const ListComponent = currentList.type;
             const listKey = `list-${formattedContent.length}`;
             formattedContent.push(
-                <ListComponent key={listKey} className={`list-inside my-4 space-y-2 ${currentList.type === 'ol' ? 'list-decimal' : 'list-disc'} ml-4`}>
+                <ListComponent key={listKey} className={`my-4 space-y-2 ${currentList.type === 'ol' ? 'list-decimal' : 'list-disc'} ml-6`}>
                     {currentList.items}
                 </ListComponent>
             );
@@ -381,11 +375,21 @@ export default function Home() {
         }
     };
 
+    const formatLine = (line: string) => {
+        const parts = line.split(boldRegex).map((part, i) => {
+            if (i % 2 === 1) { // This part was inside **...**
+                return <strong key={i} className="font-semibold text-foreground">{part}</strong>;
+            }
+            return part;
+        });
+        return <>{parts}</>;
+    };
+
     lines.forEach((line, index) => {
         const subtitleMatch = line.match(subtitleRegex);
         if (subtitleMatch) {
             flushList();
-            formattedContent.push(<h3 key={`h3-${index}`} className="text-xl font-bold mt-6 mb-3">{subtitleMatch[1].trim()}</h3>);
+            formattedContent.push(<h3 key={`h3-${index}`} className="text-xl font-bold text-foreground mt-6 mb-3">{subtitleMatch[1].trim()}</h3>);
             return;
         }
 
@@ -395,8 +399,7 @@ export default function Home() {
                 flushList();
                 currentList = { type: 'ul', items: [] };
             }
-            const boldedLine = bulletMatch[2].replace(boldRegex, '<strong>$1</strong>');
-            currentList.items.push(<li key={`li-${index}`} dangerouslySetInnerHTML={{ __html: boldedLine }} />);
+            currentList.items.push(<li key={`li-${index}`}>{formatLine(bulletMatch[2])}</li>);
             return;
         }
         
@@ -406,14 +409,12 @@ export default function Home() {
                 flushList();
                 currentList = { type: 'ol', items: [] };
             }
-            const boldedLine = numberedMatch[2].replace(boldRegex, '<strong>$1</strong>');
-            currentList.items.push(<li key={`li-${index}`} dangerouslySetInnerHTML={{ __html: boldedLine }} />);
+            currentList.items.push(<li key={`li-${index}`}>{formatLine(numberedMatch[2])}</li>);
             return;
         }
         
         flushList();
-        const boldedLine = line.replace(boldRegex, '<strong>$1</strong>');
-        formattedContent.push(<p key={`p-${index}`} className="mb-4 text-muted-foreground leading-relaxed" dangerouslySetInnerHTML={{ __html: boldedLine }} />);
+        formattedContent.push(<p key={`p-${index}`} className="mb-4 text-muted-foreground leading-relaxed">{formatLine(line)}</p>);
     });
     
     flushList(); // Add any remaining list items
