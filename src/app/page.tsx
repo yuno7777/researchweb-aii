@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { jsPDF } from 'jspdf';
-import { ArrowUp, Menu, Trash2, FileText, List } from 'lucide-react';
+import { ArrowUp, Menu, Trash2, FileText, List, FileDown } from 'lucide-react';
 
 import type { GenerateReportOutput } from '@/ai/flows/generate-report';
 import { useLocalStorage } from '@/hooks/use-local-storage';
@@ -57,7 +57,7 @@ export default function Home() {
   }
 
   const handleExportPdf = () => {
-    if (!report) {
+    if (!report && !conciseReport) {
       toast({ variant: 'destructive', title: 'Error', description: 'No report data available to export.' });
       return;
     }
@@ -99,7 +99,7 @@ export default function Home() {
             y = pageMargin;
             addPageHeaderAndFooter();
         };
-
+        
         // --- TITLE PAGE ---
         pdf.setFillColor(248, 249, 250); 
         pdf.rect(0, 0, pdf.internal.pageSize.getWidth(), pdf.internal.pageSize.getHeight(), 'F');
@@ -127,48 +127,50 @@ export default function Home() {
 
         // --- CONTENT PAGES ---
         addPageWithHeaderFooter();
+        
+        const addSection = (title: string, content: string | string[]) => {
+            pdf.setFont('helvetica', 'bold');
+            pdf.setFontSize(16);
+            pdf.setTextColor(49, 53, 57);
 
-        const sectionOrder: (keyof ReportData)[] = ['introduction', 'history', 'benefits', 'challenges', 'currentTrends', 'futureScope'];
-        const sectionTitles: Record<keyof ReportData, string> = {
-          introduction: 'Introduction',
-          history: 'History',
-          benefits: 'Benefits',
-          challenges: 'Challenges',
-          currentTrends: 'Current Trends',
-          futureScope: 'Future Scope',
-        };
-
-        sectionOrder.forEach(sectionKey => {
-            if (report[sectionKey]) {
+            if (y + 25 > pageHeight - pageMargin) { 
+                addPageWithHeaderFooter();
                 pdf.setFont('helvetica', 'bold');
                 pdf.setFontSize(16);
                 pdf.setTextColor(49, 53, 57);
-
-                if (y + 25 > pageHeight - pageMargin) { 
-                    addPageWithHeaderFooter();
-                    pdf.setFont('helvetica', 'bold');
-                    pdf.setFontSize(16);
-                    pdf.setTextColor(49, 53, 57);
-                }
-                
-                const sectionContent = report[sectionKey];
-                const sectionTitleText = sectionTitles[sectionKey];
-
-                pdf.text(sectionTitleText, pageMargin, y);
-                y += 7;
-                
-                pdf.setDrawColor(222, 226, 230);
-                pdf.setLineWidth(0.25);
-                pdf.line(pageMargin, y, contentWidth + pageMargin, y);
-                y += 8;
-                
-                pdf.setFont('helvetica', 'normal');
-                pdf.setFontSize(12);
-                pdf.setTextColor(33, 37, 41);
-                
-                const contentLines = pdf.splitTextToSize(sectionContent, contentWidth);
-                const lineHeight = 8; 
-
+            }
+            
+            pdf.text(title, pageMargin, y);
+            y += 7;
+            
+            pdf.setDrawColor(222, 226, 230);
+            pdf.setLineWidth(0.25);
+            pdf.line(pageMargin, y, contentWidth + pageMargin, y);
+            y += 8;
+            
+            pdf.setFont('helvetica', 'normal');
+            pdf.setFontSize(12);
+            pdf.setTextColor(33, 37, 41);
+            
+            const lineHeight = 8;
+            
+            if (Array.isArray(content)) {
+                content.forEach(line => {
+                    const bulletPoint = `• ${line}`;
+                    const contentLines = pdf.splitTextToSize(bulletPoint, contentWidth - 5);
+                    contentLines.forEach((splitLine: string) => {
+                         if (y + lineHeight > pageHeight - pageMargin) {
+                            addPageWithHeaderFooter();
+                             pdf.setFont('helvetica', 'normal');
+                             pdf.setFontSize(12);
+                             pdf.setTextColor(33, 37, 41);
+                        }
+                        pdf.text(splitLine, pageMargin + 5, y);
+                        y += lineHeight;
+                    });
+                });
+            } else {
+                const contentLines = pdf.splitTextToSize(content, contentWidth);
                 contentLines.forEach((line: string) => {
                     if (y + lineHeight > pageHeight - pageMargin) {
                         addPageWithHeaderFooter();
@@ -179,10 +181,31 @@ export default function Home() {
                     pdf.text(line, pageMargin, y);
                     y += lineHeight;
                 });
-                
-                y += 10;
             }
-        });
+            y += 10;
+        };
+
+
+        if (report) {
+            const sectionOrder: (keyof ReportData)[] = ['introduction', 'history', 'benefits', 'challenges', 'currentTrends', 'futureScope'];
+            const sectionTitles: Record<keyof ReportData, string> = {
+              introduction: 'Introduction',
+              history: 'History',
+              benefits: 'Benefits',
+              challenges: 'Challenges',
+              currentTrends: 'Current Trends',
+              futureScope: 'Future Scope',
+            };
+
+            sectionOrder.forEach(sectionKey => {
+                if (report[sectionKey]) {
+                    addSection(sectionTitles[sectionKey], report[sectionKey]);
+                }
+            });
+        } else if (conciseReport) {
+            addSection('Summary', conciseReport.summary);
+            addSection('Key Points', conciseReport.keyPoints);
+        }
 
         pdf.save(fileName);
         toast({ title: 'Export complete!', description: `${fileName} has been downloaded.`});
@@ -328,11 +351,15 @@ export default function Home() {
               {conciseReport && !isLoading && (
                   <div className="py-12 max-w-4xl mx-auto">
                       <Card>
-                          <CardHeader>
+                          <CardHeader className="flex flex-row items-center justify-between">
                               <CardTitle className="flex items-center gap-2">
                                   <FileText />
                                   Concise Report
                               </CardTitle>
+                              <Button variant="outline" size="sm" onClick={handleExportPdf}>
+                                  <FileDown className="mr-2 h-4 w-4" />
+                                  Export as PDF
+                              </Button>
                           </CardHeader>
                           <CardContent className="space-y-6">
                               <div>
