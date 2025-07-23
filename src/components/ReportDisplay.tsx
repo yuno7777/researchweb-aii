@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Edit, Save, X, FileDown } from 'lucide-react';
 import { Separator } from './ui/separator';
 
-type Report = Exclude<GenerateReportOutput['report'], { conciseReport: string }>;
+type Report = Exclude<GenerateReportOutput['report'], { summary: string, keyPoints: string[] }>;
 type ReportSection = keyof Report;
 
 interface ReportDisplayProps {
@@ -48,7 +48,7 @@ export function ReportDisplay({ report, onReportUpdate, onExportPdf }: ReportDis
 
   const handleEditClick = (section: ReportSection) => {
     setEditingSection(section);
-    setEditContent(editableReport[section]);
+    setEditContent(editableReport[section] as string);
   };
 
   const handleSaveClick = () => {
@@ -66,19 +66,19 @@ export function ReportDisplay({ report, onReportUpdate, onExportPdf }: ReportDis
   return (
     <div className="space-y-8">
       <div className="flex justify-end">
-        <Button onClick={onExportPdf}>
+        <Button onClick={onExportPdf} className="rounded-full">
             <FileDown className="mr-2 h-4 w-4" />
             Export as PDF
         </Button>
       </div>
       <div className="space-y-12 rounded-lg border bg-card text-card-foreground p-8 shadow-sm">
         {sectionOrder.map((sectionKey) => (
-          report[sectionKey] && (
+          (report as any)[sectionKey] && (
               <div key={sectionKey}>
                   <div className="flex flex-row items-center justify-between mb-4">
                       <h2 className="text-2xl font-bold">{sectionTitles[sectionKey]}</h2>
                       {editingSection !== sectionKey && (
-                           <Button variant="outline" size="sm" onClick={() => handleEditClick(sectionKey)}><Edit className="mr-2 h-4 w-4" />Edit</Button>
+                           <Button variant="outline" size="sm" onClick={() => handleEditClick(sectionKey as ReportSection)}><Edit className="mr-2 h-4 w-4" />Edit</Button>
                       )}
                   </div>
                   <Separator className="mb-6"/>
@@ -96,7 +96,7 @@ export function ReportDisplay({ report, onReportUpdate, onExportPdf }: ReportDis
                       </div>
                       </div>
                   ) : (
-                      <p className="text-base text-muted-foreground leading-relaxed whitespace-pre-wrap">{editableReport[sectionKey]}</p>
+                      <p className="text-base text-muted-foreground leading-relaxed whitespace-pre-wrap">{(editableReport as any)[sectionKey]}</p>
                   )}
               </div>
           )
