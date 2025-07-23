@@ -24,7 +24,7 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import { GradientText } from '@/components/GradientText';
 import { HomePageContent } from '@/components/HomePageContent';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
 const formSchema = z.object({
@@ -274,14 +274,10 @@ export default function Home() {
         "Introduction", "Historical Background", "History", "Key Benefits", "Benefits", 
         "Challenges and Criticisms", "Challenges", "Current Trends", "Future Scope"
     ];
-    // Create a regex that finds any of the subtitles at the beginning of a line
     const regex = new RegExp(`^(${subtitles.join('|')}):?`, 'gm');
-    
-    // Split the text by the subtitles to create sections
     const sections = reportText.split(regex);
     
     const content = [];
-    // The first element is the text before the first subtitle, which might be empty
     if (sections[0] && sections[0].trim()) {
         content.push(
             <p key="intro-text" className="text-base text-muted-foreground leading-relaxed whitespace-pre-wrap">
@@ -290,13 +286,12 @@ export default function Home() {
         );
     }
 
-    // Iterate over the rest of the sections array, which will be [subtitle, content, subtitle, content, ...]
     for (let i = 1; i < sections.length; i += 2) {
         const subtitle = sections[i];
         const text = sections[i+1];
         if (subtitle && text) {
             content.push(
-                <div key={subtitle}>
+                <div key={subtitle} className="prose dark:prose-invert max-w-none">
                     <h3 className="text-xl font-bold mt-6 mb-2">{subtitle}</h3>
                     <p className="text-base text-muted-foreground leading-relaxed whitespace-pre-wrap">
                         {text.trim()}
@@ -434,45 +429,53 @@ export default function Home() {
               {isLoading && <div className="py-12"><ReportSkeleton /></div>}
 
               {report && !isLoading && (
-                 isConciseReport(report) ? (
-                    <div className="py-12 max-w-4xl mx-auto">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Concise Report</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-6">
-                                <div>
-                                    <h3 className="font-semibold text-lg mb-2">Summary</h3>
-                                    <p className="text-base text-muted-foreground leading-relaxed whitespace-pre-wrap">{report.summary}</p>
-                                </div>
-                                <Separator />
-                                <div>
-                                    <h3 className="font-semibold text-lg mb-2">Key Points</h3>
-                                    <ul className="space-y-2 list-disc list-inside text-muted-foreground">
-                                        {report.keyPoints.map((point, index) => (
-                                            <li key={index}>{point}</li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            </CardContent>
-                        </Card>
+                <div className="py-12 max-w-4xl mx-auto">
+                   <div className="flex justify-end mb-4">
+                      <Button onClick={handleExportPdf} className="rounded-full">
+                          <FileDown className="mr-2 h-4 w-4" />
+                          Export as PDF
+                      </Button>
                     </div>
+                {isConciseReport(report) ? (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Concise Report</CardTitle>
+                             <CardDescription>A brief summary and key takeaways about "{form.getValues('topic')}".</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                            <div>
+                                <h3 className="font-semibold text-lg mb-2">Summary</h3>
+                                <p className="text-base text-muted-foreground leading-relaxed whitespace-pre-wrap">{report.summary}</p>
+                            </div>
+                            <Separator />
+                            <div>
+                                <h3 className="font-semibold text-lg mb-2">Key Points</h3>
+                                <ul className="space-y-2 list-disc list-inside text-muted-foreground">
+                                    {report.keyPoints.map((point, index) => (
+                                        <li key={index}>{point}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </CardContent>
+                    </Card>
                 ) : isDeepReport(report) ? (
-                    <div className="py-12 max-w-4xl mx-auto">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>{report.title}</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-6">
-                                {renderFormattedReport(report.report)}
-                            </CardContent>
-                        </Card>
-                    </div>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>{report.title}</CardTitle>
+                            <CardDescription>A deep-dive report about "{form.getValues('topic')}".</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                            {renderFormattedReport(report.report)}
+                        </CardContent>
+                    </Card>
                 ) : (
-                    <div className="py-12 max-w-4xl mx-auto">
-                        <ReportDisplay report={report} onReportUpdate={handleReportUpdate} onExportPdf={handleExportPdf} />
-                    </div>
-                )
+                  <Card>
+                    <CardContent className="p-0">
+                      <ReportDisplay report={report} onReportUpdate={handleReportUpdate} />
+                    </CardContent>
+                  </Card>
+                )}
+                </div>
               )}
               
               {!isLoading && !report && history.length > 0 && (
@@ -513,5 +516,3 @@ export default function Home() {
     </div>
   );
 }
-
-    

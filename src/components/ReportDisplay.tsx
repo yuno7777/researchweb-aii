@@ -5,16 +5,15 @@ import { useState, useEffect } from 'react';
 import type { GenerateReportOutput } from '@/ai/flows/generate-report';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Edit, Save, X, FileDown } from 'lucide-react';
+import { Edit, Save, X } from 'lucide-react';
 import { Separator } from './ui/separator';
 
-type Report = Exclude<GenerateReportOutput['report'], { summary: string, keyPoints: string[] }>;
+type Report = Exclude<GenerateReportOutput['report'], { summary: string, keyPoints: string[] } | { title: string, report: string }>;
 type ReportSection = keyof Report;
 
 interface ReportDisplayProps {
   report: Report;
   onReportUpdate: (updatedReport: Report) => void;
-  onExportPdf: () => void;
 }
 
 const sectionOrder: ReportSection[] = [
@@ -37,7 +36,7 @@ const sectionTitles: Record<ReportSection, string> = {
   futureScope: 'Future Scope',
 };
 
-export function ReportDisplay({ report, onReportUpdate, onExportPdf }: ReportDisplayProps) {
+export function ReportDisplay({ report, onReportUpdate }: ReportDisplayProps) {
   const [editableReport, setEditableReport] = useState<Report>(report);
   const [editingSection, setEditingSection] = useState<ReportSection | null>(null);
   const [editContent, setEditContent] = useState('');
@@ -64,14 +63,7 @@ export function ReportDisplay({ report, onReportUpdate, onExportPdf }: ReportDis
   };
 
   return (
-    <div className="space-y-8">
-      <div className="flex justify-end">
-        <Button onClick={onExportPdf} className="rounded-full">
-            <FileDown className="mr-2 h-4 w-4" />
-            Export as PDF
-        </Button>
-      </div>
-      <div className="space-y-12 rounded-lg border bg-card text-card-foreground p-8 shadow-sm">
+    <div className="space-y-8 p-8">
         {sectionOrder.map((sectionKey) => (
           (report as any)[sectionKey] && (
               <div key={sectionKey}>
@@ -102,6 +94,5 @@ export function ReportDisplay({ report, onReportUpdate, onExportPdf }: ReportDis
           )
         ))}
       </div>
-    </div>
   );
 }
