@@ -70,7 +70,7 @@ export function ConciseReportDisplay({ report, onReportUpdate, topic }: ConciseR
           <div className="flex flex-row items-center justify-between mb-2">
             <h3 className="font-semibold text-lg">Summary</h3>
             {editingSection !== 'summary' && (
-              <Button variant="outline" size="sm" onClick={() => handleEditClick('summary')}>
+              <Button variant="outline" size="sm" onClick={() => handleEditClick('summary')} className="rounded-full">
                 <Edit className="mr-2 h-4 w-4" />Edit
               </Button>
             )}
@@ -83,8 +83,8 @@ export function ConciseReportDisplay({ report, onReportUpdate, topic }: ConciseR
                 className="min-h-[200px] text-base leading-relaxed rounded-lg"
               />
               <div className="flex justify-end space-x-2">
-                <Button variant="ghost" size="sm" onClick={handleCancelClick}><X className="mr-2 h-4 w-4" />Cancel</Button>
-                <Button size="sm" onClick={handleSaveClick}><Save className="mr-2 h-4 w-4" />Save</Button>
+                <Button variant="ghost" size="sm" onClick={handleCancelClick} className="rounded-full"><X className="mr-2 h-4 w-4" />Cancel</Button>
+                <Button size="sm" onClick={handleSaveClick} className="rounded-full"><Save className="mr-2 h-4 w-4" />Save</Button>
               </div>
             </div>
           ) : (
@@ -99,7 +99,7 @@ export function ConciseReportDisplay({ report, onReportUpdate, topic }: ConciseR
           <div className="flex flex-row items-center justify-between mb-2">
             <h3 className="font-semibold text-lg">Key Points</h3>
              {editingSection !== 'keyPoints' && (
-              <Button variant="outline" size="sm" onClick={() => handleEditClick('keyPoints')}>
+              <Button variant="outline" size="sm" onClick={() => handleEditClick('keyPoints')} className="rounded-full">
                 <Edit className="mr-2 h-4 w-4" />Edit
               </Button>
             )}
@@ -112,8 +112,8 @@ export function ConciseReportDisplay({ report, onReportUpdate, topic }: ConciseR
                 className="min-h-[250px] text-base leading-relaxed rounded-lg"
               />
               <div className="flex justify-end space-x-2">
-                <Button variant="ghost" size="sm" onClick={handleCancelClick}><X className="mr-2 h-4 w-4" />Cancel</Button>
-                <Button size="sm" onClick={handleSaveClick}><Save className="mr-2 h-4 w-4" />Save</Button>
+                <Button variant="ghost" size="sm" onClick={handleCancelClick} className="rounded-full"><X className="mr-2 h-4 w-4" />Cancel</Button>
+                <Button size="sm" onClick={handleSaveClick} className="rounded-full"><Save className="mr-2 h-4 w-4" />Save</Button>
               </div>
             </div>
           ) : (

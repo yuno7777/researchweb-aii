@@ -70,7 +70,7 @@ export function ReportDisplay({ report, onReportUpdate }: ReportDisplayProps) {
                   <div className="flex flex-row items-center justify-between mb-4">
                       <h2 className="text-2xl font-bold">{sectionTitles[sectionKey]}</h2>
                       {editingSection !== sectionKey && (
-                           <Button variant="outline" size="sm" onClick={() => handleEditClick(sectionKey as ReportSection)}><Edit className="mr-2 h-4 w-4" />Edit</Button>
+                           <Button variant="outline" size="sm" onClick={() => handleEditClick(sectionKey as ReportSection)} className="rounded-full"><Edit className="mr-2 h-4 w-4" />Edit</Button>
                       )}
                   </div>
                   <Separator className="mb-6"/>
@@ -83,8 +83,8 @@ export function ReportDisplay({ report, onReportUpdate }: ReportDisplayProps) {
                           className="min-h-[300px] text-base leading-relaxed rounded-lg"
                       />
                       <div className="flex justify-end space-x-2">
-                          <Button variant="ghost" size="sm" onClick={handleCancelClick}><X className="mr-2 h-4 w-4" />Cancel</Button>
-                          <Button size="sm" onClick={handleSaveClick}><Save className="mr-2 h-4 w-4" />Save</Button>
+                          <Button variant="ghost" size="sm" onClick={handleCancelClick} className="rounded-full"><X className="mr-2 h-4 w-4" />Cancel</Button>
+                          <Button size="sm" onClick={handleSaveClick} className="rounded-full"><Save className="mr-2 h-4 w-4" />Save</Button>
                       </div>
                       </div>
                   ) : (
