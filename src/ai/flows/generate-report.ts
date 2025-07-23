@@ -15,6 +15,7 @@ import {z} from 'genkit';
 const GenerateReportInputSchema = z.object({
   topic: z.string().describe('The topic to generate a report on.'),
   searchType: z.enum(['concise', 'web', 'deep']).describe('The type of search to perform.'),
+  generateWithReferences: z.boolean().optional().describe('Whether to include a list of sources.'),
 });
 export type GenerateReportInput = z.infer<typeof GenerateReportInputSchema>;
 
@@ -26,16 +27,19 @@ const StandardReportSchema = z.object({
     challenges: z.string().describe("A thorough examination of the problems, difficulties, and criticisms associated with the topic."),
     currentTrends: z.string().describe("An analysis of the latest trends, recent research, and current events shaping the topic."),
     futureScope: z.string().describe("A forecast of the topic's future, discussing potential innovations and long-term implications."),
+    sources: z.string().optional().describe("A list of sources or citations used for the report, formatted as a string with each source on a new line."),
 });
 
 const ConciseReportSchema = z.object({
     summary: z.string().describe("A detailed, 300-word summary of the topic."),
     keyPoints: z.array(z.string()).describe("A list of 10-15 key takeaways or bullet points about the topic."),
+    sources: z.string().optional().describe("A list of sources or citations used for the report, formatted as a string with each source on a new line."),
 });
 
 const DeepReportSchema = z.object({
     title: z.string().describe("A concise and engaging title for the report."),
     report: z.string().describe("A comprehensive and in-depth report. It should be well-structured with clear paragraphs and headings for different sections like Introduction, History, Benefits, etc."),
+    sources: z.string().optional().describe("A list of sources or citations used for the report, formatted as a string with each source on a new line."),
 });
 
 
@@ -64,6 +68,10 @@ For the topic "{{{topic}}}", please provide a detailed explanation for each of t
 - Challenges: Thoroughly analyze the problems, difficulties, and criticisms related to the topic.
 - Current Trends: Detail the latest trends and developments shaping the topic.
 - Future Scope: Extrapolate on the potential future implications and applications of the topic.
+
+{{#if generateWithReferences}}
+- Sources: Provide a list of 2-3 web links or citations that were used to generate this report. Format them as a string, with each source on a new line.
+{{/if}}
 `,
 });
 
@@ -82,6 +90,10 @@ For the topic "{{{topic}}}", provide a very detailed and extensive explanation f
 - Challenges: Thoroughly analyze the problems, difficulties, and criticisms related to the topic.
 - Current Trends: Detail the latest trends and developments shaping the topic.
 - Future Scope: Extrapolate on the potential future implications and applications of the topic.
+
+{{#if generateWithReferences}}
+- Sources: Provide a list of 5-7 web links or citations that were used to generate this report. Format them as a string, with each source on a new line.
+{{/if}}
 `,
 });
 
@@ -93,6 +105,10 @@ const conciseReportPrompt = ai.definePrompt({
 
 1.  A detailed summary of the topic, approximately 300 words in length.
 2.  A list of 10-15 key takeaways presented as bullet points.
+
+{{#if generateWithReferences}}
+3.  A list of 2-3 web links or citations that were used to generate this summary. Format them as a string, with each source on a new line.
+{{/if}}
 `,
 });
 

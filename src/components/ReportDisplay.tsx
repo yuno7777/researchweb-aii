@@ -24,6 +24,7 @@ const sectionOrder: ReportSection[] = [
   'challenges',
   'currentTrends',
   'futureScope',
+  'sources',
 ];
 
 const sectionTitles: Record<ReportSection, string> = {
@@ -34,6 +35,7 @@ const sectionTitles: Record<ReportSection, string> = {
   challenges: 'Challenges',
   currentTrends: 'Current Trends',
   futureScope: 'Future Scope',
+  sources: 'Sources',
 };
 
 export function ReportDisplay({ report, onReportUpdate }: ReportDisplayProps) {

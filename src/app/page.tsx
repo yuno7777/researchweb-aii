@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { jsPDF } from 'jspdf';
-import { ArrowUp, Menu, Trash2, FileText, List, FileDown, BrainCircuit } from 'lucide-react';
+import { ArrowUp, Menu, Trash2, FileText, List, FileDown, BrainCircuit, Book, Link } from 'lucide-react';
 
 import type { GenerateReportOutput } from '@/ai/flows/generate-report';
 import { useLocalStorage } from '@/hooks/use-local-storage';
@@ -25,6 +25,8 @@ import { GradientText } from '@/components/GradientText';
 import { HomePageContent } from '@/components/HomePageContent';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { ConciseReportDisplay } from '@/components/ConciseReportDisplay';
 
@@ -41,6 +43,7 @@ export default function Home() {
   const [history, setHistory] = useLocalStorage<string[]>('report-history', []);
   const { toast } = useToast();
   const [searchType, setSearchType] = useState<SearchType>('web');
+  const [generateWithReferences, setGenerateWithReferences] = useState(false);
   
   const handleSelectTopic = (topic: string) => {
     form.setValue('topic', topic);
@@ -193,8 +196,9 @@ export default function Home() {
             if (isConciseReport(report)) {
                  addSection('Summary', report.summary);
                  addSection('Key Points', report.keyPoints);
+                 if (report.sources) addSection('Sources', report.sources);
             } else if (isStandardReport(report)) {
-                const sectionOrder: (keyof typeof report)[] = ['introduction', 'history', 'benefits', 'challenges', 'currentTrends', 'futureScope'];
+                const sectionOrder: (keyof typeof report)[] = ['introduction', 'history', 'benefits', 'challenges', 'currentTrends', 'futureScope', 'sources'];
                 const sectionTitles: Record<string, string> = {
                   introduction: 'Introduction',
                   history: 'History',
@@ -202,6 +206,7 @@ export default function Home() {
                   challenges: 'Challenges',
                   currentTrends: 'Current Trends',
                   futureScope: 'Future Scope',
+                  sources: 'Sources',
                 };
                 sectionOrder.forEach(sectionKey => {
                     const key = sectionKey as keyof typeof report;
@@ -209,6 +214,9 @@ export default function Home() {
                         addSection(sectionTitles[key], report[key] as string);
                     }
                 });
+            } else if (isDeepReport(report)) {
+                 addSection('Report', report.report);
+                 if (report.sources) addSection('Sources', report.sources);
             }
         }
 
@@ -241,7 +249,7 @@ export default function Home() {
     setReport(null);
     form.clearErrors();
 
-    const result = await handleGenerateReport({ topic: values.topic, searchType });
+    const result = await handleGenerateReport({ topic: values.topic, searchType, generateWithReferences });
 
     if (result.error) {
       toast({
@@ -260,15 +268,15 @@ export default function Home() {
     setIsLoading(false);
   };
   
-  const isConciseReport = (report: ReportData | null): report is { summary: string; keyPoints: string[] } => {
+  const isConciseReport = (report: ReportData | null): report is { summary: string; keyPoints: string[], sources?: string } => {
     return report !== null && 'summary' in report && 'keyPoints' in report;
   };
 
-  const isDeepReport = (report: ReportData | null): report is { title: string; report: string } => {
+  const isDeepReport = (report: ReportData | null): report is { title: string; report: string, sources?: string } => {
       return report !== null && 'report' in report && typeof report.report === 'string' && 'title' in report && !('summary' in report);
   };
 
-  const isStandardReport = (report: ReportData | null): report is { title: string; introduction: string; history: string; benefits: string; challenges: string; currentTrends: string; futureScope: string; } => {
+  const isStandardReport = (report: ReportData | null): report is { title: string; introduction: string; history: string; benefits: string; challenges: string; currentTrends: string; futureScope: string; sources?: string } => {
     return report !== null && 'introduction' in report && 'history' in report;
   }
 
@@ -416,7 +424,7 @@ export default function Home() {
                           />
                       </form>
                   </Form>
-                  <div className="flex items-center justify-center gap-2 pt-2">
+                  <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
                     <TooltipProvider>
                       <Tooltip>
                           <TooltipTrigger asChild>
@@ -476,6 +484,16 @@ export default function Home() {
                           </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
+                    <Separator orientation="vertical" className="h-6" />
+                     <div className="flex items-center space-x-2">
+                        <Link className="h-4 w-4" />
+                        <Label htmlFor="references-switch">Generate with References</Label>
+                        <Switch
+                          id="references-switch"
+                          checked={generateWithReferences}
+                          onCheckedChange={setGenerateWithReferences}
+                        />
+                      </div>
                   </div>
               </div>
             </div>
@@ -553,5 +571,3 @@ export default function Home() {
     </div>
   );
 }
-
-    
