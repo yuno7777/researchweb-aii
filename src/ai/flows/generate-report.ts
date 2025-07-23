@@ -99,8 +99,8 @@ const generateReportFlow = ai.defineFlow(
         const { output } = await reportPrompt(input);
         reportOutput = output;
     } else if (input.searchType === 'deep') {
-        const { response } = await deepResearchPrompt(input);
-        const reportText = response.text;
+        const { text } = await deepResearchPrompt(input);
+        const reportText = text;
         if (!reportText) {
           throw new Error('Deep research failed to generate a report.');
         }
