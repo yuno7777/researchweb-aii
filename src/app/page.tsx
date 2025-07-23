@@ -484,10 +484,10 @@ export default function Home() {
                           </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
-                    <Separator orientation="vertical" className="h-6" />
+                    <Separator orientation="vertical" className="h-6 mx-2" />
                      <div className="flex items-center space-x-2">
-                        <Link className="h-4 w-4" />
-                        <Label htmlFor="references-switch">Generate with References</Label>
+                        <Link className="h-4 w-4 text-muted-foreground" />
+                        <Label htmlFor="references-switch" className="text-muted-foreground">Generate with References</Label>
                         <Switch
                           id="references-switch"
                           checked={generateWithReferences}
