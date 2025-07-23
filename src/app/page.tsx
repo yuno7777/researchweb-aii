@@ -403,7 +403,7 @@ export default function Home() {
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent>
-                                <p>Enable Deep Research for extensive academic-style analysis (1200+ words)</p>
+                                <p>Enable Deep Research for extensive academic-style analysis</p>
                             </TooltipContent>
                         </Tooltip>
                       <Tooltip>
