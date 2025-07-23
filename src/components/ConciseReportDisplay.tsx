@@ -119,8 +119,8 @@ export function ConciseReportDisplay({ report, onReportUpdate, topic }: ConciseR
           ) : (
             <ul className="space-y-3 list-disc list-inside text-muted-foreground">
               {editableReport.keyPoints.map((point, index) => (
-                <li key={index} className="flex items-start">
-                  <span className="flex-1">{point}</span>
+                <li key={index}>
+                  <span>{point}</span>
                 </li>
               ))}
             </ul>
