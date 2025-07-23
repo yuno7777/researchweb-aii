@@ -67,20 +67,20 @@ const deepResearchPrompt = ai.definePrompt({
     name: 'deepResearchPrompt',
     input: {schema: GenerateReportInputSchema},
     output: {schema: StandardReportSchema},
-    prompt: `You are a panel of three expert AI research analysts. Your task is to conduct a deep, iterative investigation into the given topic and produce a highly detailed, analytical, and insightful report. The report must be at least 1200 words.
+    prompt: `You are a panel of three expert AI research analysts. Your task is to conduct a deep, iterative investigation into the given topic and produce a highly detailed, analytical, and insightful report. The report must be at least 1500 words.
 
 Your response should be titled "Deep Research Report: {{{topic}}}".
 
-For the topic "{{{topic}}}", perform a multi-faceted analysis and generate the following sections:
+For the topic "{{{topic}}}", perform a multi-faceted analysis and generate the following sections. Each section should be comprehensive, containing a mix of detailed paragraphs for explanation and bullet points for key facts or data.
 
 - Introduction: Provide a masterful introduction that frames the topic within a broader context, articulates its critical importance, and outlines the sophisticated analytical approach your panel will undertake.
-- Historical Context & Evolution: Go beyond a simple timeline. Analyze the key inflection points, paradigm shifts, and influential figures that have shaped the topic. Discuss the "why" behind the historical events.
-- Core Benefits & Societal Impact: Instead of a simple list, provide a nuanced analysis of the primary and secondary benefits. Use data-driven arguments and case studies to illustrate the large-scale impact on society, economies, and ecosystems.
-- Critical Challenges & Nuanced Risks: Do not just list challenges. Analyze the root causes of these challenges, including systemic issues, ethical dilemmas, and unforeseen consequences. Evaluate the complex interplay between different risks.
-- Current Landscape & Emerging Trends: Synthesize the most current information, including cutting-edge research, market dynamics, and competitive landscapes. Identify not just the trends, but the drivers behind them and their potential longevity.
-- Future Trajectory & Strategic Outlook: Provide a sophisticated forecast. Instead of predictions, offer a scenario analysis of potential futures (e.g., optimistic, pessimistic, most likely). Discuss strategic implications for stakeholders over the next 5-10 years.
+- Historical Context & Evolution: Go beyond a simple timeline. Analyze the key inflection points, paradigm shifts, and influential figures that have shaped the topic. Discuss the "why" behind the historical events using both narrative paragraphs and a list of key milestones.
+- Core Benefits & Societal Impact: Provide a nuanced analysis of the primary and secondary benefits. Use data-driven arguments in paragraphs and supplement with bullet points highlighting specific case studies or statistics to illustrate the large-scale impact.
+- Critical Challenges & Nuanced Risks: Do not just list challenges. Analyze the root causes of these challenges in prose, including systemic issues and ethical dilemmas. Use a bulleted list to summarize the most critical risks and their potential consequences.
+- Current Landscape & Emerging Trends: Synthesize the most current information, including cutting-edge research and market dynamics. Describe the overall landscape in paragraphs and use bullet points to call out the most significant emerging trends.
+- Future Trajectory & Strategic Outlook: Provide a sophisticated forecast. Instead of just predictions, offer a scenario analysis of potential futures (e.g., optimistic, pessimistic, most likely) in paragraph form. Conclude with a bulleted list of strategic recommendations for key stakeholders.
 
-Your panel must ensure the final report is not just descriptive but deeply analytical, connecting disparate pieces of information to form a cohesive and insightful narrative.
+Your panel must ensure the final report is not just descriptive but deeply analytical, connecting disparate pieces of information to form a cohesive and insightful narrative of at least 1500 words.
 `,
 });
 
