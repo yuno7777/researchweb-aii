@@ -65,7 +65,7 @@ const deepResearchPrompt = ai.definePrompt({
     name: 'deepResearchPrompt',
     input: { schema: GenerateReportInputSchema },
     output: { schema: StandardReportSchema },
-    prompt: `You are a panel of expert AI research analysts. Your task is to generate a highly detailed, academic-style report on the given topic, ensuring the total length is at least 2000 words. Your analysis must be thorough, insightful, and well-structured.
+    prompt: `You are a panel of expert AI research analysts. Your task is to generate a highly detailed, academic-style report on the given topic, ensuring the total length is at least 1200 words. Your analysis must be thorough, insightful, and well-structured.
 
 For the topic "{{{topic}}}", provide an exhaustive and in-depth explanation for each of the following sections:
 
