@@ -99,9 +99,9 @@ export function ConciseReportDisplay({ report, onReportUpdate, topic }: ConciseR
             {editableReport.keyPoints.map((point, index) => {
               const sectionId = `keyPoint-${index}` as const;
               return (
-                <li key={index} className="space-y-2">
+                <li key={index} className="flex items-start">
                   {editingSection === sectionId ? (
-                    <div className="space-y-4 ml-[-1.5rem] mt-4">
+                    <div className="space-y-4 ml-[-1.5rem] mt-4 w-full">
                         <Textarea
                             value={editContent}
                             onChange={(e) => setEditContent(e.target.value)}
@@ -113,9 +113,9 @@ export function ConciseReportDisplay({ report, onReportUpdate, topic }: ConciseR
                         </div>
                     </div>
                   ) : (
-                    <div className="flex justify-between items-start group">
-                        <span>{point}</span>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100" onClick={() => handleEditClick(sectionId, point)}>
+                    <div className="flex justify-between items-start group w-full">
+                        <span className="flex-1">{point}</span>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 flex-shrink-0" onClick={() => handleEditClick(sectionId, point)}>
                             <Edit className="h-4 w-4" />
                         </Button>
                     </div>
