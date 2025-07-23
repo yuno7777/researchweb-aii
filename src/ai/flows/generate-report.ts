@@ -69,14 +69,14 @@ const deepResearchPrompt = ai.definePrompt({
     output: {schema: StandardReportSchema},
     prompt: `You are an expert AI research analyst. Your task is to produce a highly detailed, analytical, and insightful report on the given topic. The report must be at least 1500 words.
 
-For the topic "{{{topic}}}", please generate a highly detailed and well-structured report covering the following sections:
+For the topic "{{{topic}}}", please generate a highly detailed and well-structured report by providing an in-depth explanation for each of the following JSON fields:
 
-- Introduction: A masterful introduction that frames the topic within a broader context, articulates its critical importance, and outlines the report's structure.
-- Historical Context & Evolution: A deep analysis of the key events, paradigm shifts, and influential figures that have shaped the topic.
-- Core Benefits & Societal Impact: A nuanced analysis of the primary and secondary benefits, supported by data and real-world examples.
-- Critical Challenges & Nuanced Risks: A thorough examination of the challenges, including systemic issues and ethical dilemmas, and their potential consequences.
-- Current Landscape & Emerging Trends: A synthesis of the most current information, including cutting-edge research, market dynamics, and emerging trends.
-- Future Trajectory & Strategic Outlook: A sophisticated forecast, offering a scenario analysis of potential futures and strategic recommendations.
+- introduction: A masterful introduction that frames the topic within a broader context, articulates its critical importance, and outlines the report's structure.
+- history: A deep analysis of the key events, paradigm shifts, and influential figures that have shaped the topic.
+- benefits: A nuanced analysis of the primary and secondary benefits, supported by data and real-world examples.
+- challenges: A thorough examination of the challenges, including systemic issues and ethical dilemmas, and their potential consequences.
+- currentTrends: A synthesis of the most current information, including cutting-edge research, market dynamics, and emerging trends.
+- futureScope: A sophisticated forecast, offering a scenario analysis of potential futures and strategic recommendations.
 
 Ensure the final report is deeply analytical, connecting disparate pieces of information to form a cohesive and insightful narrative of at least 1500 words. Use a mix of detailed paragraphs and bullet points for clarity.
 `,
