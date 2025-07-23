@@ -233,20 +233,41 @@ export default function Home() {
                  addSection('Key Points', report.keyPoints);
                  if (report.sources) addSection('Sources', report.sources);
             } else if (isStandardOrDeepReport(report)) {
-                 const sections = report.report.split(/(\n###\s.*)/).filter(Boolean);
-                 for (let i = 0; i < sections.length; i += 2) {
-                     const titleWithMarker = sections[i];
-                     const content = sections[i+1] ? sections[i+1].trim() : '';
-                     
-                     if (titleWithMarker.startsWith('###')) {
-                        const title = titleWithMarker.replace('###', '').trim();
+                // Split the report by '###' headers
+                const sections = report.report.split(/\n###\s(.+)/).filter(s => s.trim() !== '');
+                
+                // Handle the case where the first part of the report is the introduction without a header
+                let initialContent = sections[0];
+                let sectionsStartIndex = 1;
+
+                // A heuristic to check if the first chunk is a title or actual content
+                const isFirstChunkTitle = ["Introduction", "Overview"].includes(initialContent.trim());
+
+                if (!isFirstChunkTitle) {
+                  // Find the first real title
+                  let firstTitleIndex = sections.findIndex((s, i) => i % 2 === 1);
+                  if (firstTitleIndex > -1) {
+                    const firstTitle = sections[firstTitleIndex];
+                    if (firstTitle.toLowerCase().includes('introduction')) {
+                       addSection(firstTitle, sections[firstTitleIndex + 1]);
+                       sectionsStartIndex = firstTitleIndex + 2;
+                    } else {
+                       addSection("Introduction", initialContent);
+                    }
+                  } else {
+                     addSection("Introduction", initialContent);
+                  }
+                }
+
+                // Process the rest of the sections
+                for (let i = sectionsStartIndex; i < sections.length; i += 2) {
+                    const title = sections[i] ? sections[i].trim() : "Untitled Section";
+                    const content = sections[i + 1] ? sections[i + 1].trim() : "";
+                    if (title && content) {
                         addSection(title, content);
-                     } else {
-                        // This handles the case where the first section does not have a marker
-                        addSection('Introduction', `${titleWithMarker}\n${content}`);
-                     }
-                 }
-                 if (report.sources) addSection('Sources', report.sources);
+                    }
+                }
+                if (report.sources) addSection('Sources', report.sources);
             }
         }
 
