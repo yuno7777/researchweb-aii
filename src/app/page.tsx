@@ -271,73 +271,71 @@ export default function Home() {
   
   const renderFormattedReport = (reportText: string) => {
     const subtitles = [
-      "Introduction", "Historical Background", "History", "Key Benefits", "Benefits",
-      "Challenges and Criticisms", "Challenges and Risks", "Challenges", "Current Trends", "Future Scope",
-      "Conclusion"
+        "Introduction", "Historical Background", "History", "Key Benefits", "Benefits",
+        "Challenges and Criticisms", "Challenges and Risks", "Challenges", "Current Trends", "Future Scope",
+        "Conclusion"
     ];
-    const subtitleRegex = new RegExp(`^(?:[#*\\s]*)((${subtitles.join('|')})(?:[:#*\\s]*))$`, 'i');
+    const subtitleRegex = new RegExp(`^###\\s*(${subtitles.join('|')})`, 'i');
     const boldRegex = /\*\*(.*?)\*\*/g;
     const bulletRegex = /^\s*([*•-])\s(.*)/;
     const numberedListRegex = /^\s*(\d+)\.\s(.*)/;
-  
+
     const lines = reportText.split('\n').filter(line => line.trim() !== '');
-  
     const formattedContent: JSX.Element[] = [];
     let currentList: { type: 'ul' | 'ol'; items: JSX.Element[] } | null = null;
-  
+
     const flushList = () => {
-      if (currentList) {
-        const ListComponent = currentList.type;
-        const listKey = `list-${formattedContent.length}`;
-        formattedContent.push(
-          <ListComponent key={listKey} className={`list-inside my-4 space-y-2 ${currentList.type === 'ol' ? 'list-decimal' : 'list-disc'} ml-4`}>
-            {currentList.items}
-          </ListComponent>
-        );
-        currentList = null;
-      }
+        if (currentList) {
+            const ListComponent = currentList.type;
+            const listKey = `list-${formattedContent.length}`;
+            formattedContent.push(
+                <ListComponent key={listKey} className={`list-inside my-4 space-y-2 ${currentList.type === 'ol' ? 'list-decimal' : 'list-disc'} ml-4`}>
+                    {currentList.items}
+                </ListComponent>
+            );
+            currentList = null;
+        }
     };
-  
+
     lines.forEach((line, index) => {
-      const subtitleMatch = line.match(subtitleRegex);
-      if (subtitleMatch) {
+        const subtitleMatch = line.match(subtitleRegex);
+        if (subtitleMatch) {
+            flushList();
+            formattedContent.push(<h3 key={`h3-${index}`} className="text-xl font-bold mt-6 mb-3">{subtitleMatch[1].trim()}</h3>);
+            return;
+        }
+
+        const bulletMatch = line.match(bulletRegex);
+        if (bulletMatch) {
+            if (!currentList || currentList.type !== 'ul') {
+                flushList();
+                currentList = { type: 'ul', items: [] };
+            }
+            const boldedLine = bulletMatch[2].replace(boldRegex, '<strong>$1</strong>');
+            currentList.items.push(<li key={`li-${index}`} dangerouslySetInnerHTML={{ __html: boldedLine }} />);
+            return;
+        }
+        
+        const numberedMatch = line.match(numberedListRegex);
+        if (numberedMatch) {
+            if (!currentList || currentList.type !== 'ol') {
+                flushList();
+                currentList = { type: 'ol', items: [] };
+            }
+            const boldedLine = numberedMatch[2].replace(boldRegex, '<strong>$1</strong>');
+            currentList.items.push(<li key={`li-${index}`} dangerouslySetInnerHTML={{ __html: boldedLine }} />);
+            return;
+        }
+        
         flushList();
-        const cleanedSubtitle = subtitleMatch[1].replace(/[#*:]/g, "").trim();
-        formattedContent.push(<h3 key={`h3-${index}`} className="text-xl font-bold mt-6 mb-3">{cleanedSubtitle}</h3>);
-        return;
-      }
-  
-      const bulletMatch = line.match(bulletRegex);
-      if (bulletMatch) {
-        if (!currentList || currentList.type !== 'ul') {
-          flushList();
-          currentList = { type: 'ul', items: [] };
-        }
-        const boldedLine = bulletMatch[2].replace(boldRegex, '<strong>$1</strong>');
-        currentList.items.push(<li key={`li-${index}`} dangerouslySetInnerHTML={{ __html: boldedLine }} />);
-        return;
-      }
-  
-      const numberedMatch = line.match(numberedListRegex);
-      if (numberedMatch) {
-        if (!currentList || currentList.type !== 'ol') {
-          flushList();
-          currentList = { type: 'ol', items: [] };
-        }
-        const boldedLine = numberedMatch[2].replace(boldRegex, '<strong>$1</strong>');
-        currentList.items.push(<li key={`li-${index}`} dangerouslySetInnerHTML={{ __html: boldedLine }} />);
-        return;
-      }
-  
-      flushList();
-      const boldedLine = line.replace(boldRegex, '<strong>$1</strong>');
-      formattedContent.push(<p key={`p-${index}`} className="mb-4 text-muted-foreground leading-relaxed" dangerouslySetInnerHTML={{ __html: boldedLine }} />);
+        const boldedLine = line.replace(boldRegex, '<strong>$1</strong>');
+        formattedContent.push(<p key={`p-${index}`} className="mb-4 text-muted-foreground leading-relaxed" dangerouslySetInnerHTML={{ __html: boldedLine }} />);
     });
-  
+    
     flushList(); // Add any remaining list items
-  
+
     return <div className="prose dark:prose-invert max-w-none">{formattedContent}</div>;
-  };
+};
 
 
   return (
@@ -553,3 +551,5 @@ export default function Home() {
     </div>
   );
 }
+
+    
