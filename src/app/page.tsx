@@ -7,9 +7,9 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { jsPDF } from 'jspdf';
-import { ArrowUp, Menu, Trash2, FileText, List, FileDown, BrainCircuit, Book, Link } from 'lucide-react';
+import { ArrowUp, Menu, Trash2, FileText, List, FileDown, BrainCircuit, Book, Link, Settings } from 'lucide-react';
 
-import type { GenerateReportOutput } from '@/ai/flows/generate-report';
+import type { GenerateReportOutput, GenerateReportInput } from '@/ai/flows/generate-report';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { useToast } from '@/hooks/use-toast';
 
@@ -29,6 +29,9 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { ConciseReportDisplay } from '@/components/ConciseReportDisplay';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Checkbox } from '@/components/ui/checkbox';
+
 
 const formSchema = z.object({
   topic: z.string().min(3, { message: "Topic must be at least 3 characters long." }).max(100, { message: "Topic must be at most 100 characters long." }),
@@ -37,6 +40,18 @@ const formSchema = z.object({
 type ReportData = GenerateReportOutput['report'];
 type SearchType = 'concise' | 'web' | 'deep';
 
+type SectionKey = Exclude<keyof GenerateReportInput['sections'], symbol | number>;
+
+
+const allSections: { id: SectionKey, label: string }[] = [
+    { id: 'introduction', label: 'Introduction' },
+    { id: 'history', label: 'History' },
+    { id: 'benefits', label: 'Benefits' },
+    { id: 'challenges', label: 'Challenges' },
+    { id: 'currentTrends', label: 'Current Trends' },
+    { id: 'futureScope', label: 'Future Scope' },
+];
+
 export default function Home() {
   const [report, setReport] = useState<ReportData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -44,6 +59,7 @@ export default function Home() {
   const { toast } = useToast();
   const [searchType, setSearchType] = useState<SearchType>('web');
   const [generateWithReferences, setGenerateWithReferences] = useState(false);
+  const [selectedSections, setSelectedSections] = useState<SectionKey[]>(allSections.map(s => s.id));
   
   const handleSelectTopic = (topic: string) => {
     form.setValue('topic', topic);
@@ -249,7 +265,12 @@ export default function Home() {
     setReport(null);
     form.clearErrors();
 
-    const result = await handleGenerateReport({ topic: values.topic, searchType, generateWithReferences });
+    const result = await handleGenerateReport({ 
+        topic: values.topic, 
+        searchType, 
+        generateWithReferences,
+        sections: searchType === 'concise' ? undefined : selectedSections,
+    });
 
     if (result.error) {
       toast({
@@ -276,8 +297,8 @@ export default function Home() {
       return report !== null && 'report' in report && typeof report.report === 'string' && 'title' in report && !('summary' in report);
   };
 
-  const isStandardReport = (report: ReportData | null): report is { title: string; introduction: string; history: string; benefits: string; challenges: string; currentTrends: string; futureScope: string; sources?: string } => {
-    return report !== null && 'introduction' in report && 'history' in report;
+  const isStandardReport = (report: ReportData | null): report is { title: string; introduction?: string; history?: string; benefits?: string; challenges?: string; currentTrends?: string; futureScope?: string; sources?: string } => {
+    return report !== null && ('introduction' in report || 'history' in report || 'benefits' in report);
   }
 
   const renderFormattedReport = (reportText: string) => {
@@ -494,6 +515,48 @@ export default function Home() {
                           onCheckedChange={setGenerateWithReferences}
                         />
                       </div>
+                      {searchType !== 'concise' && (
+                        <>
+                          <Separator orientation="vertical" className="h-6" />
+                           <Popover>
+                                <PopoverTrigger asChild>
+                                    <Button variant="ghost" size="sm" className="rounded-full">
+                                        <Settings className="mr-2 h-4 w-4" />
+                                        Customize
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-64 p-4">
+                                    <div className="space-y-4">
+                                        <h4 className="font-medium leading-none">Customize Sections</h4>
+                                        <p className="text-sm text-muted-foreground">
+                                            Select the sections to include in your report.
+                                        </p>
+                                        <div className="space-y-2">
+                                            {allSections.map((section) => (
+                                                <div key={section.id} className="flex items-center space-x-2">
+                                                    <Checkbox
+                                                        id={section.id}
+                                                        checked={selectedSections.includes(section.id)}
+                                                        onCheckedChange={(checked) => {
+                                                            return checked
+                                                                ? setSelectedSections([...selectedSections, section.id])
+                                                                : setSelectedSections(selectedSections.filter((id) => id !== section.id));
+                                                        }}
+                                                    />
+                                                    <label
+                                                        htmlFor={section.id}
+                                                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                                    >
+                                                        {section.label}
+                                                    </label>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </PopoverContent>
+                            </Popover>
+                        </>
+                      )}
                   </div>
               </div>
             </div>
