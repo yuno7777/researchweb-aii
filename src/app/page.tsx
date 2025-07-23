@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { jsPDF } from 'jspdf';
-import { ArrowUp, Menu, Trash2 } from 'lucide-react';
+import { ArrowUp, Menu, Trash2, FileText, List } from 'lucide-react';
 
 import type { GenerateReportOutput } from '@/ai/flows/generate-report';
 import { useLocalStorage } from '@/hooks/use-local-storage';
@@ -24,15 +24,18 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import { GradientText } from '@/components/GradientText';
 import { HomePageContent } from '@/components/HomePageContent';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const formSchema = z.object({
   topic: z.string().min(3, { message: "Topic must be at least 3 characters long." }).max(100, { message: "Topic must be at most 100 characters long." }),
 });
 
 type ReportData = GenerateReportOutput['report'];
+type ConciseReportData = GenerateReportOutput['conciseReport'];
 
 export default function Home() {
   const [report, setReport] = useState<ReportData | null>(null);
+  const [conciseReport, setConciseReport] = useState<ConciseReportData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [history, setHistory] = useLocalStorage<string[]>('report-history', []);
   const [searchType, setSearchType] = useState<'web' | 'deep' | 'concise'>('web');
@@ -208,18 +211,24 @@ export default function Home() {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
     setReport(null);
+    setConciseReport(null);
     form.clearErrors();
 
-    const result = await handleGenerateReport({ topic: values.topic });
+    const result = await handleGenerateReport({ topic: values.topic, searchType });
 
-    if (result.error || !result.report) {
+    if (result.error) {
       toast({
         variant: "destructive",
         title: "Error Generating Report",
-        description: result.error || "An unknown error occurred.",
+        description: result.error,
       });
     } else {
-      setReport(result.report);
+        if (result.report) {
+            setReport(result.report);
+        }
+        if (result.conciseReport) {
+            setConciseReport(result.conciseReport);
+        }
       if (!history.includes(values.topic)) {
         setHistory([values.topic, ...history]);
       }
@@ -315,8 +324,38 @@ export default function Home() {
                   <ReportDisplay report={report} onReportUpdate={handleReportUpdate} onExportPdf={handleExportPdf} />
                 </div>
               )}
+
+              {conciseReport && !isLoading && (
+                  <div className="py-12 max-w-4xl mx-auto">
+                      <Card>
+                          <CardHeader>
+                              <CardTitle className="flex items-center gap-2">
+                                  <FileText />
+                                  Concise Report
+                              </CardTitle>
+                          </CardHeader>
+                          <CardContent className="space-y-6">
+                              <div>
+                                  <h3 className="font-semibold mb-2">Summary</h3>
+                                  <p className="text-muted-foreground whitespace-pre-wrap">{conciseReport.summary}</p>
+                              </div>
+                              <div>
+                                  <h3 className="font-semibold mb-2">Key Points</h3>
+                                  <ul className="space-y-2">
+                                      {conciseReport.keyPoints.map((point, index) => (
+                                          <li key={index} className="flex items-start gap-2">
+                                              <List className="h-4 w-4 mt-1 text-primary"/>
+                                              <span className="text-muted-foreground">{point}</span>
+                                          </li>
+                                      ))}
+                                  </ul>
+                              </div>
+                          </CardContent>
+                      </Card>
+                  </div>
+              )}
               
-              {!isLoading && !report && history.length > 0 && (
+              {!isLoading && !report && !conciseReport && history.length > 0 && (
                 <div className="py-12 max-w-4xl mx-auto">
                     <div className="flex items-center justify-between pb-4">
                         <h3 className="text-xl font-bold">Search History</h3>
@@ -356,5 +395,3 @@ export default function Home() {
   );
 
 }
-
-    
