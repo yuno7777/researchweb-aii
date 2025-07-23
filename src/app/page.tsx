@@ -39,7 +39,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [history, setHistory] = useLocalStorage<string[]>('report-history', []);
   const { toast } = useToast();
-  const [searchType, setSearchType] = useState<SearchType>('concise');
+  const [searchType, setSearchType] = useState<SearchType>('web');
   
   const handleSelectTopic = (topic: string) => {
     form.setValue('topic', topic);
@@ -190,11 +190,11 @@ export default function Home() {
             if ('summary' in report && 'keyPoints' in report) {
                  addSection('Summary', report.summary);
                  addSection('Key Points', report.keyPoints);
-            } else if ('conciseReport' in report) {
-                 addSection('Concise Report', report.conciseReport);
+            } else if ('report' in report && 'title' in report && typeof report.report === 'string') {
+                addSection(report.title, report.report);
             } else {
                 const sectionOrder: (keyof typeof report)[] = ['introduction', 'history', 'benefits', 'challenges', 'currentTrends', 'futureScope'];
-                const sectionTitles: Record<keyof typeof report, string> = {
+                const sectionTitles: Record<string, string> = {
                   introduction: 'Introduction',
                   history: 'History',
                   benefits: 'Benefits',
@@ -205,8 +205,9 @@ export default function Home() {
                 };
 
                 sectionOrder.forEach(sectionKey => {
-                    if (report[sectionKey]) {
-                        addSection(sectionTitles[sectionKey], report[sectionKey] as string);
+                    const key = sectionKey as keyof typeof report;
+                    if (report[key]) {
+                        addSection(sectionTitles[key], report[key] as string);
                     }
                 });
             }
@@ -259,9 +260,13 @@ export default function Home() {
     }
     setIsLoading(false);
   };
-
+  
   const isConciseReport = (report: ReportData | null): report is { summary: string; keyPoints: string[] } => {
     return report !== null && 'summary' in report && 'keyPoints' in report;
+  };
+
+  const isDeepReport = (report: ReportData | null): report is { title: string; report: string } => {
+      return report !== null && 'report' in report && typeof report.report === 'string';
   };
 
   return (
@@ -378,7 +383,7 @@ export default function Home() {
                               </Button>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>Concise search mode: Provides concise, fact-focused responses using internet sources</p>
+                            <p>Get a 300-word summary and 10-15 key takeaways.</p>
                           </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
@@ -410,6 +415,17 @@ export default function Home() {
                                         ))}
                                     </ul>
                                 </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+                ) : isDeepReport(report) ? (
+                    <div className="py-12 max-w-4xl mx-auto">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>{report.title}</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-6">
+                                <p className="text-base text-muted-foreground leading-relaxed whitespace-pre-wrap">{report.report}</p>
                             </CardContent>
                         </Card>
                     </div>

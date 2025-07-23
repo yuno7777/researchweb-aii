@@ -33,8 +33,14 @@ const ConciseReportSchema = z.object({
     keyPoints: z.array(z.string()).describe("A list of 10-15 key takeaways or bullet points about the topic."),
 });
 
+const DeepReportSchema = z.object({
+    title: z.string().describe("A concise and engaging title for the report."),
+    report: z.string().describe("A comprehensive and in-depth report of at least 1200 words. It should be well-structured with clear paragraphs and headings for different sections like Introduction, History, Benefits, etc."),
+});
+
+
 const GenerateReportOutputSchema = z.object({
-    report: z.union([StandardReportSchema, ConciseReportSchema]),
+    report: z.union([StandardReportSchema, ConciseReportSchema, DeepReportSchema]),
 });
 export type GenerateReportOutput = z.infer<typeof GenerateReportOutputSchema>;
 
@@ -64,20 +70,12 @@ For the topic "{{{topic}}}", please provide a detailed explanation for each of t
 const deepResearchPrompt = ai.definePrompt({
     name: 'deepResearchPrompt',
     input: { schema: GenerateReportInputSchema },
-    output: { schema: StandardReportSchema },
-    prompt: `You are a panel of expert AI research analysts. Your task is to generate a highly detailed, academic-style report on the given topic, ensuring the total length is at least 1200 words. Your analysis must be thorough, insightful, and well-structured.
+    output: { schema: DeepReportSchema },
+    prompt: `You are an expert AI research analyst. Your task is to generate a highly detailed, academic-style report on the given topic, ensuring the total length is at least 1200 words. Your analysis must be thorough, insightful, and well-structured.
 
-IMPORTANT: Your response must be a valid JSON object that strictly adheres to the provided output schema.
-
-For the topic "{{{topic}}}", provide an exhaustive and in-depth explanation for each of the following JSON keys:
-
-- title: A concise and engaging title for the report.
-- introduction: A compelling introduction that clearly defines the topic, explains its significance, and gives a detailed overview of what the report will cover. This should be a substantial section.
-- history: An in-depth look at the historical background of the topic, covering its origins, key milestones, and evolution.
-- benefits: A detailed explanation of the topic's benefits, supported by examples or data. Discuss the positive impacts on society, industry, or individuals.
-- challenges: A thorough analysis of the problems, difficulties, and criticisms related to the topic, including ethical, technical, or social hurdles.
-- currentTrends: A detailed analysis of the latest trends, recent research, and current events shaping the topic.
-- futureScope: A thoughtful forecast of the topic's future, including potential innovations and long-term implications over the next decade.
+For the topic "{{{topic}}}", provide:
+- A concise and engaging title.
+- A comprehensive report that is at least 1200 words long. Structure the report with clear headings for sections like Introduction, Historical Background, Key Benefits, Challenges, Current Trends, and Future Scope. Use a mix of detailed paragraphs and bullet points for clarity.
 `,
 });
 
