@@ -106,19 +106,22 @@ const generateReportFlow = ai.defineFlow(
   },
   async (input): Promise<GenerateReportOutput> => {
     switch (input.searchType) {
-        case 'concise':
-            const { output: conciseOutput } = await concisePrompt(input);
-            if (!conciseOutput) throw new Error("Concise report generation failed.");
-            return { conciseReport: conciseOutput, searchType: 'concise' };
-        case 'deep':
-            const { output: deepOutput } = await deepResearchPrompt(input);
-            if (!deepOutput) throw new Error("Deep research report generation failed.");
-            return { report: deepOutput, searchType: 'deep' };
+        case 'concise': {
+            const { output } = await concisePrompt(input);
+            if (!output) throw new Error("Concise report generation failed.");
+            return { conciseReport: output, searchType: 'concise' };
+        }
+        case 'deep': {
+            const { output } = await deepResearchPrompt(input);
+            if (!output) throw new Error("Deep research report generation failed.");
+            return { report: output, searchType: 'deep' };
+        }
         case 'web':
-        default:
-            const { output: webOutput } = await reportPrompt(input);
-            if (!webOutput) throw new Error("Web report generation failed.");
-            return { report: webOutput, searchType: 'web' };
+        default: {
+            const { output } = await reportPrompt(input);
+            if (!output) throw new Error("Web report generation failed.");
+            return { report: output, searchType: 'web' };
+        }
     }
   }
 );
