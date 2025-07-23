@@ -67,20 +67,18 @@ const deepResearchPrompt = ai.definePrompt({
     name: 'deepResearchPrompt',
     input: {schema: GenerateReportInputSchema},
     output: {schema: StandardReportSchema},
-    prompt: `You are a panel of three expert AI research analysts. Your task is to conduct a deep, iterative investigation into the given topic and produce a highly detailed, analytical, and insightful report. The report must be at least 1500 words.
+    prompt: `You are an expert AI research analyst. Your task is to produce a highly detailed, analytical, and insightful report on the given topic. The report must be at least 1500 words.
 
-Your response should be titled "Deep Research Report: {{{topic}}}".
+For the topic "{{{topic}}}", generate the following sections. Each section must be comprehensive and well-structured.
 
-For the topic "{{{topic}}}", perform a multi-faceted analysis and generate the following sections. Each section should be comprehensive, containing a mix of detailed paragraphs for explanation and bullet points for key facts or data.
+- Introduction: A masterful introduction that frames the topic within a broader context, articulates its critical importance, and outlines the report's structure.
+- Historical Context & Evolution: A deep analysis of the key events, paradigm shifts, and influential figures that have shaped the topic.
+- Core Benefits & Societal Impact: A nuanced analysis of the primary and secondary benefits, supported by data and real-world examples.
+- Critical Challenges & Nuanced Risks: A thorough examination of the challenges, including systemic issues and ethical dilemmas, and their potential consequences.
+- Current Landscape & Emerging Trends: A synthesis of the most current information, including cutting-edge research, market dynamics, and emerging trends.
+- Future Trajectory & Strategic Outlook: A sophisticated forecast, offering a scenario analysis of potential futures and strategic recommendations.
 
-- Introduction: Provide a masterful introduction that frames the topic within a broader context, articulates its critical importance, and outlines the sophisticated analytical approach your panel will undertake.
-- Historical Context & Evolution: Go beyond a simple timeline. Analyze the key inflection points, paradigm shifts, and influential figures that have shaped the topic. Discuss the "why" behind the historical events using both narrative paragraphs and a list of key milestones.
-- Core Benefits & Societal Impact: Provide a nuanced analysis of the primary and secondary benefits. Use data-driven arguments in paragraphs and supplement with bullet points highlighting specific case studies or statistics to illustrate the large-scale impact.
-- Critical Challenges & Nuanced Risks: Do not just list challenges. Analyze the root causes of these challenges in prose, including systemic issues and ethical dilemmas. Use a bulleted list to summarize the most critical risks and their potential consequences.
-- Current Landscape & Emerging Trends: Synthesize the most current information, including cutting-edge research and market dynamics. Describe the overall landscape in paragraphs and use bullet points to call out the most significant emerging trends.
-- Future Trajectory & Strategic Outlook: Provide a sophisticated forecast. Instead of just predictions, offer a scenario analysis of potential futures (e.g., optimistic, pessimistic, most likely) in paragraph form. Conclude with a bulleted list of strategic recommendations for key stakeholders.
-
-Your panel must ensure the final report is not just descriptive but deeply analytical, connecting disparate pieces of information to form a cohesive and insightful narrative of at least 1500 words.
+Ensure the final report is deeply analytical, connecting disparate pieces of information to form a cohesive and insightful narrative of at least 1500 words.
 `,
 });
 
