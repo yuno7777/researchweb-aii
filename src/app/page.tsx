@@ -33,6 +33,14 @@ const formSchema = z.object({
 type ReportData = GenerateReportOutput['report'];
 type ConciseReportData = GenerateReportOutput['conciseReport'];
 
+const WebIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 h-4 w-4">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="2" y1="12" x2="22" y2="12"></line>
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+    </svg>
+)
+
 export default function Home() {
   const [report, setReport] = useState<ReportData | null>(null);
   const [conciseReport, setConciseReport] = useState<ConciseReportData | null>(null);
@@ -319,7 +327,17 @@ export default function Home() {
 
                           <div className="flex items-center justify-center gap-4 text-sm">
                             <TooltipProvider>
-                              <Button type="button" variant={searchType === 'web' ? 'secondary' : 'ghost'} onClick={() => setSearchType('web')} className="rounded-full">Web Search</Button>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button type="button" variant={searchType === 'web' ? 'secondary' : 'ghost'} onClick={() => setSearchType('web')} className="rounded-full">
+                                    <WebIcon />
+                                    Web Search
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Enable web search for brief, factual information from the internet (150-350 words)</p>
+                                </TooltipContent>
+                              </Tooltip>
                               <Tooltip>
                                 <TooltipTrigger asChild>
                                   <Button type="button" variant={searchType === 'deep' ? 'secondary' : 'ghost'} onClick={() => setSearchType('deep')} className="rounded-full">
