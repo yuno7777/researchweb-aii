@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { jsPDF } from 'jspdf';
-import { ArrowUp, Menu, Trash2, FileText, List, FileDown } from 'lucide-react';
+import { ArrowUp, Menu, Trash2, FileText, List, FileDown, BrainCircuit } from 'lucide-react';
 
 import type { GenerateReportOutput } from '@/ai/flows/generate-report';
 import { useLocalStorage } from '@/hooks/use-local-storage';
@@ -320,7 +320,17 @@ export default function Home() {
                           <div className="flex items-center justify-center gap-4 text-sm">
                             <TooltipProvider>
                               <Button type="button" variant={searchType === 'web' ? 'secondary' : 'ghost'} onClick={() => setSearchType('web')} className="rounded-full">Web Search</Button>
-                              <Button type="button" variant={searchType === 'deep' ? 'secondary' : 'ghost'} onClick={() => setSearchType('deep')} className="rounded-full">Deep Research</Button>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button type="button" variant={searchType === 'deep' ? 'secondary' : 'ghost'} onClick={() => setSearchType('deep')} className="rounded-full">
+                                    <BrainCircuit className="mr-2 h-4 w-4" />
+                                    Deep Research
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Enable Deep Research for extensive academic-style analysis (1200+ words)</p>
+                                </TooltipContent>
+                              </Tooltip>
                               <Tooltip>
                                 <TooltipTrigger asChild>
                                   <Button type="button" variant={searchType === 'concise' ? 'secondary' : 'ghost'} onClick={() => setSearchType('concise')} className="rounded-full">
