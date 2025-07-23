@@ -47,7 +47,7 @@ export async function generateReport(input: GenerateReportInput): Promise<Genera
 const reportPrompt = ai.definePrompt({
   name: 'reportPrompt',
   input: {schema: GenerateReportInputSchema},
-  output: {schema: z.object({ report: StandardReportSchema }) },
+  output: {schema: StandardReportSchema },
   prompt: `You are an expert AI research assistant. Your task is to generate a comprehensive, in-depth, and well-structured report on the given topic. The total length of the report should be at least 1500 words.
 
 For the topic "{{{topic}}}", please provide a detailed explanation for each of the following sections:
@@ -57,7 +57,7 @@ For the topic "{{{topic}}}", please provide a detailed explanation for each of t
 - Benefits: Elaborate on the advantages and benefits associated with the topic. Provide specific examples, data, or case studies to support your points. Discuss the positive impacts on society, industry, or individuals.
 - Challenges: Thoroughly analyze the problems, difficulties, and criticisms related to the topic. Discuss any ethical, technical, or social hurdles. Explain the complexities and nuances of these challenges.
 - Current Trends: Detail the latest trends and developments. Analyze recent research, emerging technologies, or current events that are shaping the topic. Provide a forward-looking perspective on what is happening right now.
-- Future Scope: Extrapolate on the potential future implications and applications of the topic. Discuss long-term potential, possible innovations, and how it might evolve over the next decade. Provide a thoughtful and well-reasoned forecast.
+- Future Scope: Extrapolate on the potential future implications and applications of the topic. Discuss long-term potential, possible innovations, and how it might evolve over the next decade. Provide a thoughtful and well-reasonsed forecast.
 
 Please ensure your writing is explanatory, insightful, and goes beyond surface-level descriptions. The final output must be a single, cohesive report that is at least 1500 words long.
 `,
@@ -66,7 +66,7 @@ Please ensure your writing is explanatory, insightful, and goes beyond surface-l
 const deepResearchPrompt = ai.definePrompt({
     name: 'deepResearchPrompt',
     input: {schema: GenerateReportInputSchema},
-    output: {schema: z.object({ report: StandardReportSchema })},
+    output: {schema: StandardReportSchema},
     prompt: `You are a panel of three expert AI research analysts. Your task is to conduct a deep, iterative investigation into the given topic and produce a highly detailed, analytical, and insightful report. The report must be at least 2000 words.
 
 Your response should be titled "Deep Research Report: {{{topic}}}".
@@ -87,7 +87,7 @@ Your panel must ensure the final report is not just descriptive but deeply analy
 const concisePrompt = ai.definePrompt({
     name: 'concisePrompt',
     input: {schema: GenerateReportInputSchema},
-    output: {schema: z.object({ conciseReport: ConciseReportSchema }) },
+    output: {schema: ConciseReportSchema },
     prompt: `You are a factual AI assistant. Your task is to provide a concise and direct answer to the user's query about "{{{topic}}}".
 
 The response should be structured as follows:
@@ -109,16 +109,16 @@ const generateReportFlow = ai.defineFlow(
         case 'concise':
             const { output: conciseOutput } = await concisePrompt(input);
             if (!conciseOutput) throw new Error("Concise report generation failed.");
-            return { ...conciseOutput, searchType: 'concise' };
+            return { conciseReport: conciseOutput, searchType: 'concise' };
         case 'deep':
             const { output: deepOutput } = await deepResearchPrompt(input);
             if (!deepOutput) throw new Error("Deep research report generation failed.");
-            return { ...deepOutput, searchType: 'deep' };
+            return { report: deepOutput, searchType: 'deep' };
         case 'web':
         default:
             const { output: webOutput } = await reportPrompt(input);
             if (!webOutput) throw new Error("Web report generation failed.");
-            return { ...webOutput, searchType: 'web' };
+            return { report: webOutput, searchType: 'web' };
     }
   }
 );
