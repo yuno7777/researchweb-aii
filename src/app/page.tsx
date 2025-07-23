@@ -129,70 +129,159 @@ export default function Home() {
         addPageWithHeaderFooter();
         
         const addSection = (title: string, content: string | string[]) => {
-            pdf.setFont('helvetica', 'bold');
-            pdf.setFontSize(16);
-            pdf.setTextColor(49, 53, 57);
+          pdf.setFont('helvetica', 'bold');
+          pdf.setFontSize(16);
+          pdf.setTextColor(49, 53, 57);
 
-            if (y + 25 > pageHeight - pageMargin) { 
-                addPageWithHeaderFooter();
-                pdf.setFont('helvetica', 'bold');
-                pdf.setFontSize(16);
-                pdf.setTextColor(49, 53, 57);
-            }
-            
-            pdf.text(title, pageMargin, y);
-            y += 7;
-            
-            pdf.setDrawColor(222, 226, 230);
-            pdf.setLineWidth(0.25);
-            pdf.line(pageMargin, y, contentWidth + pageMargin, y);
-            y += 8;
-            
-            pdf.setFont('helvetica', 'normal');
-            pdf.setFontSize(12);
-            pdf.setTextColor(33, 37, 41);
-            
+          if (y + 25 > pageHeight - pageMargin) { 
+              addPageWithHeaderFooter();
+          }
+          
+          pdf.text(title, pageMargin, y);
+          y += 7;
+          
+          pdf.setDrawColor(222, 226, 230);
+          pdf.setLineWidth(0.25);
+          pdf.line(pageMargin, y, contentWidth + pageMargin, y);
+          y += 8;
+          
+          const lineHeight = 8;
+          
+          if (Array.isArray(content)) {
+              content.forEach(line => {
+                  const bulletPoint = `• ${line}`;
+                  const contentLines = pdf.splitTextToSize(bulletPoint, contentWidth - 5);
+                  contentLines.forEach((splitLine: string) => {
+                       if (y + lineHeight > pageHeight - pageMargin) {
+                          addPageWithHeaderFooter();
+                      }
+                      pdf.setFont('helvetica', 'normal');
+                      pdf.setFontSize(12);
+                      pdf.setTextColor(33, 37, 41);
+                      pdf.text(splitLine, pageMargin + 5, y);
+                      y += lineHeight;
+                  });
+              });
+          } else {
+              const contentLines = pdf.splitTextToSize(content, contentWidth);
+              contentLines.forEach((line: string) => {
+                  if (y + lineHeight > pageHeight - pageMargin) {
+                      addPageWithHeaderFooter();
+                  }
+                  pdf.setFont('helvetica', 'normal');
+                  pdf.setFontSize(12);
+                  pdf.setTextColor(33, 37, 41);
+                  pdf.text(line, pageMargin, y);
+                  y += lineHeight;
+              });
+          }
+          y += 10;
+        };
+
+        const addDeepReportSection = (title: string, content: string) => {
+            const subtitles = [
+                "Introduction", "Historical Background", "History", "Key Benefits", "Benefits",
+                "Challenges and Criticisms", "Challenges and Risks", "Challenges", "Current Trends", "Future Scope",
+                "Conclusion"
+            ];
+            const subtitleRegex = new RegExp(`^###\\s*(${subtitles.join('|')})`, 'i');
+            const boldRegex = /\*\*(.*?)\*\*/g;
+            const bulletRegex = /^\s*([*•-])\s(.*)/;
+            const numberedListRegex = /^\s*(\d+)\.\s(.*)/;
             const lineHeight = 8;
+
+            const checkPageBreak = (neededHeight: number) => {
+                if (y + neededHeight > pageHeight - pageMargin) {
+                    addPageWithHeaderFooter();
+                }
+            };
             
-            if (Array.isArray(content)) {
-                content.forEach(line => {
-                    const bulletPoint = `• ${line}`;
-                    const contentLines = pdf.splitTextToSize(bulletPoint, contentWidth - 5);
+            // Report Title
+            pdf.setFont('helvetica', 'bold');
+            pdf.setFontSize(20);
+            pdf.setTextColor(32, 19, 32);
+            checkPageBreak(15);
+            const titleLines = pdf.splitTextToSize(title, contentWidth);
+            pdf.text(titleLines, pdf.internal.pageSize.getWidth() / 2, y, { align: 'center' });
+            y += titleLines.length * 10;
+            y += 10;
+
+            const lines = content.split('\n').filter(line => line.trim() !== '');
+            lines.forEach(line => {
+                const subtitleMatch = line.match(subtitleRegex);
+                if (subtitleMatch) {
+                    checkPageBreak(15);
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.setFontSize(16);
+                    pdf.setTextColor(49, 53, 57);
+                    pdf.text(subtitleMatch[1].trim(), pageMargin, y);
+                    y += 10;
+                    return;
+                }
+
+                const bulletMatch = line.match(bulletRegex);
+                if (bulletMatch) {
+                    checkPageBreak(lineHeight);
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.setFontSize(12);
+                    pdf.setTextColor(33, 37, 41);
+                    const contentLines = pdf.splitTextToSize(`• ${bulletMatch[2]}`, contentWidth - 5);
                     contentLines.forEach((splitLine: string) => {
-                         if (y + lineHeight > pageHeight - pageMargin) {
-                            addPageWithHeaderFooter();
-                             pdf.setFont('helvetica', 'normal');
-                             pdf.setFontSize(12);
-                             pdf.setTextColor(33, 37, 41);
-                        }
+                        checkPageBreak(lineHeight);
                         pdf.text(splitLine, pageMargin + 5, y);
                         y += lineHeight;
                     });
-                });
-            } else {
-                const contentLines = pdf.splitTextToSize(content, contentWidth);
-                contentLines.forEach((line: string) => {
-                    if (y + lineHeight > pageHeight - pageMargin) {
-                        addPageWithHeaderFooter();
-                        pdf.setFont('helvetica', 'normal');
-                        pdf.setFontSize(12);
-                        pdf.setTextColor(33, 37, 41);
-                    }
-                    pdf.text(line, pageMargin, y);
+                    return;
+                }
+
+                const numberedMatch = line.match(numberedListRegex);
+                 if (numberedMatch) {
+                    checkPageBreak(lineHeight);
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.setFontSize(12);
+                    pdf.setTextColor(33, 37, 41);
+                    const contentLines = pdf.splitTextToSize(`${numberedMatch[1]}. ${numberedMatch[2]}`, contentWidth - 5);
+                    contentLines.forEach((splitLine: string) => {
+                        checkPageBreak(lineHeight);
+                        pdf.text(splitLine, pageMargin + 5, y);
+                        y += lineHeight;
+                    });
+                    return;
+                }
+
+                // Handle paragraphs with potential bolding
+                checkPageBreak(lineHeight);
+                pdf.setFont('helvetica', 'normal');
+                pdf.setFontSize(12);
+                pdf.setTextColor(33, 37, 41);
+
+                const parts = line.split(boldRegex);
+                let currentX = pageMargin;
+
+                const styledLine = parts.map(part => ({
+                    text: part,
+                    isBold: line.includes(`**${part}**`)
+                }));
+
+                const fullLineText = line.replace(boldRegex, '$1');
+                const textLines = pdf.splitTextToSize(fullLineText, contentWidth);
+                
+                textLines.forEach((textLine:string) => {
+                    checkPageBreak(lineHeight);
+                    pdf.text(textLine, pageMargin, y);
                     y += lineHeight;
                 });
-            }
-            y += 10;
+                y += lineHeight / 2; // Paragraph spacing
+            });
         };
 
-
         if (report) {
-            if ('summary' in report && 'keyPoints' in report) {
+            if ('summary' in report && 'keyPoints' in report) { // Concise Report
                  addSection('Summary', report.summary);
                  addSection('Key Points', report.keyPoints);
-            } else if ('report' in report && 'title' in report && typeof report.report === 'string') {
-                addSection(report.title, report.report);
-            } else {
+            } else if ('report' in report && 'title' in report && typeof report.report === 'string') { // Deep Report
+                addDeepReportSection(report.title, report.report);
+            } else { // Standard Report
                 const sectionOrder: (keyof typeof report)[] = ['introduction', 'history', 'benefits', 'challenges', 'currentTrends', 'futureScope'];
                 const sectionTitles: Record<string, string> = {
                   introduction: 'Introduction',
@@ -270,12 +359,7 @@ export default function Home() {
   };
   
   const renderFormattedReport = (reportText: string) => {
-    const subtitles = [
-        "Introduction", "Historical Background", "History", "Key Benefits", "Benefits",
-        "Challenges and Criticisms", "Challenges and Risks", "Challenges", "Current Trends", "Future Scope",
-        "Conclusion"
-    ];
-    const subtitleRegex = new RegExp(`^###\\s*(${subtitles.join('|')})`, 'i');
+    const subtitleRegex = /^###\s*(.*?)(?:\s*:)?$/i;
     const boldRegex = /\*\*(.*?)\*\*/g;
     const bulletRegex = /^\s*([*•-])\s(.*)/;
     const numberedListRegex = /^\s*(\d+)\.\s(.*)/;
@@ -433,7 +517,7 @@ export default function Home() {
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent>
-                                <p>Enable Deep Research for extensive academic-style analysis</p>
+                                <p>Enable Deep Research for extensive academic-style analysis (approx. 1600 words)</p>
                             </TooltipContent>
                         </Tooltip>
                       <Tooltip>
@@ -551,5 +635,7 @@ export default function Home() {
     </div>
   );
 }
+
+    
 
     
