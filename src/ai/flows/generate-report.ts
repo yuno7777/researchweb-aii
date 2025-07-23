@@ -70,9 +70,18 @@ For the topic "{{{topic}}}", please provide a detailed explanation for each of t
 const deepResearchPrompt = ai.definePrompt({
     name: 'deepResearchPrompt',
     input: { schema: GenerateReportInputSchema },
+    output: { schema: StandardReportSchema },
     prompt: `You are an expert AI research analyst. Your task is to generate a comprehensive and in-depth report on the given topic of approximately 1600 words. Your analysis must be thorough, insightful, and well-structured.
 
-For the topic "{{{topic}}}", provide a comprehensive report that is well-structured with clear headings for sections like Introduction, Historical Background, Key Benefits, Challenges, Current Trends, and Future Scope. Use a mix of detailed paragraphs and bullet points for clarity.
+For the topic "{{{topic}}}", provide a very detailed and extensive explanation for each of the following sections, ensuring the total word count is around 1600 words:
+
+- Title: A concise and engaging title for the report.
+- Introduction: Provide a compelling introduction that clearly defines the topic, explains its significance, and gives a brief overview of what the report will cover.
+- History: Delve into the historical background of the topic. Cover its origins, key milestones, and the evolution of thought or technology related to it.
+- Benefits: Elaborate on the advantages and benefits associated with the topic. Provide specific examples or data to support your points.
+- Challenges: Thoroughly analyze the problems, difficulties, and criticisms related to the topic.
+- Current Trends: Detail the latest trends and developments shaping the topic.
+- Future Scope: Extrapolate on the potential future implications and applications of the topic.
 `,
 });
 
@@ -99,15 +108,8 @@ const generateReportFlow = ai.defineFlow(
         const { output } = await reportPrompt(input);
         reportOutput = output;
     } else if (input.searchType === 'deep') {
-        const { text } = await deepResearchPrompt(input);
-        const reportText = text;
-        if (!reportText) {
-          throw new Error('Deep research failed to generate a report.');
-        }
-        reportOutput = {
-          title: input.topic,
-          report: reportText,
-        };
+        const { output } = await deepResearchPrompt(input);
+        reportOutput = output;
     } else {
         const { output } = await conciseReportPrompt(input);
         reportOutput = output;

@@ -333,7 +333,11 @@ export default function Home() {
   const isDeepReport = (report: ReportData | null): report is { title: string; report: string } => {
       return report !== null && 'report' in report && typeof report.report === 'string';
   };
-  
+
+  const isStandardReport = (report: ReportData | null): report is { title: string, introduction: string } => {
+    return report !== null && 'introduction' in report && !('summary' in report) && !('report' in report);
+  }
+
   const renderFormattedReport = (reportText: string) => {
     const subtitleRegex = /^###\s*(.*?)(?:\s*|\n|:)/i;
     const bulletRegex = /^\s*([*•-])\s(.*)/;
@@ -585,13 +589,13 @@ export default function Home() {
                             {renderFormattedReport(report.report)}
                         </CardContent>
                     </Card>
-                ) : (
+                ) : isStandardReport(report) ? (
                   <Card>
                     <CardContent className="p-0">
                       <ReportDisplay report={report} onReportUpdate={handleReportUpdate} />
                     </CardContent>
                   </Card>
-                )}
+                ) : null}
                 </div>
               )}
               
