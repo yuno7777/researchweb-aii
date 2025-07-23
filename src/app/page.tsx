@@ -384,7 +384,7 @@ export default function Home() {
                                   <FileText />
                                   Concise Report
                               </CardTitle>
-                              <Button variant="outline" size="sm" onClick={handleExportPdf}>
+                              <Button variant="outline" size="sm" onClick={handleExportPdf} className="rounded-full">
                                   <FileDown className="mr-2 h-4 w-4" />
                                   Export as PDF
                               </Button>
