@@ -274,16 +274,35 @@ export default function Home() {
         "Introduction", "Historical Background", "History", "Key Benefits", "Benefits", 
         "Challenges and Criticisms", "Challenges", "Current Trends", "Future Scope"
     ];
-    // This regex now handles optional markdown characters like '###' and trailing colons.
     const regex = new RegExp(`(^[#\\s*]*(${subtitles.join('|')})[:#\\s*]*$)`, 'gm');
     const sections = reportText.split(regex);
     
-    const content = [];
+    const formatText = (text: string) => {
+        const lines = text.split('\n').filter(line => line.trim() !== '');
+        return lines.map((line, index) => {
+            // Handle bullet points
+            if (line.trim().startsWith('*')) {
+                const cleanLine = line.trim().substring(1).trim();
+                const boldedLine = cleanLine.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                return <li key={index} dangerouslySetInnerHTML={{ __html: boldedLine }} />;
+            }
+            // Handle bold text
+            const boldedLine = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            return <p key={index} className="mb-2" dangerouslySetInnerHTML={{ __html: boldedLine }} />;
+        });
+    };
+
+    const content: JSX.Element[] = [];
+
     if (sections[0] && sections[0].trim()) {
+        const formatted = formatText(sections[0].trim());
         content.push(
-            <p key="intro-text" className="text-base text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                {sections[0].trim()}
-            </p>
+            <div key="intro-text" className="text-base text-muted-foreground leading-relaxed">
+                {formatted.map((item, index) => {
+                    if (item.type === 'li') return <ul key={index} className="list-disc list-inside ml-4">{item}</ul>
+                    return item;
+                })}
+            </div>
         );
     }
 
@@ -293,26 +312,41 @@ export default function Home() {
         const text = sections[i+2];
 
         if (subtitleClean && text) {
+            const formattedText = formatText(text.trim());
             content.push(
-                <div key={subtitleClean} className="prose dark:prose-invert max-w-none">
-                    <h3 className="text-xl font-bold mt-6 mb-2">{subtitleClean}</h3>
-                    <p className="text-base text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                        {text.trim()}
-                    </p>
+                <div key={subtitleClean} className="prose dark:prose-invert max-w-none mt-6">
+                    <h3 className="text-xl font-bold mb-2">{subtitleClean}</h3>
+                     <div className="text-base text-muted-foreground leading-relaxed">
+                        {formattedText.map((item, index) => {
+                            if (item.type === 'li') {
+                                // Group consecutive list items
+                                const listItems = [];
+                                for (let j = index; j < formattedText.length; j++) {
+                                    if(formattedText[j].type === 'li') {
+                                        listItems.push(formattedText[j]);
+                                    } else {
+                                        break;
+                                    }
+                                }
+                                if (index > 0 && formattedText[index-1].type === 'li') return null; // Already processed
+                                return <ul key={`ul-${index}`} className="list-disc list-inside ml-4 my-2">{listItems}</ul>
+                            }
+                            return item;
+                        })}
+                    </div>
                 </div>
             );
         } else if (fullSubtitleMatch && !subtitleClean && !text) {
-             // Handles cases where a subtitle might not be followed by content, though unlikely with current regex.
             const cleanedMatch = fullSubtitleMatch.replace(/[#*:]/g, "").trim();
             content.push(
-                 <div key={cleanedMatch} className="prose dark:prose-invert max-w-none">
-                    <h3 className="text-xl font-bold mt-6 mb-2">{cleanedMatch}</h3>
+                 <div key={cleanedMatch} className="prose dark:prose-invert max-w-none mt-6">
+                    <h3 className="text-xl font-bold mb-2">{cleanedMatch}</h3>
                 </div>
             )
         }
     }
     return content;
-};
+  };
 
   return (
     <div id="home" className="flex min-h-screen w-full flex-col bg-background text-foreground" suppressHydrationWarning>
