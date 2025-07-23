@@ -35,7 +35,7 @@ const ConciseReportSchema = z.object({
 
 const DeepReportSchema = z.object({
     title: z.string().describe("A concise and engaging title for the report."),
-    report: z.string().describe("A comprehensive and in-depth report of approximately 1600 words. It should be well-structured with clear paragraphs and headings for different sections like Introduction, History, Benefits, etc."),
+    report: z.string().describe("A comprehensive and in-depth report. It should be well-structured with clear paragraphs and headings for different sections like Introduction, History, Benefits, etc."),
 });
 
 
@@ -70,7 +70,7 @@ For the topic "{{{topic}}}", please provide a detailed explanation for each of t
 const deepResearchPrompt = ai.definePrompt({
     name: 'deepResearchPrompt',
     input: { schema: GenerateReportInputSchema },
-    prompt: `You are an expert AI research analyst. Your task is to generate a comprehensive and in-depth report of approximately 1600 words on the given topic. Your analysis must be thorough, insightful, and well-structured.
+    prompt: `You are an expert AI research analyst. Your task is to generate a comprehensive and in-depth report on the given topic. Your analysis must be thorough, insightful, and well-structured.
 
 For the topic "{{{topic}}}", provide a comprehensive report that is well-structured with clear headings for sections like Introduction, Historical Background, Key Benefits, Challenges, Current Trends, and Future Scope. Use a mix of detailed paragraphs and bullet points for clarity.
 `,
