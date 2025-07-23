@@ -67,8 +67,14 @@ export default function Home() {
       return title.replace(/\b\w/g, char => char.toUpperCase());
     };
     
-    const topicTitle = capitalizeTitle(form.getValues('topic'));
-    const fileName = `InsightForge_Report_${topicTitle.replace(/ /g, '_') || 'Untitled'}.pdf`;
+    let reportTitle: string;
+    if ('title' in report && report.title) {
+      reportTitle = capitalizeTitle(report.title);
+    } else {
+      reportTitle = capitalizeTitle(form.getValues('topic'));
+    }
+
+    const fileName = `InsightForge_Report_${reportTitle.replace(/ /g, '_') || 'Untitled'}.pdf`;
     
     toast({ title: 'Exporting PDF...', description: 'Please wait while your report is being prepared.' });
 
@@ -100,14 +106,10 @@ export default function Home() {
             addPageHeaderAndFooter();
         };
         
-        // --- TITLE PAGE ---
-        pdf.setFillColor(248, 249, 250); 
-        pdf.rect(0, 0, pdf.internal.pageSize.getWidth(), pdf.internal.pageSize.getHeight(), 'F');
-        
         pdf.setFont('helvetica', 'bold');
         pdf.setFontSize(28);
         pdf.setTextColor(32, 19, 32); 
-        const titleLines = pdf.splitTextToSize(topicTitle, contentWidth - 20);
+        const titleLines = pdf.splitTextToSize(reportTitle, contentWidth - 20);
         pdf.text(titleLines, pdf.internal.pageSize.getWidth() / 2, pageHeight / 2 - 20, { align: 'center' });
 
         pdf.setFont('helvetica', 'normal');
@@ -125,7 +127,6 @@ export default function Home() {
 
         pdf.setTextColor(0);
 
-        // --- CONTENT PAGES ---
         addPageWithHeaderFooter();
         
         const addSection = (title: string, content: string | string[]) => {
@@ -177,14 +178,9 @@ export default function Home() {
           }
           y += 10;
         };
-
-        const addDeepReportSection = (title: string, content: string) => {
-            const subtitles = [
-                "Introduction", "Historical Background", "History", "Key Benefits", "Benefits",
-                "Challenges and Criticisms", "Challenges and Risks", "Challenges", "Current Trends", "Future Scope",
-                "Conclusion"
-            ];
-            const subtitleRegex = new RegExp(`^###\\s*(${subtitles.join('|')})`, 'i');
+        
+        const addDeepReportSection = (content: string) => {
+            const subtitleRegex = /^###\s*(.*?)(?:\s*|\n|:)/i;
             const boldRegex = /\*\*(.*?)\*\*/g;
             const bulletRegex = /^\s*([*•-])\s(.*)/;
             const numberedListRegex = /^\s*(\d+)\.\s(.*)/;
@@ -195,23 +191,13 @@ export default function Home() {
                     addPageWithHeaderFooter();
                 }
             };
-            
-            // Report Title
-            pdf.setFont('helvetica', 'bold');
-            pdf.setFontSize(20);
-            pdf.setTextColor(32, 19, 32);
-            checkPageBreak(15);
-            const titleLines = pdf.splitTextToSize(title, contentWidth);
-            pdf.text(titleLines, pdf.internal.pageSize.getWidth() / 2, y, { align: 'center' });
-            y += titleLines.length * 10;
-            y += 10;
 
             const lines = content.split('\n').filter(line => line.trim() !== '');
             lines.forEach(line => {
                 const subtitleMatch = line.match(subtitleRegex);
                 if (subtitleMatch) {
                     checkPageBreak(15);
-                    y += 5; // Extra space before subtitle
+                    y += 5;
                     pdf.setFont('helvetica', 'bold');
                     pdf.setFontSize(16);
                     pdf.setTextColor(49, 53, 57);
@@ -223,9 +209,9 @@ export default function Home() {
                 const bulletMatch = line.match(bulletRegex);
                 if (bulletMatch) {
                     checkPageBreak(lineHeight);
-                    const bulletContent = bulletMatch[2];
-                    const contentLines = pdf.splitTextToSize(`• ${bulletContent.replace(boldRegex, '$1')}`, contentWidth - 5);
-                     contentLines.forEach((splitLine: string) => {
+                    const bulletContent = bulletMatch[2].replace(boldRegex, '$1');
+                    const contentLines = pdf.splitTextToSize(`• ${bulletContent}`, contentWidth - 5);
+                    contentLines.forEach((splitLine: string) => {
                         checkPageBreak(lineHeight);
                         pdf.setFont('helvetica', 'normal');
                         pdf.setFontSize(12);
@@ -239,8 +225,8 @@ export default function Home() {
                 const numberedMatch = line.match(numberedListRegex);
                  if (numberedMatch) {
                     checkPageBreak(lineHeight);
-                    const numberedContent = numberedMatch[2];
-                    const contentLines = pdf.splitTextToSize(`${numberedMatch[1]}. ${numberedContent.replace(boldRegex, '$1')}`, contentWidth - 5);
+                    const numberedContent = numberedMatch[2].replace(boldRegex, '$1');
+                    const contentLines = pdf.splitTextToSize(`${numberedMatch[1]}. ${numberedContent}`, contentWidth - 5);
                     contentLines.forEach((splitLine: string) => {
                         checkPageBreak(lineHeight);
                          pdf.setFont('helvetica', 'normal');
@@ -252,30 +238,27 @@ export default function Home() {
                     return;
                 }
 
-                // Handle paragraphs with potential bolding
                 checkPageBreak(lineHeight);
                 pdf.setFont('helvetica', 'normal');
                 pdf.setFontSize(12);
                 pdf.setTextColor(33, 37, 41);
-
                 const textLines = pdf.splitTextToSize(line.replace(boldRegex, '$1'), contentWidth);
-                
                 textLines.forEach((textLine:string) => {
                     checkPageBreak(lineHeight);
                     pdf.text(textLine, pageMargin, y);
                     y += lineHeight;
                 });
-                y += lineHeight / 2; // Paragraph spacing
+                y += lineHeight / 2;
             });
         };
 
         if (report) {
-            if ('summary' in report && 'keyPoints' in report) { // Concise Report
+            if ('summary' in report && 'keyPoints' in report) { 
                  addSection('Summary', report.summary);
                  addSection('Key Points', report.keyPoints);
-            } else if ('report' in report && 'title' in report && typeof report.report === 'string') { // Deep Report
-                addDeepReportSection(report.title, report.report);
-            } else { // Standard Report
+            } else if ('report' in report && 'title' in report && typeof report.report === 'string') { 
+                addDeepReportSection(report.report);
+            } else { 
                 const sectionOrder: (keyof typeof report)[] = ['introduction', 'history', 'benefits', 'challenges', 'currentTrends', 'futureScope'];
                 const sectionTitles: Record<string, string> = {
                   introduction: 'Introduction',
@@ -286,7 +269,6 @@ export default function Home() {
                   futureScope: 'Future Scope',
                   title: 'Title',
                 };
-
                 sectionOrder.forEach(sectionKey => {
                     const key = sectionKey as keyof typeof report;
                     if (report[key]) {
@@ -352,9 +334,8 @@ export default function Home() {
       return report !== null && 'report' in report && typeof report.report === 'string';
   };
   
-const renderFormattedReport = (reportText: string) => {
+  const renderFormattedReport = (reportText: string) => {
     const subtitleRegex = /^###\s*(.*?)(?:\s*|\n|:)/i;
-    const boldRegex = /\*\*(.*?)\*\*/g;
     const bulletRegex = /^\s*([*•-])\s(.*)/;
     const numberedListRegex = /^\s*(\d+)\.\s(.*)/;
 
@@ -375,31 +356,37 @@ const renderFormattedReport = (reportText: string) => {
         }
     };
     
-    const formatLine = (line: string, isListItem = false) => {
-        const parts = line.split(boldRegex).map((part, i) => {
-            if (i % 2 === 1) { // This part was inside **...**
+    const formatLine = (line: string) => {
+        const parts = line.split(/\*\*(.*?)\*\*/g).map((part, i) => {
+            if (i % 2 === 1) { 
                 return <strong key={i} className="font-semibold text-foreground">{part}</strong>;
             }
-            return isListItem ? <span className="text-muted-foreground">{part}</span> : part;
+            return part;
         });
-
-        if (isListItem) {
-            const firstColonIndex = line.indexOf(':');
-            if (firstColonIndex !== -1) {
-                const titlePart = line.substring(0, firstColonIndex + 1);
-                const descriptionPart = line.substring(firstColonIndex + 1);
-                return <>{formatLine(titlePart, false)}{formatLine(descriptionPart, true)}</>;
-            }
-        }
-        
         return <>{parts}</>;
     };
+
+    const formatListItem = (line: string) => {
+        const firstColonIndex = line.indexOf(':');
+        if (firstColonIndex !== -1) {
+            const titlePart = line.substring(0, firstColonIndex + 1);
+            const descriptionPart = line.substring(firstColonIndex + 1);
+            return (
+                <>
+                    <strong className="font-semibold text-foreground">{formatLine(titlePart)}</strong>
+                    <span className="text-muted-foreground">{formatLine(descriptionPart)}</span>
+                </>
+            );
+        }
+        return <span className="text-muted-foreground">{formatLine(line)}</span>;
+    };
+
 
     lines.forEach((line, index) => {
         const subtitleMatch = line.match(subtitleRegex);
         if (subtitleMatch) {
             flushList();
-            formattedContent.push(<h3 key={`h3-${index}`} className="text-xl font-bold text-foreground mt-6 mb-3">{subtitleMatch[1].trim()}</h3>);
+            formattedContent.push(<h3 key={`h3-${index}`} className="text-2xl font-bold text-foreground mt-8 mb-4">{subtitleMatch[1].trim()}</h3>);
             return;
         }
 
@@ -409,7 +396,7 @@ const renderFormattedReport = (reportText: string) => {
                 flushList();
                 currentList = { type: 'ul', items: [] };
             }
-            currentList.items.push(<li key={`li-${index}`}>{formatLine(bulletMatch[2], true)}</li>);
+            currentList.items.push(<li key={`li-${index}`}>{formatListItem(bulletMatch[2])}</li>);
             return;
         }
         
@@ -419,7 +406,7 @@ const renderFormattedReport = (reportText: string) => {
                 flushList();
                 currentList = { type: 'ol', items: [] };
             }
-            currentList.items.push(<li key={`li-${index}`}>{formatLine(numberedMatch[2], true)}</li>);
+            currentList.items.push(<li key={`li-${index}`}>{formatListItem(numberedMatch[2])}</li>);
             return;
         }
         
@@ -427,10 +414,10 @@ const renderFormattedReport = (reportText: string) => {
         formattedContent.push(<p key={`p-${index}`} className="mb-4 text-muted-foreground leading-relaxed">{formatLine(line)}</p>);
     });
     
-    flushList(); // Add any remaining list items
+    flushList();
 
     return <div className="prose dark:prose-invert max-w-none">{formattedContent}</div>;
-};
+  };
 
 
   return (
@@ -594,7 +581,7 @@ const renderFormattedReport = (reportText: string) => {
                             <CardTitle>{report.title}</CardTitle>
                             <CardDescription>A deep-dive report about "{form.getValues('topic')}".</CardDescription>
                         </CardHeader>
-                        <CardContent className="space-y-6">
+                        <CardContent>
                             {renderFormattedReport(report.report)}
                         </CardContent>
                     </Card>
@@ -646,5 +633,3 @@ const renderFormattedReport = (reportText: string) => {
     </div>
   );
 }
-
-    

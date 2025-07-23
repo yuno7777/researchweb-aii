@@ -70,12 +70,9 @@ For the topic "{{{topic}}}", please provide a detailed explanation for each of t
 const deepResearchPrompt = ai.definePrompt({
     name: 'deepResearchPrompt',
     input: { schema: GenerateReportInputSchema },
-    output: { schema: DeepReportSchema },
     prompt: `You are an expert AI research analyst. Your task is to generate a comprehensive and in-depth report of approximately 1600 words on the given topic. Your analysis must be thorough, insightful, and well-structured.
 
-For the topic "{{{topic}}}", provide:
-- A concise and engaging title for the report.
-- A comprehensive report that is well-structured with clear headings for sections like Introduction, Historical Background, Key Benefits, Challenges, Current Trends, and Future Scope. Use a mix of detailed paragraphs and bullet points for clarity. Ensure your entire response is a valid JSON object that adheres to the provided schema.
+For the topic "{{{topic}}}", provide a comprehensive report that is well-structured with clear headings for sections like Introduction, Historical Background, Key Benefits, Challenges, Current Trends, and Future Scope. Use a mix of detailed paragraphs and bullet points for clarity.
 `,
 });
 
@@ -102,8 +99,15 @@ const generateReportFlow = ai.defineFlow(
         const { output } = await reportPrompt(input);
         reportOutput = output;
     } else if (input.searchType === 'deep') {
-        const { output } = await deepResearchPrompt(input);
-        reportOutput = output;
+        const { response } = await deepResearchPrompt(input);
+        const reportText = response.text;
+        if (!reportText) {
+          throw new Error('Deep research failed to generate a report.');
+        }
+        reportOutput = {
+          title: input.topic,
+          report: reportText,
+        };
     } else {
         const { output } = await conciseReportPrompt(input);
         reportOutput = output;
