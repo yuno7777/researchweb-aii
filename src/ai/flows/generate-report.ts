@@ -14,28 +14,16 @@ import {z} from 'genkit';
 
 const GenerateReportInputSchema = z.object({
   topic: z.string().describe('The topic to generate a report on.'),
-  searchType: z.enum(['web', 'deep', 'concise']).describe('The type of search to perform.'),
 });
 export type GenerateReportInput = z.infer<typeof GenerateReportInputSchema>;
 
-const StandardReportSchema = z.object({
+const GenerateReportOutputSchema = z.object({
   introduction: z.string().describe('A compelling introduction that clearly defines the topic, explains its significance, and gives a brief overview of what the report will cover. This should be a substantial section.'),
   history: z.string().describe("An in-depth look at the historical background of the topic, covering its origins, key milestones, and evolution."),
   benefits: z.string().describe("A detailed explanation of the topic's benefits, supported by examples or data. Discuss the positive impacts on society, industry, or individuals."),
   challenges: z.string().describe("A thorough analysis of the problems, difficulties, and criticisms related to the topic, including ethical, technical, or social hurdles."),
   currentTrends: z.string().describe("A detailed analysis of the latest trends, recent research, and current events shaping the topic."),
   futureScope: z.string().describe("A thoughtful forecast of the topic's future, including potential innovations and long-term implications over the next decade."),
-});
-
-const ConciseReportSchema = z.object({
-    summary: z.string().describe("A concise, fact-based summary of the topic, directly answering the user's query. It should be no more than 3 paragraphs."),
-    keyPoints: z.array(z.string()).describe("A bulleted list of 3-5 key facts or talking points about the topic."),
-});
-
-const GenerateReportOutputSchema = z.object({
-    report: StandardReportSchema.optional(),
-    conciseReport: ConciseReportSchema.optional(),
-    searchType: z.enum(['web', 'deep', 'concise']),
 });
 export type GenerateReportOutput = z.infer<typeof GenerateReportOutputSchema>;
 
@@ -47,7 +35,7 @@ export async function generateReport(input: GenerateReportInput): Promise<Genera
 const reportPrompt = ai.definePrompt({
   name: 'reportPrompt',
   input: {schema: GenerateReportInputSchema},
-  output: {schema: StandardReportSchema },
+  output: {schema: GenerateReportOutputSchema },
   prompt: `You are an expert AI research assistant. Your task is to generate a comprehensive, in-depth, and well-structured report on the given topic. The total length of the report should be between 150 and 350 words.
 
 For the topic "{{{topic}}}", please provide a detailed explanation for each of the following sections:
@@ -63,63 +51,17 @@ Please ensure your writing is explanatory, insightful, and goes beyond surface-l
 `,
 });
 
-const deepResearchPrompt = ai.definePrompt({
-    name: 'deepResearchPrompt',
-    input: {schema: GenerateReportInputSchema},
-    output: {schema: StandardReportSchema},
-    prompt: `You are an expert AI research analyst. Your task is to produce a highly detailed, analytical, and insightful report on the given topic. The report must be at least 1500 words.
-
-For the topic "{{{topic}}}", please generate a highly detailed and well-structured report by providing an in-depth explanation for each of the following JSON fields:
-
-- introduction: A masterful introduction that frames the topic within a broader context, articulates its critical importance, and outlines the report's structure.
-- history: A deep analysis of the key events, paradigm shifts, and influential figures that have shaped the topic.
-- benefits: A nuanced analysis of the primary and secondary benefits, supported by data and real-world examples.
-- challenges: A thorough examination of the challenges, including systemic issues and ethical dilemmas, and their potential consequences.
-- currentTrends: A synthesis of the most current information, including cutting-edge research, market dynamics, and emerging trends.
-- futureScope: A sophisticated forecast, offering a scenario analysis of potential futures and strategic recommendations.
-
-Ensure the final report is deeply analytical, connecting disparate pieces of information to form a cohesive and insightful narrative of at least 1500 words. Use a mix of detailed paragraphs and bullet points for clarity.
-`,
-});
-
-const concisePrompt = ai.definePrompt({
-    name: 'concisePrompt',
-    input: {schema: GenerateReportInputSchema},
-    output: {schema: ConciseReportSchema },
-    prompt: `You are a factual AI assistant. Your task is to provide a concise and direct answer to the user's query about "{{{topic}}}".
-
-The response should be structured as follows:
-1.  A brief summary, no more than 3 paragraphs long, that gets straight to the point.
-2.  A bulleted list of 3-5 key, verifiable facts or talking points.
-
-Do not include any introductory or concluding pleasantries. Focus solely on delivering the information requested.`,
-});
-
-
 const generateReportFlow = ai.defineFlow(
   {
     name: 'generateReportFlow',
     inputSchema: GenerateReportInputSchema,
     outputSchema: GenerateReportOutputSchema,
   },
-  async (input): Promise<GenerateReportOutput> => {
-    switch (input.searchType) {
-        case 'concise': {
-            const { output } = await concisePrompt(input);
-            if (!output) throw new Error("Concise report generation failed.");
-            return { conciseReport: output, searchType: 'concise' };
-        }
-        case 'deep': {
-            const { output } = await deepResearchPrompt(input);
-            if (!output) throw new Error("Deep research report generation failed.");
-            return { report: output, searchType: 'deep' };
-        }
-        case 'web':
-        default: {
-            const { output } = await reportPrompt(input);
-            if (!output) throw new Error("Web report generation failed.");
-            return { report: output, searchType: 'web' };
-        }
+  async (input) => {
+    const { output } = await reportPrompt(input);
+    if (!output) {
+      throw new Error('Report generation failed.');
     }
+    return output;
   }
 );

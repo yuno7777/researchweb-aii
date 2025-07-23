@@ -30,23 +30,12 @@ const formSchema = z.object({
   topic: z.string().min(3, { message: "Topic must be at least 3 characters long." }).max(100, { message: "Topic must be at most 100 characters long." }),
 });
 
-type ReportData = GenerateReportOutput['report'];
-type ConciseReportData = GenerateReportOutput['conciseReport'];
-
-const WebIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 h-4 w-4">
-        <circle cx="12" cy="12" r="10"></circle>
-        <line x1="2" y1="12" x2="22" y2="12"></line>
-        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-    </svg>
-)
+type ReportData = GenerateReportOutput;
 
 export default function Home() {
   const [report, setReport] = useState<ReportData | null>(null);
-  const [conciseReport, setConciseReport] = useState<ConciseReportData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [history, setHistory] = useLocalStorage<string[]>('report-history', []);
-  const [searchType, setSearchType] = useState<'web' | 'deep' | 'concise'>('web');
   const { toast } = useToast();
   
   const handleSelectTopic = (topic: string) => {
@@ -65,7 +54,7 @@ export default function Home() {
   }
 
   const handleExportPdf = () => {
-    if (!report && !conciseReport) {
+    if (!report) {
       toast({ variant: 'destructive', title: 'Error', description: 'No report data available to export.' });
       return;
     }
@@ -210,9 +199,6 @@ export default function Home() {
                     addSection(sectionTitles[sectionKey], report[sectionKey]);
                 }
             });
-        } else if (conciseReport) {
-            addSection('Summary', conciseReport.summary);
-            addSection('Key Points', conciseReport.keyPoints);
         }
 
         pdf.save(fileName);
@@ -242,10 +228,9 @@ export default function Home() {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
     setReport(null);
-    setConciseReport(null);
     form.clearErrors();
 
-    const result = await handleGenerateReport({ topic: values.topic, searchType });
+    const result = await handleGenerateReport({ topic: values.topic });
 
     if (result.error) {
       toast({
@@ -256,9 +241,6 @@ export default function Home() {
     } else {
         if (result.report) {
             setReport(result.report);
-        }
-        if (result.conciseReport) {
-            setConciseReport(result.conciseReport);
         }
       if (!history.includes(values.topic)) {
         setHistory([values.topic, ...history]);
@@ -324,44 +306,6 @@ export default function Home() {
                                   </FormItem>
                               )}
                           />
-
-                          <div className="flex items-center justify-center gap-4 text-sm">
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Button type="button" variant={searchType === 'web' ? 'secondary' : 'ghost'} onClick={() => setSearchType('web')} className="rounded-full">
-                                    <WebIcon />
-                                    Web Search
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p>Enable web search for brief, factual information from the internet (150-350 words)</p>
-                                </TooltipContent>
-                              </Tooltip>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Button type="button" variant={searchType === 'deep' ? 'secondary' : 'ghost'} onClick={() => setSearchType('deep')} className="rounded-full">
-                                    <BrainCircuit className="mr-2 h-4 w-4" />
-                                    Deep Research
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p>Enable Deep Research for extensive academic-style analysis (1200+ words)</p>
-                                </TooltipContent>
-                              </Tooltip>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Button type="button" variant={searchType === 'concise' ? 'secondary' : 'ghost'} onClick={() => setSearchType('concise')} className="rounded-full">
-                                    <Menu className="mr-2 h-4 w-4" />
-                                    Concise Response
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p>Concise search mode: Provides concise, fact-focused responses using internet sources</p>
-                                </TooltipContent>
-                              </Tooltip>
-                              </TooltipProvider>
-                          </div>
                       </form>
                   </Form>
               </div>
@@ -375,42 +319,8 @@ export default function Home() {
                   <ReportDisplay report={report} onReportUpdate={handleReportUpdate} onExportPdf={handleExportPdf} />
                 </div>
               )}
-
-              {conciseReport && !isLoading && (
-                  <div className="py-12 max-w-4xl mx-auto">
-                      <Card>
-                          <CardHeader className="flex flex-row items-center justify-between">
-                              <CardTitle className="flex items-center gap-2">
-                                  <FileText />
-                                  Concise Report
-                              </CardTitle>
-                              <Button variant="outline" size="sm" onClick={handleExportPdf} className="rounded-full">
-                                  <FileDown className="mr-2 h-4 w-4" />
-                                  Export as PDF
-                              </Button>
-                          </CardHeader>
-                          <CardContent className="space-y-6">
-                              <div>
-                                  <h3 className="font-semibold mb-2">Summary</h3>
-                                  <p className="text-muted-foreground whitespace-pre-wrap">{conciseReport.summary}</p>
-                              </div>
-                              <div>
-                                  <h3 className="font-semibold mb-2">Key Points</h3>
-                                  <ul className="space-y-2">
-                                      {conciseReport.keyPoints.map((point, index) => (
-                                          <li key={index} className="flex items-start gap-2">
-                                              <List className="h-4 w-4 mt-1 text-primary"/>
-                                              <span className="text-muted-foreground">{point}</span>
-                                          </li>
-                                      ))}
-                                  </ul>
-                              </div>
-                          </CardContent>
-                      </Card>
-                  </div>
-              )}
               
-              {!isLoading && !report && !conciseReport && history.length > 0 && (
+              {!isLoading && !report && history.length > 0 && (
                 <div className="py-12 max-w-4xl mx-auto">
                     <div className="flex items-center justify-between pb-4">
                         <h3 className="text-xl font-bold">Search History</h3>
