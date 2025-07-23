@@ -271,82 +271,44 @@ export default function Home() {
   
   const renderFormattedReport = (reportText: string) => {
     const subtitles = [
-        "Introduction", "Historical Background", "History", "Key Benefits", "Benefits", 
-        "Challenges and Criticisms", "Challenges", "Current Trends", "Future Scope"
+        "Introduction", "Historical Background", "History", "Key Benefits", "Benefits",
+        "Challenges and Criticisms", "Challenges and Risks", "Challenges", "Current Trends", "Future Scope"
     ];
-    const regex = new RegExp(`(^[#\\s*]*(${subtitles.join('|')})[:#\\s*]*$)`, 'gm');
-    const sections = reportText.split(regex);
-    
-    const formatText = (text: string) => {
-        const lines = text.split('\n').filter(line => line.trim() !== '');
-        return lines.map((line, index) => {
-            // Handle bullet points
-            if (line.trim().startsWith('*')) {
-                const cleanLine = line.trim().substring(1).trim();
-                const boldedLine = cleanLine.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                return <li key={index} dangerouslySetInnerHTML={{ __html: boldedLine }} />;
-            }
-            // Handle bold text
-            const boldedLine = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-            return <p key={index} className="mb-2" dangerouslySetInnerHTML={{ __html: boldedLine }} />;
-        });
+    const subtitleRegex = new RegExp(`^(?:[#*\\s]*)((${subtitles.join('|')})[:#*\\s]*)$`, 'i');
+
+    const lines = reportText.split('\n').filter(line => line.trim() !== '');
+    const formattedContent: JSX.Element[] = [];
+    let currentList: JSX.Element[] = [];
+
+    const flushList = () => {
+        if (currentList.length > 0) {
+            formattedContent.push(<ul key={`ul-${formattedContent.length}`} className="list-disc list-inside ml-4 my-2 space-y-1">{currentList}</ul>);
+            currentList = [];
+        }
     };
 
-    const content: JSX.Element[] = [];
-
-    if (sections[0] && sections[0].trim()) {
-        const formatted = formatText(sections[0].trim());
-        content.push(
-            <div key="intro-text" className="text-base text-muted-foreground leading-relaxed">
-                {formatted.map((item, index) => {
-                    if (item.type === 'li') return <ul key={index} className="list-disc list-inside ml-4">{item}</ul>
-                    return item;
-                })}
-            </div>
-        );
-    }
-
-    for (let i = 1; i < sections.length; i += 3) {
-        const fullSubtitleMatch = sections[i];
-        const subtitleClean = sections[i+1];
-        const text = sections[i+2];
-
-        if (subtitleClean && text) {
-            const formattedText = formatText(text.trim());
-            content.push(
-                <div key={subtitleClean} className="prose dark:prose-invert max-w-none mt-6">
-                    <h3 className="text-xl font-bold mb-2">{subtitleClean}</h3>
-                     <div className="text-base text-muted-foreground leading-relaxed">
-                        {formattedText.map((item, index) => {
-                            if (item.type === 'li') {
-                                // Group consecutive list items
-                                const listItems = [];
-                                for (let j = index; j < formattedText.length; j++) {
-                                    if(formattedText[j].type === 'li') {
-                                        listItems.push(formattedText[j]);
-                                    } else {
-                                        break;
-                                    }
-                                }
-                                if (index > 0 && formattedText[index-1].type === 'li') return null; // Already processed
-                                return <ul key={`ul-${index}`} className="list-disc list-inside ml-4 my-2">{listItems}</ul>
-                            }
-                            return item;
-                        })}
-                    </div>
-                </div>
-            );
-        } else if (fullSubtitleMatch && !subtitleClean && !text) {
-            const cleanedMatch = fullSubtitleMatch.replace(/[#*:]/g, "").trim();
-            content.push(
-                 <div key={cleanedMatch} className="prose dark:prose-invert max-w-none mt-6">
-                    <h3 className="text-xl font-bold mb-2">{cleanedMatch}</h3>
-                </div>
-            )
+    lines.forEach((line, index) => {
+        const subtitleMatch = line.match(subtitleRegex);
+        if (subtitleMatch) {
+            flushList();
+            const cleanedSubtitle = subtitleMatch[1].replace(/[#*:]/g, "").trim();
+            formattedContent.push(<h3 key={`h3-${index}`} className="text-xl font-bold mt-6 mb-2">{cleanedSubtitle}</h3>);
+        } else if (line.trim().startsWith('*')) {
+            const cleanLine = line.trim().substring(1).trim();
+            const boldedLine = cleanLine.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            currentList.push(<li key={`li-${index}`} dangerouslySetInnerHTML={{ __html: boldedLine }} />);
+        } else {
+            flushList();
+            const boldedLine = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            formattedContent.push(<p key={`p-${index}`} className="mb-2 text-muted-foreground leading-relaxed" dangerouslySetInnerHTML={{ __html: boldedLine }} />);
         }
-    }
-    return content;
+    });
+
+    flushList(); // Add any remaining list items
+
+    return <div className="prose dark:prose-invert max-w-none">{formattedContent}</div>;
   };
+
 
   return (
     <div id="home" className="flex min-h-screen w-full flex-col bg-background text-foreground" suppressHydrationWarning>
