@@ -25,18 +25,21 @@ import { GradientText } from '@/components/GradientText';
 import { HomePageContent } from '@/components/HomePageContent';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 
 const formSchema = z.object({
   topic: z.string().min(3, { message: "Topic must be at least 3 characters long." }).max(100, { message: "Topic must be at most 100 characters long." }),
 });
 
-type ReportData = GenerateReportOutput;
+type ReportData = GenerateReportOutput['report'];
+type SearchType = 'concise' | 'web' | 'deep';
 
 export default function Home() {
   const [report, setReport] = useState<ReportData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [history, setHistory] = useLocalStorage<string[]>('report-history', []);
   const { toast } = useToast();
+  const [searchType, setSearchType] = useState<SearchType>('concise');
   
   const handleSelectTopic = (topic: string) => {
     form.setValue('topic', topic);
@@ -184,21 +187,26 @@ export default function Home() {
 
 
         if (report) {
-            const sectionOrder: (keyof ReportData)[] = ['introduction', 'history', 'benefits', 'challenges', 'currentTrends', 'futureScope'];
-            const sectionTitles: Record<keyof ReportData, string> = {
-              introduction: 'Introduction',
-              history: 'History',
-              benefits: 'Benefits',
-              challenges: 'Challenges',
-              currentTrends: 'Current Trends',
-              futureScope: 'Future Scope',
-            };
+            if ('conciseReport' in report) {
+                 addSection('Concise Report', report.conciseReport);
+            } else {
+                const sectionOrder: (keyof typeof report)[] = ['introduction', 'history', 'benefits', 'challenges', 'currentTrends', 'futureScope'];
+                const sectionTitles: Record<keyof typeof report, string> = {
+                  introduction: 'Introduction',
+                  history: 'History',
+                  benefits: 'Benefits',
+                  challenges: 'Challenges',
+                  currentTrends: 'Current Trends',
+                  futureScope: 'Future Scope',
+                  title: 'Title',
+                };
 
-            sectionOrder.forEach(sectionKey => {
-                if (report[sectionKey]) {
-                    addSection(sectionTitles[sectionKey], report[sectionKey]);
-                }
-            });
+                sectionOrder.forEach(sectionKey => {
+                    if (report[sectionKey]) {
+                        addSection(sectionTitles[sectionKey], report[sectionKey] as string);
+                    }
+                });
+            }
         }
 
         pdf.save(fileName);
@@ -230,7 +238,7 @@ export default function Home() {
     setReport(null);
     form.clearErrors();
 
-    const result = await handleGenerateReport({ topic: values.topic });
+    const result = await handleGenerateReport({ topic: values.topic, searchType });
 
     if (result.error) {
       toast({
@@ -249,6 +257,9 @@ export default function Home() {
     setIsLoading(false);
   };
 
+  const isConciseReport = (report: ReportData | null): report is { conciseReport: string } => {
+    return report !== null && 'conciseReport' in report;
+  };
 
   return (
     <div id="home" className="flex min-h-screen w-full flex-col bg-background text-foreground" suppressHydrationWarning>
@@ -308,6 +319,61 @@ export default function Home() {
                           />
                       </form>
                   </Form>
+                  <div className="flex items-center justify-center gap-2 pt-2">
+                    <TooltipProvider>
+                      <Tooltip>
+                          <TooltipTrigger asChild>
+                              <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => setSearchType('web')}
+                                  className={cn(
+                                      "rounded-full",
+                                      searchType === 'web' && 'bg-muted text-foreground'
+                                  )}
+                              >
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                                  Web search
+                              </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                              <p>Enable web search for brief, factual information from the internet (150-350 words)</p>
+                          </TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setSearchType('deep')}
+                                    className={cn(
+                                        "rounded-full",
+                                        searchType === 'deep' && 'bg-muted text-foreground'
+                                    )}
+                                >
+                                    <BrainCircuit className="h-4 w-4 mr-2" />
+                                    Deep research
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>Enable Deep Research for extensive academic-style analysis (2000+ words)</p>
+                            </TooltipContent>
+                        </Tooltip>
+
+                      <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setSearchType('concise')}
+                          className={cn(
+                              "rounded-full",
+                              searchType === 'concise' && 'bg-muted text-foreground'
+                          )}
+                      >
+                          <List className="h-4 w-4 mr-2" />
+                          Concise Response
+                      </Button>
+                    </TooltipProvider>
+                  </div>
               </div>
             </div>
             
@@ -315,9 +381,22 @@ export default function Home() {
               {isLoading && <div className="py-12"><ReportSkeleton /></div>}
 
               {report && !isLoading && (
-                <div className="py-12 max-w-4xl mx-auto">
-                  <ReportDisplay report={report} onReportUpdate={handleReportUpdate} onExportPdf={handleExportPdf} />
-                </div>
+                 isConciseReport(report) ? (
+                    <div className="py-12 max-w-4xl mx-auto">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Concise Report</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-base text-muted-foreground leading-relaxed whitespace-pre-wrap">{report.conciseReport}</p>
+                            </CardContent>
+                        </Card>
+                    </div>
+                ) : (
+                    <div className="py-12 max-w-4xl mx-auto">
+                        <ReportDisplay report={report} onReportUpdate={handleReportUpdate} onExportPdf={handleExportPdf} />
+                    </div>
+                )
               )}
               
               {!isLoading && !report && history.length > 0 && (
@@ -328,10 +407,9 @@ export default function Home() {
                             variant="outline"
                             size="sm"
                             onClick={handleClearHistory}
-                            className="rounded-full"
                         >
                             <Trash2 className="mr-2 h-4 w-4" />
-                            Delete History
+                            Clear History
                         </Button>
                     </div>
                     <div className="border rounded-lg bg-background">
@@ -358,5 +436,4 @@ export default function Home() {
       </main>
     </div>
   );
-
 }

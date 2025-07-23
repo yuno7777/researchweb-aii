@@ -1,20 +1,21 @@
+
 'use server';
 
 import { generateReport, type GenerateReportInput, type GenerateReportOutput } from "@/ai/flows/generate-report";
 
 export async function handleGenerateReport(input: GenerateReportInput): Promise<{ 
-  report: GenerateReportOutput | null;
+  report: GenerateReportOutput['report'] | null;
   error: string | null 
 }> {
   try {
-    const report = await generateReport(input);
+    const output = await generateReport(input);
 
-    if (!report) {
+    if (!output || !output.report) {
         return { report: null, error: 'Failed to generate report. The AI returned no data.' };
     }
     
     return { 
-      report, 
+      report: output.report, 
       error: null 
     };
   } catch (e) {

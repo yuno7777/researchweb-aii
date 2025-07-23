@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -7,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Edit, Save, X, FileDown } from 'lucide-react';
 import { Separator } from './ui/separator';
 
-type Report = GenerateReportOutput['report'];
+type Report = Exclude<GenerateReportOutput['report'], { conciseReport: string }>;
 type ReportSection = keyof Report;
 
 interface ReportDisplayProps {
@@ -17,6 +18,7 @@ interface ReportDisplayProps {
 }
 
 const sectionOrder: ReportSection[] = [
+  'title',
   'introduction',
   'history',
   'benefits',
@@ -26,6 +28,7 @@ const sectionOrder: ReportSection[] = [
 ];
 
 const sectionTitles: Record<ReportSection, string> = {
+  title: 'Title',
   introduction: 'Introduction',
   history: 'History',
   benefits: 'Benefits',
@@ -63,7 +66,7 @@ export function ReportDisplay({ report, onReportUpdate, onExportPdf }: ReportDis
   return (
     <div className="space-y-8">
       <div className="flex justify-end">
-        <Button onClick={onExportPdf} className="rounded-full">
+        <Button onClick={onExportPdf}>
             <FileDown className="mr-2 h-4 w-4" />
             Export as PDF
         </Button>
@@ -75,7 +78,7 @@ export function ReportDisplay({ report, onReportUpdate, onExportPdf }: ReportDis
                   <div className="flex flex-row items-center justify-between mb-4">
                       <h2 className="text-2xl font-bold">{sectionTitles[sectionKey]}</h2>
                       {editingSection !== sectionKey && (
-                           <Button variant="outline" size="sm" onClick={() => handleEditClick(sectionKey)} className="rounded-full"><Edit className="mr-2 h-4 w-4" />Edit</Button>
+                           <Button variant="outline" size="sm" onClick={() => handleEditClick(sectionKey)}><Edit className="mr-2 h-4 w-4" />Edit</Button>
                       )}
                   </div>
                   <Separator className="mb-6"/>
@@ -88,8 +91,8 @@ export function ReportDisplay({ report, onReportUpdate, onExportPdf }: ReportDis
                           className="min-h-[300px] text-base leading-relaxed rounded-lg"
                       />
                       <div className="flex justify-end space-x-2">
-                          <Button variant="ghost" size="sm" onClick={handleCancelClick} className="rounded-full"><X className="mr-2 h-4 w-4" />Cancel</Button>
-                          <Button size="sm" onClick={handleSaveClick} className="rounded-full"><Save className="mr-2 h-4 w-4" />Save</Button>
+                          <Button variant="ghost" size="sm" onClick={handleCancelClick}><X className="mr-2 h-4 w-4" />Cancel</Button>
+                          <Button size="sm" onClick={handleSaveClick}><Save className="mr-2 h-4 w-4" />Save</Button>
                       </div>
                       </div>
                   ) : (
