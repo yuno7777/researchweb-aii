@@ -113,17 +113,15 @@ export default function Home() {
         const contentFontSize = 12;
 
         const addPageHeaderAndFooter = () => {
-            if (pageNum > 1) {
-              pdf.setFontSize(9);
-              pdf.setFont('helvetica', 'italic');
-              pdf.setTextColor(150);
-              pdf.text(`Page ${pageNum}`, pdf.internal.pageSize.getWidth() / 2, pageHeight - 10, { align: 'center' });
-              
-              // Reset font for the content
-              pdf.setTextColor(33, 37, 41);
-              pdf.setFont('helvetica', 'normal');
-              pdf.setFontSize(contentFontSize);
-            }
+            pdf.setFontSize(9);
+            pdf.setFont('helvetica', 'italic');
+            pdf.setTextColor(150);
+            pdf.text(`Page ${pageNum}`, pdf.internal.pageSize.getWidth() / 2, pageHeight - 10, { align: 'center' });
+            
+            // Reset font for the content
+            pdf.setTextColor(33, 37, 41);
+            pdf.setFont('helvetica', 'normal');
+            pdf.setFontSize(contentFontSize);
         };
 
         const addPageWithHeaderFooter = () => {
@@ -186,13 +184,34 @@ export default function Home() {
           pdf.setTextColor(33, 37, 41);
           
           const processContent = (text: string, isListItem = false) => {
-            const lines = pdf.splitTextToSize(text, isListItem ? contentWidth - 5 : contentWidth);
+            const bulletRegex = /^\s*([*•-])\s(.*)/;
+            const numberedListRegex = /^\s*(\d+)\.\s(.*)/;
+
+            const lines = text.split('\n').filter(line => line.trim() !== '');
             lines.forEach((line: string) => {
-                if (y + contentLineHeight > pageHeight - pageMargin) {
-                    addPageWithHeaderFooter();
+                let textToPrint = line;
+                let leftMargin = pageMargin;
+
+                const bulletMatch = line.match(bulletRegex);
+                if (bulletMatch) {
+                    textToPrint = `• ${bulletMatch[2]}`;
+                    leftMargin += 5;
                 }
-                pdf.text(line, isListItem ? pageMargin + 5 : pageMargin, y);
-                y += contentLineHeight;
+                const numberedMatch = line.match(numberedListRegex);
+                 if (numberedMatch) {
+                    textToPrint = `${numberedMatch[1]}. ${numberedMatch[2]}`;
+                    leftMargin += 5;
+                }
+
+                const splitLines = pdf.splitTextToSize(textToPrint, contentWidth - (leftMargin - pageMargin));
+                
+                splitLines.forEach((splitLine: string) => {
+                  if (y + contentLineHeight > pageHeight - pageMargin) {
+                      addPageWithHeaderFooter();
+                  }
+                  pdf.text(splitLine, leftMargin, y);
+                  y += contentLineHeight;
+                });
             });
           };
 
@@ -231,7 +250,12 @@ export default function Home() {
                     }
                 });
             } else if (isDeepReport(report)) {
-                 addSection('Report', report.report);
+                 const sections = report.report.split(/(\n###\s.*)/).filter(Boolean);
+                 for (let i = 0; i < sections.length; i += 2) {
+                     const title = sections[i].replace('###', '').trim();
+                     const content = sections[i+1] ? sections[i+1].trim() : '';
+                     addSection(title, content);
+                 }
                  if (report.sources) addSection('Sources', report.sources);
             }
         }
@@ -302,7 +326,7 @@ export default function Home() {
   }
 
   const renderFormattedReport = (reportText: string) => {
-    const subtitleRegex = /^###\s*(.*?)(?:\s*|\n|:)/i;
+    const subtitleRegex = /^###\s*(.*?)(?:\s*|\n|:)/;
     const bulletRegex = /^\s*([*•-])\s(.*)/;
     const numberedListRegex = /^\s*(\d+)\.\s(.*)/;
 
@@ -585,6 +609,14 @@ export default function Home() {
                         </CardHeader>
                         <CardContent>
                             {renderFormattedReport(report.report)}
+                             {report.sources && (
+                                <>
+                                    <h3 className="text-2xl font-bold text-foreground mt-8 mb-4">Sources</h3>
+                                    <div className="prose dark:prose-invert max-w-none">
+                                        <p className="mb-4 text-muted-foreground leading-relaxed whitespace-pre-wrap">{report.sources}</p>
+                                    </div>
+                                </>
+                             )}
                         </CardContent>
                       </>
                     ) : isStandardReport(report) ? (
