@@ -16,7 +16,7 @@ const sectionsSchema = z.enum([
     "introduction",
     "history",
     "benefits",
-"challenges",
+    "challenges",
     "currentTrends",
     "futureScope"
 ]);
@@ -29,16 +29,16 @@ const GenerateReportInputSchema = z.object({
 });
 export type GenerateReportInput = z.infer<typeof GenerateReportInputSchema>;
 
+const StandardReportContentSchema = z.object({
+    report: z.string().describe("A comprehensive and well-structured report. It should be well-structured with clear paragraphs and headings for different sections like Introduction, History, Benefits, etc."),
+});
+
 const StandardReportSchema = z.object({
     title: z.string().describe("A concise and engaging title for the report."),
-    introduction: z.string().optional().describe("A compelling introduction that defines the topic, explains its significance, and outlines the report's scope."),
-    history: z.string().optional().describe("An in-depth exploration of the topic's historical background, including its origins, key milestones, and evolution."),
-    benefits: z.string().optional().describe("A detailed analysis of the topic's benefits, supported by examples or data, highlighting positive impacts."),
-    challenges: z.string().optional().describe("A thorough examination of the problems, difficulties, and criticisms associated with the topic."),
-    currentTrends: z.string().optional().describe("An analysis of the latest trends, recent research, and current events shaping the topic."),
-    futureScope: z.string().optional().describe("A forecast of the topic's future, discussing potential innovations and long-term implications."),
+    report: z.string().describe("A comprehensive and well-structured report based on the user's selected sections."),
     sources: z.string().optional().describe("A list of sources or citations used for the report, formatted as a string with each source on a new line."),
 });
+
 
 const ConciseReportSchema = z.object({
     summary: z.string().describe("A detailed, 300-word summary of the topic."),
@@ -83,28 +83,36 @@ const reportPrompt = ai.definePrompt({
 For the topic "{{{topic}}}", please provide a detailed explanation for each of the following sections:
 
 - Title: A concise and engaging title for the report.
+- Report: Generate a comprehensive report. The sections to be included are based on the user's selection.
 
 {{#if shouldGenerate.introduction}}
-- Introduction: Provide a compelling introduction that clearly defines the topic, explains its significance, and gives a brief overview of what the report will cover.
+### Introduction
+Provide a compelling introduction that clearly defines the topic, explains its significance, and gives a brief overview of what the report will cover.
 {{/if}}
 {{#if shouldGenerate.history}}
-- History: Delve into the historical background of the topic. Cover its origins, key milestones, and the evolution of thought or technology related to it.
+### History
+Delve into the historical background of the topic. Cover its origins, key milestones, and the evolution of thought or technology related to it.
 {{/if}}
 {{#if shouldGenerate.benefits}}
-- Benefits: Elaborate on the advantages and benefits associated with the topic. Provide specific examples or data to support your points.
+### Benefits
+Elaborate on the advantages and benefits associated with the topic. Provide specific examples or data to support your points.
 {{/if}}
 {{#if shouldGenerate.challenges}}
-- Challenges: Thoroughly analyze the problems, difficulties, and criticisms related to the topic.
+### Challenges
+Thoroughly analyze the problems, difficulties, and criticisms related to the topic.
 {{/if}}
 {{#if shouldGenerate.currentTrends}}
-- Current Trends: Detail the latest trends and developments shaping the topic.
+### Current Trends
+Detail the latest trends and developments shaping the topic.
 {{/if}}
 {{#if shouldGenerate.futureScope}}
-- Future Scope: Extrapolate on the potential future implications and applications of the topic.
+### Future Scope
+Extrapolate on the potential future implications and applications of the topic.
 {{/if}}
 
 {{#if generateWithReferences}}
-- Sources: Provide a list of 2-3 web links or citations that were used to generate this report. Format them as a string, with each source on a new line.
+### Sources
+Provide a list of 2-3 web links or citations that were used to generate this report. Format them as a string, with each source on a new line.
 {{/if}}
 `,
 });

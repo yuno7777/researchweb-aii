@@ -232,29 +232,19 @@ export default function Home() {
                  addSection('Summary', report.summary);
                  addSection('Key Points', report.keyPoints);
                  if (report.sources) addSection('Sources', report.sources);
-            } else if (isStandardReport(report)) {
-                const sectionOrder: (keyof typeof report)[] = ['introduction', 'history', 'benefits', 'challenges', 'currentTrends', 'futureScope', 'sources'];
-                const sectionTitles: Record<string, string> = {
-                  introduction: 'Introduction',
-                  history: 'History',
-                  benefits: 'Benefits',
-                  challenges: 'Challenges',
-                  currentTrends: 'Current Trends',
-                  futureScope: 'Future Scope',
-                  sources: 'Sources',
-                };
-                sectionOrder.forEach(sectionKey => {
-                    const key = sectionKey as keyof typeof report;
-                    if (report[key] && typeof report[key] === 'string') {
-                        addSection(sectionTitles[key], report[key] as string);
-                    }
-                });
-            } else if (isDeepReport(report)) {
+            } else if (isStandardOrDeepReport(report)) {
                  const sections = report.report.split(/(\n###\s.*)/).filter(Boolean);
                  for (let i = 0; i < sections.length; i += 2) {
-                     const title = sections[i].replace('###', '').trim();
+                     const titleWithMarker = sections[i];
                      const content = sections[i+1] ? sections[i+1].trim() : '';
-                     addSection(title, content);
+                     
+                     if (titleWithMarker.startsWith('###')) {
+                        const title = titleWithMarker.replace('###', '').trim();
+                        addSection(title, content);
+                     } else {
+                        // This handles the case where the first section does not have a marker
+                        addSection('Introduction', `${titleWithMarker}\n${content}`);
+                     }
                  }
                  if (report.sources) addSection('Sources', report.sources);
             }
@@ -317,13 +307,10 @@ export default function Home() {
     return report !== null && 'summary' in report && 'keyPoints' in report;
   };
 
-  const isDeepReport = (report: ReportData | null): report is { title: string; report: string, sources?: string } => {
+  const isStandardOrDeepReport = (report: ReportData | null): report is { title: string; report: string; sources?: string } => {
       return report !== null && 'report' in report && typeof report.report === 'string' && 'title' in report && !('summary' in report);
   };
 
-  const isStandardReport = (report: ReportData | null): report is { title: string; introduction?: string; history?: string; benefits?: string; challenges?: string; currentTrends?: string; futureScope?: string; sources?: string } => {
-    return report !== null && ('introduction' in report || 'history' in report || 'benefits' in report);
-  }
 
   const renderFormattedReport = (reportText: string) => {
     const subtitleRegex = /^###\s*(.*?)(?:\s*|\n|:)/;
@@ -601,11 +588,11 @@ export default function Home() {
                         <CardContent className="p-0">
                            <ConciseReportDisplay report={report} onReportUpdate={handleReportUpdate} topic={form.getValues('topic')} />
                         </CardContent>
-                    ) : isDeepReport(report) ? (
+                    ) : isStandardOrDeepReport(report) ? (
                       <>
                         <CardHeader>
                             <CardTitle>{report.title}</CardTitle>
-                            <CardDescription>A deep-dive report about "{form.getValues('topic')}".</CardDescription>
+                            <CardDescription>A report about "{form.getValues('topic')}".</CardDescription>
                         </CardHeader>
                         <CardContent>
                             {renderFormattedReport(report.report)}
@@ -619,10 +606,6 @@ export default function Home() {
                              )}
                         </CardContent>
                       </>
-                    ) : isStandardReport(report) ? (
-                      <CardContent className="p-0">
-                        <ReportDisplay report={report} onReportUpdate={handleReportUpdate} />
-                      </CardContent>
                     ) : null}
                   </Card>
                 </div>
