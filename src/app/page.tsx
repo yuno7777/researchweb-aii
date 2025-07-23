@@ -274,7 +274,8 @@ export default function Home() {
         "Introduction", "Historical Background", "History", "Key Benefits", "Benefits", 
         "Challenges and Criticisms", "Challenges", "Current Trends", "Future Scope"
     ];
-    const regex = new RegExp(`^(${subtitles.join('|')}):?`, 'gm');
+    // This regex now handles optional markdown characters like '###' and trailing colons.
+    const regex = new RegExp(`(^[#\\s*]*(${subtitles.join('|')})[:#\\s*]*$)`, 'gm');
     const sections = reportText.split(regex);
     
     const content = [];
@@ -286,18 +287,28 @@ export default function Home() {
         );
     }
 
-    for (let i = 1; i < sections.length; i += 2) {
-        const subtitle = sections[i];
-        const text = sections[i+1];
-        if (subtitle && text) {
+    for (let i = 1; i < sections.length; i += 3) {
+        const fullSubtitleMatch = sections[i];
+        const subtitleClean = sections[i+1];
+        const text = sections[i+2];
+
+        if (subtitleClean && text) {
             content.push(
-                <div key={subtitle} className="prose dark:prose-invert max-w-none">
-                    <h3 className="text-xl font-bold mt-6 mb-2">{subtitle}</h3>
+                <div key={subtitleClean} className="prose dark:prose-invert max-w-none">
+                    <h3 className="text-xl font-bold mt-6 mb-2">{subtitleClean}</h3>
                     <p className="text-base text-muted-foreground leading-relaxed whitespace-pre-wrap">
                         {text.trim()}
                     </p>
                 </div>
             );
+        } else if (fullSubtitleMatch && !subtitleClean && !text) {
+             // Handles cases where a subtitle might not be followed by content, though unlikely with current regex.
+            const cleanedMatch = fullSubtitleMatch.replace(/[#*:]/g, "").trim();
+            content.push(
+                 <div key={cleanedMatch} className="prose dark:prose-invert max-w-none">
+                    <h3 className="text-xl font-bold mt-6 mb-2">{cleanedMatch}</h3>
+                </div>
+            )
         }
     }
     return content;
