@@ -40,7 +40,7 @@ const formSchema = z.object({
 type ReportData = GenerateReportOutput['report'];
 type SearchType = 'concise' | 'web' | 'deep';
 
-type SectionKey = Exclude<keyof GenerateReportInput['sections'], symbol | number>;
+type SectionKey = "introduction" | "history" | "benefits" | "challenges" | "currentTrends" | "futureScope";
 
 
 const allSections: { id: SectionKey, label: string }[] = [

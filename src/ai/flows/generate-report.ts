@@ -63,9 +63,20 @@ export async function generateReport(input: GenerateReportInput): Promise<Genera
   return generateReportFlow(input);
 }
 
+const PromptInputSchema = GenerateReportInputSchema.extend({
+    shouldGenerate: z.object({
+        introduction: z.boolean(),
+        history: z.boolean(),
+        benefits: z.boolean(),
+        challenges: z.boolean(),
+        currentTrends: z.boolean(),
+        futureScope: z.boolean(),
+    }).optional()
+});
+
 const reportPrompt = ai.definePrompt({
   name: 'reportPrompt',
-  input: {schema: GenerateReportInputSchema},
+  input: {schema: PromptInputSchema},
   output: {schema: StandardReportSchema },
   prompt: `You are an expert AI research assistant. Your task is to generate a comprehensive, in-depth, and well-structured report on the given topic. The total length of the report should be between 150 and 350 words.
 
@@ -73,22 +84,22 @@ For the topic "{{{topic}}}", please provide a detailed explanation for each of t
 
 - Title: A concise and engaging title for the report.
 
-{{#if (includes sections "introduction")}}
+{{#if shouldGenerate.introduction}}
 - Introduction: Provide a compelling introduction that clearly defines the topic, explains its significance, and gives a brief overview of what the report will cover.
 {{/if}}
-{{#if (includes sections "history")}}
+{{#if shouldGenerate.history}}
 - History: Delve into the historical background of the topic. Cover its origins, key milestones, and the evolution of thought or technology related to it.
 {{/if}}
-{{#if (includes sections "benefits")}}
+{{#if shouldGenerate.benefits}}
 - Benefits: Elaborate on the advantages and benefits associated with the topic. Provide specific examples or data to support your points.
 {{/if}}
-{{#if (includes sections "challenges")}}
+{{#if shouldGenerate.challenges}}
 - Challenges: Thoroughly analyze the problems, difficulties, and criticisms related to the topic.
 {{/if}}
-{{#if (includes sections "currentTrends")}}
+{{#if shouldGenerate.currentTrends}}
 - Current Trends: Detail the latest trends and developments shaping the topic.
 {{/if}}
-{{#if (includes sections "futureScope")}}
+{{#if shouldGenerate.futureScope}}
 - Future Scope: Extrapolate on the potential future implications and applications of the topic.
 {{/if}}
 
@@ -100,35 +111,43 @@ For the topic "{{{topic}}}", please provide a detailed explanation for each of t
 
 const deepResearchPrompt = ai.definePrompt({
     name: 'deepResearchPrompt',
-    input: { schema: GenerateReportInputSchema },
-    output: { schema: StandardReportSchema },
+    input: { schema: PromptInputSchema },
+    output: { schema: DeepReportSchema },
     prompt: `You are an expert AI research analyst. Your task is to generate a comprehensive and in-depth report on the given topic of approximately 1600 words. Your analysis must be thorough, insightful, and well-structured.
 
 For the topic "{{{topic}}}", provide a very detailed and extensive explanation for each of the following sections, ensuring the total word count is around 1600 words:
 
 - Title: A concise and engaging title for the report.
+- Report: Generate a comprehensive report. The sections to be included are based on the user's selection.
 
-{{#if (includes sections "introduction")}}
-- Introduction: Provide a compelling introduction that clearly defines the topic, explains its significance, and gives a brief overview of what the report will cover.
+{{#if shouldGenerate.introduction}}
+### Introduction
+Provide a compelling introduction that clearly defines the topic, explains its significance, and gives a brief overview of what the report will cover.
 {{/if}}
-{{#if (includes sections "history")}}
-- History: Delve into the historical background of the topic. Cover its origins, key milestones, and the evolution of thought or technology related to it.
+{{#if shouldGenerate.history}}
+### History
+Delve into the historical background of the topic. Cover its origins, key milestones, and the evolution of thought or technology related to it.
 {{/if}}
-{{#if (includes sections "benefits")}}
-- Benefits: Elaborate on the advantages and benefits associated with the topic. Provide specific examples or data to support your points.
+{{#if shouldGenerate.benefits}}
+### Benefits
+Elaborate on the advantages and benefits associated with the topic. Provide specific examples or data to support your points.
 {{/if}}
-{{#if (includes sections "challenges")}}
-- Challenges: Thoroughly analyze the problems, difficulties, and criticisms related to the topic.
+{{#if shouldGenerate.challenges}}
+### Challenges
+Thoroughly analyze the problems, difficulties, and criticisms related to the topic.
 {{/if}}
-{{#if (includes sections "currentTrends")}}
-- Current Trends: Detail the latest trends and developments shaping the topic.
+{{#if shouldGenerate.currentTrends}}
+### Current Trends
+Detail the latest trends and developments shaping the topic.
 {{/if}}
-{{#if (includes sections "futureScope")}}
-- Future Scope: Extrapolate on the potential future implications and applications of the topic.
+{{#if shouldGenerate.futureScope}}
+### Future Scope
+Extrapolate on the potential future implications and applications of the topic.
 {{/if}}
 
 {{#if generateWithReferences}}
-- Sources: Provide a list of 5-7 web links or citations that were used to generate this report. Format them as a string, with each source on a new line.
+### Sources
+Provide a list of 5-7 web links or citations that were used to generate this report. Format them as a string, with each source on a new line.
 {{/if}}
 `,
 });
@@ -157,22 +176,31 @@ const generateReportFlow = ai.defineFlow(
   async (input) => {
     let reportOutput;
     
-    // Default sections for web and deep search if not provided
-    const sectionsToGenerate = input.sections && input.sections.length > 0
-        ? input.sections
-        : ["introduction", "history", "benefits", "challenges", "currentTrends", "futureScope"];
-        
-    const flowInput = { ...input, sections: sectionsToGenerate };
-
-    if (input.searchType === 'web') {
-        const { output } = await reportPrompt(flowInput);
-        reportOutput = output;
-    } else if (input.searchType === 'deep') {
-        const { output } = await deepResearchPrompt(flowInput);
-        reportOutput = output;
-    } else {
+    if (input.searchType === 'concise') {
         const { output } = await conciseReportPrompt(input);
         reportOutput = output;
+    } else {
+        // Default sections for web and deep search if not provided
+        const sectionsToGenerate = input.sections && input.sections.length > 0
+            ? input.sections
+            : ["introduction", "history", "benefits", "challenges", "currentTrends", "futureScope"];
+            
+        const allPossibleSections: (keyof typeof PromptInputSchema.shape.shouldGenerate.unwrap.shape)[] = ["introduction", "history", "benefits", "challenges", "currentTrends", "futureScope"];
+        
+        const shouldGenerate: Record<string, boolean> = {};
+        allPossibleSections.forEach(section => {
+            shouldGenerate[section] = sectionsToGenerate.includes(section);
+        });
+            
+        const flowInput = { ...input, shouldGenerate };
+
+        if (input.searchType === 'web') {
+            const { output } = await reportPrompt(flowInput);
+            reportOutput = output;
+        } else if (input.searchType === 'deep') {
+            const { output } = await deepResearchPrompt(flowInput);
+            reportOutput = output;
+        }
     }
     
     if (!reportOutput) {
