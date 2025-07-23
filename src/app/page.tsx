@@ -353,7 +353,7 @@ export default function Home() {
   };
   
 const renderFormattedReport = (reportText: string) => {
-    const subtitleRegex = /^###\s*(.*?)(?:\s*:)?$/i;
+    const subtitleRegex = /^###\s*(.*?)(?:\s*|\n|:)/i;
     const boldRegex = /\*\*(.*?)\*\*/g;
     const bulletRegex = /^\s*([*•-])\s(.*)/;
     const numberedListRegex = /^\s*(\d+)\.\s(.*)/;
@@ -374,14 +374,24 @@ const renderFormattedReport = (reportText: string) => {
             currentList = null;
         }
     };
-
-    const formatLine = (line: string) => {
+    
+    const formatLine = (line: string, isListItem = false) => {
         const parts = line.split(boldRegex).map((part, i) => {
             if (i % 2 === 1) { // This part was inside **...**
                 return <strong key={i} className="font-semibold text-foreground">{part}</strong>;
             }
-            return part;
+            return isListItem ? <span className="text-muted-foreground">{part}</span> : part;
         });
+
+        if (isListItem) {
+            const firstColonIndex = line.indexOf(':');
+            if (firstColonIndex !== -1) {
+                const titlePart = line.substring(0, firstColonIndex + 1);
+                const descriptionPart = line.substring(firstColonIndex + 1);
+                return <>{formatLine(titlePart, false)}{formatLine(descriptionPart, true)}</>;
+            }
+        }
+        
         return <>{parts}</>;
     };
 
@@ -399,7 +409,7 @@ const renderFormattedReport = (reportText: string) => {
                 flushList();
                 currentList = { type: 'ul', items: [] };
             }
-            currentList.items.push(<li key={`li-${index}`}>{formatLine(bulletMatch[2])}</li>);
+            currentList.items.push(<li key={`li-${index}`}>{formatLine(bulletMatch[2], true)}</li>);
             return;
         }
         
@@ -409,7 +419,7 @@ const renderFormattedReport = (reportText: string) => {
                 flushList();
                 currentList = { type: 'ol', items: [] };
             }
-            currentList.items.push(<li key={`li-${index}`}>{formatLine(numberedMatch[2])}</li>);
+            currentList.items.push(<li key={`li-${index}`}>{formatLine(numberedMatch[2], true)}</li>);
             return;
         }
         
@@ -636,7 +646,5 @@ const renderFormattedReport = (reportText: string) => {
     </div>
   );
 }
-
-    
 
     
