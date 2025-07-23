@@ -21,16 +21,20 @@ interface ConciseReportDisplayProps {
 
 export function ConciseReportDisplay({ report, onReportUpdate, topic }: ConciseReportDisplayProps) {
   const [editableReport, setEditableReport] = useState(report);
-  const [editingSection, setEditingSection] = useState<'summary' | `keyPoint-${number}` | null>(null);
+  const [editingSection, setEditingSection] = useState<'summary' | 'keyPoints' | null>(null);
   const [editContent, setEditContent] = useState('');
 
   useEffect(() => {
     setEditableReport(report);
   }, [report]);
 
-  const handleEditClick = (section: 'summary' | `keyPoint-${number}`, content: string) => {
+  const handleEditClick = (section: 'summary' | 'keyPoints') => {
     setEditingSection(section);
-    setEditContent(content);
+    if (section === 'summary') {
+      setEditContent(editableReport.summary);
+    } else {
+      setEditContent(editableReport.keyPoints.join('\n'));
+    }
   };
 
   const handleSaveClick = () => {
@@ -41,9 +45,7 @@ export function ConciseReportDisplay({ report, onReportUpdate, topic }: ConciseR
     if (editingSection === 'summary') {
       updatedReport = { ...editableReport, summary: editContent };
     } else {
-      const index = parseInt(editingSection.split('-')[1]);
-      const newKeyPoints = [...editableReport.keyPoints];
-      newKeyPoints[index] = editContent;
+      const newKeyPoints = editContent.split('\n').filter(point => point.trim() !== '');
       updatedReport = { ...editableReport, keyPoints: newKeyPoints };
     }
     
@@ -68,7 +70,7 @@ export function ConciseReportDisplay({ report, onReportUpdate, topic }: ConciseR
           <div className="flex flex-row items-center justify-between mb-2">
             <h3 className="font-semibold text-lg">Summary</h3>
             {editingSection !== 'summary' && (
-              <Button variant="outline" size="sm" onClick={() => handleEditClick('summary', editableReport.summary)}>
+              <Button variant="outline" size="sm" onClick={() => handleEditClick('summary')}>
                 <Edit className="mr-2 h-4 w-4" />Edit
               </Button>
             )}
@@ -94,36 +96,35 @@ export function ConciseReportDisplay({ report, onReportUpdate, topic }: ConciseR
 
         {/* Key Points Section */}
         <div>
-          <h3 className="font-semibold text-lg mb-2">Key Points</h3>
-          <ul className="space-y-2 list-disc list-inside text-muted-foreground">
-            {editableReport.keyPoints.map((point, index) => {
-              const sectionId = `keyPoint-${index}` as const;
-              return (
+          <div className="flex flex-row items-center justify-between mb-2">
+            <h3 className="font-semibold text-lg">Key Points</h3>
+             {editingSection !== 'keyPoints' && (
+              <Button variant="outline" size="sm" onClick={() => handleEditClick('keyPoints')}>
+                <Edit className="mr-2 h-4 w-4" />Edit
+              </Button>
+            )}
+          </div>
+          {editingSection === 'keyPoints' ? (
+             <div className="space-y-4">
+              <Textarea
+                value={editContent}
+                onChange={(e) => setEditContent(e.target.value)}
+                className="min-h-[250px] text-base leading-relaxed rounded-lg"
+              />
+              <div className="flex justify-end space-x-2">
+                <Button variant="ghost" size="sm" onClick={handleCancelClick}><X className="mr-2 h-4 w-4" />Cancel</Button>
+                <Button size="sm" onClick={handleSaveClick}><Save className="mr-2 h-4 w-4" />Save</Button>
+              </div>
+            </div>
+          ) : (
+            <ul className="space-y-3 list-disc list-inside text-muted-foreground">
+              {editableReport.keyPoints.map((point, index) => (
                 <li key={index} className="flex items-start">
-                  {editingSection === sectionId ? (
-                    <div className="space-y-4 ml-[-1.5rem] mt-4 w-full">
-                        <Textarea
-                            value={editContent}
-                            onChange={(e) => setEditContent(e.target.value)}
-                            className="text-base leading-relaxed rounded-lg"
-                        />
-                        <div className="flex justify-end space-x-2">
-                            <Button variant="ghost" size="sm" onClick={handleCancelClick}><X className="mr-2 h-4 w-4" />Cancel</Button>
-                            <Button size="sm" onClick={handleSaveClick}><Save className="mr-2 h-4 w-4" />Save</Button>
-                        </div>
-                    </div>
-                  ) : (
-                    <div className="flex justify-between items-start group w-full">
-                        <span className="flex-1">{point}</span>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 flex-shrink-0" onClick={() => handleEditClick(sectionId, point)}>
-                            <Edit className="h-4 w-4" />
-                        </Button>
-                    </div>
-                  )}
+                  <span className="flex-1">{point}</span>
                 </li>
-              )
-            })}
-          </ul>
+              ))}
+            </ul>
+          )}
         </div>
       </CardContent>
     </>
