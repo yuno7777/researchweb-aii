@@ -9,6 +9,7 @@ import { GradientText } from '@/components/GradientText';
 import { ScrollAnimation } from '@/components/ScrollAnimation';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
+import { FeedbackForm } from './FeedbackForm';
 
 export function HomePageContent() {
 
@@ -193,7 +194,7 @@ export function HomePageContent() {
                 <GradientText>From Chat to Research Report, <span className="text-primary !bg-none">Instantly!</span></GradientText>
               </h2>
               <p className="max-w-3xl mx-auto text-lg text-muted-foreground">
-                Ever had a brilliant question snowball into something bigger? Insight Forge doesn&apos;t just answer - it documents the journey:
+                Ever had a brilliant question snowball into something bigger? Insight Forge doesn't just answer - it documents the journey:
               </p>
             </div>
             <div className="mt-16 grid grid-cols-1 gap-x-8 gap-y-12 md:grid-cols-4">
@@ -316,6 +317,24 @@ export function HomePageContent() {
                     </AccordionItem>
                 ))}
               </Accordion>
+          </div>
+        </ScrollAnimation>
+      </section>
+
+      <section id="feedback" className="w-full py-20 md:py-32 bg-muted/20">
+        <ScrollAnimation>
+          <div className="container mx-auto max-w-4xl px-4 md:px-6">
+            <div className="mx-auto max-w-2xl text-center space-y-4">
+              <h2 className="font-sans text-3xl tracking-tight md:text-5xl">
+                <GradientText>We Value Your Feedback</GradientText>
+              </h2>
+              <p className="text-lg text-muted-foreground">
+                Have a suggestion or found a bug? Let us know! We're always looking to improve.
+              </p>
+            </div>
+            <div className="mt-12 max-w-xl mx-auto">
+              <FeedbackForm />
+            </div>
           </div>
         </ScrollAnimation>
       </section>
