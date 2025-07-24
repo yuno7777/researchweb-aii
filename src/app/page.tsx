@@ -31,6 +31,7 @@ import { cn } from '@/lib/utils';
 import { ConciseReportDisplay } from '@/components/ConciseReportDisplay';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Logo } from '@/components/Logo';
 
 
 const formSchema = z.object({
@@ -423,7 +424,8 @@ export default function Home() {
     <div id="home" className="flex min-h-screen w-full flex-col bg-background text-foreground" suppressHydrationWarning>
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
-            <a href="#home">
+            <a href="#home" className="flex items-center gap-2">
+              <Logo className="h-6 w-6 text-primary" />
               <h1 className="font-sans text-xl font-semibold tracking-wider text-primary">Insight Forge</h1>
             </a>
             <nav className="hidden items-center gap-6 text-sm font-medium md:flex">
