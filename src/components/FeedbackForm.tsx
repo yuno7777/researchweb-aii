@@ -7,29 +7,33 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { handleFeedbackSubmit } from '@/app/actions';
 
 export function FeedbackForm() {
   const { toast } = useToast();
   const [feedback, setFeedback] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (feedback.trim()) {
-      // In a real application, you would send this feedback to a server.
-      // For this example, we'll just show a toast notification.
-      console.log('Feedback submitted:', feedback);
+    if (feedback.trim() && !isSubmitting) {
+      setIsSubmitting(true);
+      const result = await handleFeedbackSubmit(feedback);
+      setIsSubmitting(false);
 
-      toast({
-        title: 'Feedback Received!',
-        description: "Thank you for helping us improve Insight Forge.",
-      });
-      setFeedback('');
-    } else {
+      if (result.success) {
+        toast({
+          title: 'Feedback Received!',
+          description: "Thank you for helping us improve Insight Forge.",
+        });
+        setFeedback('');
+      } else {
         toast({
             variant: 'destructive',
-            title: 'Empty Feedback',
-            description: "Please write something before submitting.",
+            title: 'Submission Failed',
+            description: result.error || "Something went wrong. Please try again.",
         });
+      }
     }
   };
 
@@ -45,12 +49,15 @@ export function FeedbackForm() {
                         value={feedback}
                         onChange={(e) => setFeedback(e.target.value)}
                         rows={5}
-                        className="text-base"
+                        className="text-base resize-none"
+                        disabled={isSubmitting}
                     />
                 </div>
             </CardContent>
             <CardFooter className="flex justify-end p-6 pt-0">
-                <Button type="submit" className="rounded-full">Submit Feedback</Button>
+                <Button type="submit" className="rounded-full" disabled={isSubmitting}>
+                  {isSubmitting ? 'Submitting...' : 'Submit Feedback'}
+                </Button>
             </CardFooter>
         </Card>
     </form>
