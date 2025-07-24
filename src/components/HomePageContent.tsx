@@ -108,7 +108,7 @@ export function HomePageContent() {
     pro: {
       title: 'Pro Plan',
       description: 'For serious researchers and innovation teams.',
-      price: '₹250',
+      price: '₹749',
       features: [
         'Unlimited Research Credits per month',
         '50 Deep Research Requests',
