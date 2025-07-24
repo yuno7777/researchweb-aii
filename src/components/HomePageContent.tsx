@@ -1,7 +1,7 @@
 
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BookOpen, BrainCircuit, Code, FileDigit, FileText, ListEnd, Palette, Search, Check, Plus } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,43 @@ import { ScrollAnimation } from '@/components/ScrollAnimation';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { FeedbackForm } from './FeedbackForm';
+
+// A new component to handle client-side price localization
+function LocalizedPrice({ basePrice }: { basePrice: number }) {
+  const [formattedPrice, setFormattedPrice] = useState<string | null>(null);
+
+  useEffect(() => {
+    // This runs only on the client, after hydration
+    const formatPrice = () => {
+      try {
+        // Use user's locale from their browser settings
+        return new Intl.NumberFormat(navigator.language, {
+          style: 'currency',
+          currency: 'INR', // We can set a default and let Intl API handle symbol placement and formatting
+          maximumFractionDigits: 0,
+        }).format(basePrice);
+      } catch (e) {
+        console.error("Could not format currency", e);
+        // Fallback for environments where Intl is not fully supported or locale is weird
+        return `₹${basePrice}`;
+      }
+    };
+
+    if (basePrice === 0) {
+        setFormattedPrice('₹0');
+    } else {
+        setFormattedPrice(formatPrice());
+    }
+  }, [basePrice]);
+
+  if (formattedPrice === null) {
+    // Render a placeholder or nothing during server render and initial client render
+    return <span className="text-4xl font-bold text-primary">...</span>;
+  }
+
+  return <p className="text-4xl font-bold text-primary">{formattedPrice}</p>;
+}
+
 
 export function HomePageContent() {
 
@@ -94,7 +131,7 @@ export function HomePageContent() {
     free: {
       title: 'Free Plan',
       description: 'Perfect for light explorers.',
-      price: '₹0',
+      price: 0,
       features: [
         '10 Research Credits per month',
         '5 Deep Research Requests',
@@ -108,7 +145,7 @@ export function HomePageContent() {
     pro: {
       title: 'Pro Plan',
       description: 'For serious researchers and innovation teams.',
-      price: '₹749',
+      price: 749,
       features: [
         'Unlimited Research Credits per month',
         '50 Deep Research Requests',
@@ -275,7 +312,7 @@ export function HomePageContent() {
                           <p className="text-muted-foreground mt-1">{plan.description}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-4xl font-bold text-primary">{plan.price}</p>
+                          <LocalizedPrice basePrice={plan.price} />
                           <p className="text-muted-foreground">month</p>
                         </div>
                       </div>
