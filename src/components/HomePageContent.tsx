@@ -58,7 +58,7 @@ export function HomePageContent() {
   const processSteps = [
     {
       title: "Start a chat",
-      description: "Kick off a conversation to explore your query with InsightForge.",
+      description: "Kick off a conversation to explore your query with Insight Forge.",
     },
     {
       title: "Trigger deep research",
@@ -102,7 +102,7 @@ export function HomePageContent() {
         '2 AI-Generated Research Reports per month',
         '1 Project Workspaces'
       ],
-      footer: "A great way to experience InsightForge's magic without any commitment."
+      footer: "A great way to experience Insight Forge's magic without any commitment."
     },
     pro: {
       title: 'Pro Plan',
@@ -125,11 +125,11 @@ export function HomePageContent() {
 
   const faqItems = [
     {
-      question: "What is InsightForge?",
-      answer: "InsightForge is an AI-powered research assistant designed to help you generate comprehensive, well-structured reports on any topic. It uses advanced AI to gather, analyze, and present information, saving you time and effort."
+      question: "What is Insight Forge?",
+      answer: "Insight Forge is an AI-powered research assistant designed to help you generate comprehensive, well-structured reports on any topic. It uses advanced AI to gather, analyze, and present information, saving you time and effort."
     },
     {
-      question: "How do I get started with InsightForge?",
+      question: "How do I get started with Insight Forge?",
       answer: "Getting started is simple! Just type a topic into the search bar on the homepage and click the generate button. Our AI will then create a detailed report for you in seconds. You can then edit, save, or export the report as needed."
     },
     {
@@ -137,12 +137,12 @@ export function HomePageContent() {
       answer: "You can create a wide variety of reports on virtually any subject, from scientific research and market analysis to historical summaries and technical papers. The AI is designed to be versatile and can adapt to different content requirements."
     },
     {
-      question: "Is InsightForge free to use?",
+      question: "Is Insight Forge free to use?",
       answer: "Yes, we offer a free plan with a generous number of credits per month, which is perfect for casual users and exploring the platform. For more intensive research needs, our Pro plan offers unlimited access and advanced features."
     },
     {
-      question: "Can I use InsightForge on mobile devices?",
-      answer: "Absolutely! InsightForge is fully responsive and works seamlessly on desktops, tablets, and mobile phones. You can conduct research and generate reports from anywhere, at any time."
+      question: "Can I use Insight Forge on mobile devices?",
+      answer: "Absolutely! Insight Forge is fully responsive and works seamlessly on desktops, tablets, and mobile phones. You can conduct research and generate reports from anywhere, at any time."
     },
     {
       question: "How does the deep research assistant work?",
@@ -160,7 +160,7 @@ export function HomePageContent() {
                       <GradientText>An AI Research Assistant That Works For You</GradientText>
                   </h2>
                   <p className="max-w-3xl mx-auto text-lg text-muted-foreground">
-                      From automated report generation to in-depth analysis, InsightForge provides the tools you need to accelerate your research workflow.
+                      From automated report generation to in-depth analysis, Insight Forge provides the tools you need to accelerate your research workflow.
                   </p>
               </div>
 
@@ -193,7 +193,7 @@ export function HomePageContent() {
                 <GradientText>From Chat to Research Report, <span className="text-primary !bg-none">Instantly!</span></GradientText>
               </h2>
               <p className="max-w-3xl mx-auto text-lg text-muted-foreground">
-                Ever had a brilliant question snowball into something bigger? InsightForge doesn&apos;t just answer - it documents the journey:
+                Ever had a brilliant question snowball into something bigger? Insight Forge doesn&apos;t just answer - it documents the journey:
               </p>
             </div>
             <div className="mt-16 grid grid-cols-1 gap-x-8 gap-y-12 md:grid-cols-4">

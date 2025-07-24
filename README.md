@@ -1,6 +1,6 @@
-# InsightForge
+# Insight Forge
 
-InsightForge is a Next.js application that uses AI to generate detailed reports on various topics. It features in-place editing, PDF export, and a query history.
+Insight Forge is a Next.js application that uses AI to generate detailed reports on various topics. It features in-place editing, PDF export, and a query history.
 
 ## Features
 
@@ -21,7 +21,7 @@ InsightForge is a Next.js application that uses AI to generate detailed reports 
 
 ## Running Locally
 
-To run InsightForge on your local machine, follow these steps:
+To run Insight Forge on your local machine, follow these steps:
 
 ### 1. Prerequisites
 
@@ -40,7 +40,7 @@ To get the app's code on your local machine, you'll need to clone its source cod
     ```
 3.  Navigate into the newly created project directory:
     ```bash
-    cd InsightForge
+    cd Insight Forge
     ```
 
 After cloning, you can proceed to the next steps.
@@ -92,7 +92,7 @@ Once both servers are running, open your web browser and navigate to:
 
 [http://localhost:3000](http://localhost:3000)
 
-You should now be able to use the InsightForge application locally!
+You should now be able to use the Insight Forge application locally!
 
 ## Publishing to GitHub
 
@@ -100,7 +100,7 @@ If you have the project code locally and want to publish it to your own new repo
 
 1.  **Create a Repository on GitHub:**
     -   Go to [github.com](https://github.com), log in, and click the `+` icon in the top-right to select **New repository**.
-    -   Choose a name for your repository (e.g., `insightforge-app`).
+    -   Choose a name for your repository (e.g., `insight-forge-app`).
     -   **Important:** Leave the "Initialize this repository with:" options unchecked. Your project already has a `README.md` and other necessary files.
     -   Click **Create repository**.
 
