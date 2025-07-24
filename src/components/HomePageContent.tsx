@@ -2,7 +2,7 @@
 'use client';
 
 import React from 'react';
-import { BookOpen, BrainCircuit, Code, FileDigit, FileText, ListEnd, Mic, Search, Check, Plus } from 'lucide-react';
+import { BookOpen, BrainCircuit, Code, FileDigit, FileText, ListEnd, Palette, Search, Check, Plus } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import { GradientText } from '@/components/GradientText';
@@ -35,13 +35,13 @@ export function HomePageContent() {
     },
     {
       icon: <FileDigit className="h-8 w-8 text-primary" />,
-      title: 'PDF & TXT Exports',
-      description: 'Export your finalized reports in multiple formats, including selectable-text PDFs and plain text files for easy sharing.',
+      title: 'PDF Export',
+      description: 'Export your finalized reports in a selectable-text PDF format for easy sharing and documentation.',
     },
     {
-      icon: <Mic className="h-8 w-8 text-primary" />,
-      title: 'Voice-to-Text',
-      description: 'Dictate your research queries or edit reports using your voice, offering a hands-free and accessible way to work.',
+      icon: <Palette className="h-8 w-8 text-primary" />,
+      title: 'Light/Dark Mode',
+      description: 'Switch between light and dark themes for a comfortable viewing experience, no matter the time of day.',
     },
     {
       icon: <ListEnd className="h-8 w-8 text-primary" />,
