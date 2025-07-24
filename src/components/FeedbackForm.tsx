@@ -50,7 +50,7 @@ export function FeedbackForm() {
                 </div>
             </CardContent>
             <CardFooter className="flex justify-end p-6 pt-0">
-                <Button type="submit">Submit Feedback</Button>
+                <Button type="submit" className="rounded-full">Submit Feedback</Button>
             </CardFooter>
         </Card>
     </form>
