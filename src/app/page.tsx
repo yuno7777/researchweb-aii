@@ -7,14 +7,13 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { jsPDF } from 'jspdf';
-import { ArrowUp, Menu, Trash2, FileText, List, FileDown, BrainCircuit, Book, Link, Settings, Sparkles } from 'lucide-react';
+import { ArrowUp, Menu, Trash2, FileText, List, FileDown, BrainCircuit, Book, Link, Settings, Sparkles, Plus, FolderKanban } from 'lucide-react';
 
 import type { GenerateReportOutput, GenerateReportInput } from '@/ai/flows/generate-report';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { useToast } from '@/hooks/use-toast';
 
 import { handleGenerateReport } from './actions';
-import { ReportDisplay } from '@/components/ReportDisplay';
 import { ReportSkeleton } from '@/components/ReportSkeleton';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -33,6 +32,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Checkbox } from '@/components/ui/checkbox';
 import { Logo } from '@/components/Logo';
 import { Thinking } from '@/components/Thinking';
+import { TemplateManager, type Template } from '@/components/TemplateManager';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 
 const formSchema = z.object({
@@ -42,27 +43,28 @@ const formSchema = z.object({
 type ReportData = GenerateReportOutput['report'];
 type SearchType = 'concise' | 'web' | 'deep';
 
-type SectionKey = "introduction" | "history" | "benefits" | "challenges" | "currentTrends" | "futureScope";
-
-
-const allSections: { id: SectionKey, label: string }[] = [
-    { id: 'introduction', label: 'Introduction' },
-    { id: 'history', label: 'History' },
-    { id: 'benefits', label: 'Benefits' },
-    { id: 'challenges', label: 'Challenges' },
-    { id: 'currentTrends', label: 'Current Trends' },
-    { id: 'futureScope', label: 'Future Scope' },
+const defaultSections: string[] = [
+    'Introduction',
+    'History',
+    'Benefits',
+    'Challenges',
+    'Current Trends',
+    'Future Scope',
 ];
 
 export default function Home() {
   const [report, setReport] = useState<ReportData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [history, setHistory] = useLocalStorage<string[]>('report-history', []);
+  const [templates, setTemplates] = useLocalStorage<Template[]>('report-templates', []);
   const { toast } = useToast();
   const [searchType, setSearchType] = useState<SearchType>('web');
   const [generateWithReferences, setGenerateWithReferences] = useState(false);
-  const [selectedSections, setSelectedSections] = useState<SectionKey[]>(allSections.map(s => s.id));
+  const [selectedSections, setSelectedSections] = useState<string[]>(defaultSections);
   const [showThinking, setShowThinking] = useState(true);
+  const [isTemplateManagerOpen, setIsTemplateManagerOpen] = useState(false);
+  const [activeTemplateId, setActiveTemplateId] = useState<string>('default');
+
   
   const handleSelectTopic = (topic: string) => {
     form.setValue('topic', topic);
@@ -334,6 +336,20 @@ export default function Home() {
   const isStandardOrDeepReport = (report: ReportData | null): report is { title: string; report: string; sources?: string } => {
       return report !== null && 'report' in report && typeof report.report === 'string' && 'title' in report && !('summary' in report);
   };
+  
+  const handleTemplateSelect = (templateId: string) => {
+    setActiveTemplateId(templateId);
+    if (templateId === 'default') {
+        setSelectedSections(defaultSections);
+    } else if (templateId === 'custom') {
+        setSelectedSections([]);
+    } else {
+        const template = templates.find(t => t.id === templateId);
+        if (template) {
+            setSelectedSections(template.sections);
+        }
+    }
+  };
 
 
   const renderFormattedReport = (reportText: string) => {
@@ -561,32 +577,50 @@ export default function Home() {
                                         Customize
                                     </Button>
                                 </PopoverTrigger>
-                                <PopoverContent className="w-64 p-4">
+                                <PopoverContent className="w-80 p-4">
                                     <div className="space-y-4">
                                         <h4 className="font-medium leading-none">Customize Sections</h4>
                                         <p className="text-sm text-muted-foreground">
-                                            Select the sections to include in your report.
+                                            Select a template or create a custom set of sections for your report.
                                         </p>
                                         <div className="space-y-2">
-                                            {allSections.map((section) => (
-                                                <div key={section.id} className="flex items-center space-x-2">
+                                            <Label>Template</Label>
+                                            <div className="flex gap-2">
+                                                <Select value={activeTemplateId} onValueChange={handleTemplateSelect}>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select a template" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="default">Default Sections</SelectItem>
+                                                        {templates.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
+                                                        <SelectItem value="custom">Custom...</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                                <Button variant="outline" size="icon" onClick={() => setIsTemplateManagerOpen(true)}>
+                                                    <FolderKanban className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                        </div>
+                                        <Separator />
+                                        <div className="space-y-2 max-h-60 overflow-y-auto">
+                                            {selectedSections.map((section, index) => (
+                                                <div key={index} className="flex items-center space-x-2">
                                                     <Checkbox
-                                                        id={section.id}
-                                                        checked={selectedSections.includes(section.id)}
+                                                        id={`section-${index}`}
+                                                        checked={true}
                                                         onCheckedChange={(checked) => {
-                                                            return checked
-                                                                ? setSelectedSections([...selectedSections, section.id])
-                                                                : setSelectedSections(selectedSections.filter((id) => id !== section.id));
+                                                            if (!checked) {
+                                                                setSelectedSections(selectedSections.filter((s) => s !== section));
+                                                                setActiveTemplateId('custom');
+                                                            }
                                                         }}
                                                     />
-                                                    <label
-                                                        htmlFor={section.id}
-                                                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                                    >
-                                                        {section.label}
-                                                    </label>
+                                                    <Label htmlFor={`section-${index}`} className="font-normal">{section}</Label>
                                                 </div>
                                             ))}
+                                            <Button variant="ghost" size="sm" onClick={() => { setSelectedSections([...selectedSections, 'New Section']); setActiveTemplateId('custom'); }}>
+                                                <Plus className="mr-2 h-4 w-4" /> Add Section
+                                            </Button>
                                         </div>
                                     </div>
                                 </PopoverContent>
@@ -691,6 +725,13 @@ export default function Home() {
               )}
             </div>
         </section>
+
+        <TemplateManager
+            isOpen={isTemplateManagerOpen}
+            onOpenChange={setIsTemplateManagerOpen}
+            templates={templates}
+            setTemplates={setTemplates}
+        />
 
         <HomePageContent />
       </main>
