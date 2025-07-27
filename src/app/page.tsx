@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { jsPDF } from 'jspdf';
-import { ArrowUp, Menu, Trash2, FileText, List, FileDown, BrainCircuit, Book, Link, Settings } from 'lucide-react';
+import { ArrowUp, Menu, Trash2, FileText, List, FileDown, BrainCircuit, Book, Link, Settings, Sparkles } from 'lucide-react';
 
 import type { GenerateReportOutput, GenerateReportInput } from '@/ai/flows/generate-report';
 import { useLocalStorage } from '@/hooks/use-local-storage';
@@ -32,6 +32,7 @@ import { ConciseReportDisplay } from '@/components/ConciseReportDisplay';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Logo } from '@/components/Logo';
+import { Thinking } from '@/components/Thinking';
 
 
 const formSchema = z.object({
@@ -61,6 +62,7 @@ export default function Home() {
   const [searchType, setSearchType] = useState<SearchType>('web');
   const [generateWithReferences, setGenerateWithReferences] = useState(false);
   const [selectedSections, setSelectedSections] = useState<SectionKey[]>(allSections.map(s => s.id));
+  const [showThinking, setShowThinking] = useState(true);
   
   const handleSelectTopic = (topic: string) => {
     form.setValue('topic', topic);
@@ -591,12 +593,35 @@ export default function Home() {
                             </Popover>
                         </>
                       )}
+                       <Separator orientation="vertical" className="h-6" />
+                       <Popover>
+                            <PopoverTrigger asChild>
+                                <Button variant="ghost" size="sm" className="rounded-full">
+                                    <Sparkles className="mr-2 h-4 w-4" />
+                                    Show thinking
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-64 p-4">
+                                <div className="flex items-center justify-between">
+                                    <Label htmlFor="thinking-switch" className="text-muted-foreground">Show AI thinking process</Label>
+                                    <Switch
+                                        id="thinking-switch"
+                                        checked={showThinking}
+                                        onCheckedChange={setShowThinking}
+                                    />
+                                </div>
+                            </PopoverContent>
+                        </Popover>
                   </div>
               </div>
             </div>
             
             <div id="report-output">
-              {isLoading && <div className="py-12"><ReportSkeleton /></div>}
+              {isLoading && (
+                  <div className="py-12 max-w-4xl mx-auto">
+                      {showThinking ? <Thinking /> : <ReportSkeleton />}
+                  </div>
+              )}
 
               {report && !isLoading && (
                 <div className="py-12 max-w-4xl mx-auto">
