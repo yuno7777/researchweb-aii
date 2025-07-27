@@ -238,36 +238,22 @@ export default function Home() {
                  addSection('Key Points', report.keyPoints);
                  if (report.sources) addSection('Sources', report.sources);
             } else if (isStandardOrDeepReport(report)) {
-                // Split the report by '###' headers
-                const sections = report.report.split(/\n###\s(.+)/).filter(s => s.trim() !== '');
+                // Split the report by '###' headers. The regex will capture the title and the content.
+                const sections = report.report.split(/\n?###\s(.+)/).filter(s => s.trim() !== '');
                 
-                // Handle the case where the first part of the report is the introduction without a header
-                let initialContent = sections[0];
-                let sectionsStartIndex = 1;
+                let reportContent = sections;
 
-                // A heuristic to check if the first chunk is a title or actual content
-                const isFirstChunkTitle = ["Introduction", "Overview"].includes(initialContent.trim());
-
-                if (!isFirstChunkTitle) {
-                  // Find the first real title
-                  let firstTitleIndex = sections.findIndex((s, i) => i % 2 === 1);
-                  if (firstTitleIndex > -1) {
-                    const firstTitle = sections[firstTitleIndex];
-                    if (firstTitle.toLowerCase().includes('introduction')) {
-                       addSection(firstTitle, sections[firstTitleIndex + 1]);
-                       sectionsStartIndex = firstTitleIndex + 2;
-                    } else {
-                       addSection("Introduction", initialContent);
-                    }
-                  } else {
-                     addSection("Introduction", initialContent);
-                  }
+                // Check if the first element is content without a header.
+                // This can happen if the AI generates an introduction without the '### Introduction' markdown.
+                if (reportContent.length % 2 !== 0) {
+                    addSection("Introduction", reportContent[0]);
+                    reportContent = reportContent.slice(1);
                 }
 
-                // Process the rest of the sections
-                for (let i = sectionsStartIndex; i < sections.length; i += 2) {
-                    const title = sections[i] ? sections[i].trim() : "Untitled Section";
-                    const content = sections[i + 1] ? sections[i + 1].trim() : "";
+                // Process the rest of the sections which should be in [title, content, title, content] format
+                for (let i = 0; i < reportContent.length; i += 2) {
+                    const title = reportContent[i] ? reportContent[i].trim() : "Untitled Section";
+                    const content = reportContent[i + 1] ? reportContent[i + 1].trim() : "";
                     if (title && content) {
                         addSection(title, content);
                     }
