@@ -24,7 +24,7 @@ export type GenerateReportInput = z.infer<typeof GenerateReportInputSchema>;
 
 const StandardReportSchema = z.object({
   title: z.string().describe('A concise and engaging title for the report.'),
-  introduction: z.string().describe('A 150-word introduction to the topic.'),
+  introduction: z.string().optional().describe('A 150-word introduction to the topic.'),
   history: z.string().optional().describe('A 200-word history of the topic.'),
   benefits: z.string().optional().describe('A 200-word overview of the benefits or advantages.'),
   challenges: z.string().optional().describe('A 200-word summary of the challenges or disadvantages.'),
@@ -42,7 +42,7 @@ const ConciseReportSchema = z.object({
 
 const DeepReportSchema = z.object({
   title: z.string().describe('A concise and engaging title for the report.'),
-  introduction: z.string().describe('A comprehensive, 400-word introduction to the topic.'),
+  introduction: z.string().optional().describe('A comprehensive, 400-word introduction to the topic.'),
   history: z.string().optional().describe('An in-depth, 400-word history of the topic.'),
   benefits: z.string().optional().describe('A detailed, 400-word overview of the benefits or advantages.'),
   challenges: z.string().optional().describe('A thorough, 400-word summary of the challenges or disadvantages.'),
@@ -72,24 +72,26 @@ const reportPrompt = ai.definePrompt({
 For the topic "{{{topic}}}", please provide a detailed explanation for each of the following sections that are provided in the 'sections' array. If a section is not in the array, you should not generate it.
 
 - Title: A concise and engaging title for the report.
-{{#if (sections.includes "Introduction")}}
+{{#each sections}}
+{{#if (eq this "Introduction")}}
 - Introduction: A 150-word introduction to the topic.
 {{/if}}
-{{#if (sections.includes "History")}}
+{{#if (eq this "History")}}
 - History: A 200-word history of the topic.
 {{/if}}
-{{#if (sections.includes "Benefits")}}
+{{#if (eq this "Benefits")}}
 - Benefits: A 200-word overview of the benefits or advantages.
 {{/if}}
-{{#if (sections.includes "Challenges")}}
+{{#if (eq this "Challenges")}}
 - Challenges: A 200-word summary of the challenges or disadvantages.
 {{/if}}
-{{#if (sections.includes "Current Trends")}}
+{{#if (eq this "Current Trends")}}
 - Current Trends: A 200-word analysis of current trends.
 {{/if}}
-{{#if (sections.includes "Future Scope")}}
+{{#if (eq this "Future Scope")}}
 - Future Scope: A 200-word projection of the future scope.
 {{/if}}
+{{/each}}
 {{#if generateWithReferences}}
 - Sources: Provide a list of 2-3 web links or citations that were used to generate this report. Format them as a string, with each source on a new line.
 {{/if}}
@@ -105,24 +107,26 @@ const deepResearchPrompt = ai.definePrompt({
 For the topic "{{{topic}}}", provide a very detailed and extensive explanation for each of the following sections provided in the 'sections' array. If a section is not in the array, you should not generate it.
 
 - Title: A concise and engaging title for the report.
-{{#if (sections.includes "Introduction")}}
+{{#each sections}}
+{{#if (eq this "Introduction")}}
 - Introduction: A comprehensive, 400-word introduction to the topic.
 {{/if}}
-{{#if (sections.includes "History")}}
+{{#if (eq this "History")}}
 - History: An in-depth, 400-word history of the topic.
 {{/if}}
-{{#if (sections.includes "Benefits")}}
+{{#if (eq this "Benefits")}}
 - Benefits: A detailed, 400-word overview of the benefits or advantages.
 {{/if}}
-{{#if (sections.includes "Challenges")}}
+{{#if (eq this "Challenges")}}
 - Challenges: A thorough, 400-word summary of the challenges or disadvantages.
 {{/if}}
-{{#if (sections.includes "Current Trends")}}
+{{#if (eq this "Current Trends")}}
 - Current Trends: An extensive, 400-word analysis of current trends.
 {{/if}}
-{{#if (sections.includes "Future Scope")}}
+{{#if (eq this "Future Scope")}}
 - Future Scope: A forward-looking, 400-word projection of the future scope.
 {{/if}}
+{{/each}}
 {{#if generateWithReferences}}
 - Sources: Provide a list of 5-7 web links or citations that were used to generate this report. Format them as a string, with each source on a new line.
 {{/if}}
@@ -163,10 +167,18 @@ const generateReportFlow = ai.defineFlow(
         const flowInput = { ...input, sections: sectionsToGenerate };
 
         if (input.searchType === 'web') {
-            const { output } = await reportPrompt(flowInput);
+            const { output } = await reportPrompt(flowInput, {
+                helpers: {
+                    eq: (a, b) => a === b,
+                }
+            });
             reportOutput = output;
         } else if (input.searchType === 'deep') {
-            const { output } = await deepResearchPrompt(flowInput);
+            const { output } = await deepResearchPrompt(flowInput, {
+                helpers: {
+                    eq: (a, b) => a === b,
+                }
+            });
             reportOutput = output;
         }
     }
