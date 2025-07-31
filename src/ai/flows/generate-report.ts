@@ -65,33 +65,37 @@ export async function generateReport(input: GenerateReportInput): Promise<Genera
 
 const reportPrompt = ai.definePrompt({
   name: 'reportPrompt',
-  input: {schema: GenerateReportInputSchema},
+  input: {schema: z.object({
+      topic: z.string(),
+      generateWithReferences: z.boolean().optional(),
+      sections: z.record(z.string(), z.boolean()),
+  })},
   output: {schema: StandardReportSchema },
   prompt: `You are an expert AI research assistant. Your task is to generate a comprehensive, in-depth, and well-structured report on the given topic.
 
-For the topic "{{{topic}}}", please provide a detailed explanation for each of the following sections that are provided in the 'sections' array. If a section is not in the array, you should not generate it.
+For the topic "{{{topic}}}", please provide a detailed explanation for each of the following sections that are provided in the 'sections' object. If a section is not in the object, you should not generate it.
 
 - Title: A concise and engaging title for the report.
-{{#each sections}}
-{{#if (eq this "Introduction")}}
+
+{{#if sections.Introduction}}
 - Introduction: A 150-word introduction to the topic.
 {{/if}}
-{{#if (eq this "History")}}
+{{#if sections.History}}
 - History: A 200-word history of the topic.
 {{/if}}
-{{#if (eq this "Benefits")}}
+{{#if sections.Benefits}}
 - Benefits: A 200-word overview of the benefits or advantages.
 {{/if}}
-{{#if (eq this "Challenges")}}
+{{#if sections.Challenges}}
 - Challenges: A 200-word summary of the challenges or disadvantages.
 {{/if}}
-{{#if (eq this "Current Trends")}}
+{{#if sections.CurrentTrends}}
 - Current Trends: A 200-word analysis of current trends.
 {{/if}}
-{{#if (eq this "Future Scope")}}
+{{#if sections.FutureScope}}
 - Future Scope: A 200-word projection of the future scope.
 {{/if}}
-{{/each}}
+
 {{#if generateWithReferences}}
 - Sources: Provide a list of 2-3 web links or citations that were used to generate this report. Format them as a string, with each source on a new line.
 {{/if}}
@@ -100,33 +104,37 @@ For the topic "{{{topic}}}", please provide a detailed explanation for each of t
 
 const deepResearchPrompt = ai.definePrompt({
     name: 'deepResearchPrompt',
-    input: { schema: GenerateReportInputSchema },
+    input: { schema: z.object({
+        topic: z.string(),
+        generateWithReferences: z.boolean().optional(),
+        sections: z.record(z.string(), z.boolean()),
+    }) },
     output: { schema: DeepReportSchema },
     prompt: `You are an expert AI research analyst. Your task is to generate a comprehensive and in-depth report on the given topic. Your analysis must be thorough, insightful, and well-structured.
 
-For the topic "{{{topic}}}", provide a very detailed and extensive explanation for each of the following sections provided in the 'sections' array. If a section is not in the array, you should not generate it.
+For the topic "{{{topic}}}", provide a very detailed and extensive explanation for each of the following sections provided in the 'sections' object. If a section is not in the object, you should not generate it.
 
 - Title: A concise and engaging title for the report.
-{{#each sections}}
-{{#if (eq this "Introduction")}}
+
+{{#if sections.Introduction}}
 - Introduction: A comprehensive, 400-word introduction to the topic.
 {{/if}}
-{{#if (eq this "History")}}
+{{#if sections.History}}
 - History: An in-depth, 400-word history of the topic.
 {{/if}}
-{{#if (eq this "Benefits")}}
+{{#if sections.Benefits}}
 - Benefits: A detailed, 400-word overview of the benefits or advantages.
 {{/if}}
-{{#if (eq this "Challenges")}}
+{{#if sections.Challenges}}
 - Challenges: A thorough, 400-word summary of the challenges or disadvantages.
 {{/if}}
-{{#if (eq this "Current Trends")}}
+{{#if sections.CurrentTrends}}
 - Current Trends: An extensive, 400-word analysis of current trends.
 {{/if}}
-{{#if (eq this "Future Scope")}}
+{{#if sections.FutureScope}}
 - Future Scope: A forward-looking, 400-word projection of the future scope.
 {{/if}}
-{{/each}}
+
 {{#if generateWithReferences}}
 - Sources: Provide a list of 5-7 web links or citations that were used to generate this report. Format them as a string, with each source on a new line.
 {{/if}}
@@ -164,21 +172,22 @@ const generateReportFlow = ai.defineFlow(
         const defaultSections = ["Introduction", "History", "Benefits", "Challenges", "Current Trends", "Future Scope"];
         const sectionsToGenerate = input.sections && input.sections.length > 0 ? input.sections : defaultSections;
             
-        const flowInput = { ...input, sections: sectionsToGenerate };
+        const sectionsAsObject = sectionsToGenerate.reduce((acc, section) => {
+            acc[section] = true;
+            return acc;
+        }, {} as Record<string, boolean>);
+
+        const flowInput = { 
+            topic: input.topic,
+            generateWithReferences: input.generateWithReferences,
+            sections: sectionsAsObject,
+        };
 
         if (input.searchType === 'web') {
-            const { output } = await reportPrompt(flowInput, {
-                helpers: {
-                    eq: (a, b) => a === b,
-                }
-            });
+            const { output } = await reportPrompt(flowInput);
             reportOutput = output;
         } else if (input.searchType === 'deep') {
-            const { output } = await deepResearchPrompt(flowInput, {
-                helpers: {
-                    eq: (a, b) => a === b,
-                }
-            });
+            const { output } = await deepResearchPrompt(flowInput);
             reportOutput = output;
         }
     }
