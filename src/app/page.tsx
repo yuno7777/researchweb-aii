@@ -423,70 +423,65 @@ export default function Home() {
                                           </Tooltip>
                                         </TooltipProvider>
                                     </div>
-                                    <div className="flex items-center gap-2">
-                                        <TooltipProvider>
-                                            <Popover>
-                                                <PopoverTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="rounded-full text-muted-foreground">
-                                                        <Settings className="h-4 w-4" />
-                                                    </Button>
-                                                </PopoverTrigger>
-                                                <PopoverContent className="w-80 p-4">
-                                                    <div className="grid gap-4">
-                                                      <div className="space-y-2">
-                                                        <h4 className="font-medium leading-none">Report Settings</h4>
-                                                        <p className="text-sm text-muted-foreground">
-                                                          Customize the sections and content of your report.
-                                                        </p>
-                                                      </div>
-                                                      <div className="grid gap-2">
-                                                        {searchType !== 'concise' && (
-                                                          <>
-                                                            <div className="space-y-2">
-                                                                <Label>Template</Label>
-                                                                <div className="flex gap-2">
-                                                                    <Select value={activeTemplateId} onValueChange={handleTemplateSelect}>
-                                                                        <SelectTrigger>
-                                                                            <SelectValue placeholder="Select a template" />
-                                                                        </SelectTrigger>
-                                                                        <SelectContent>
-                                                                            <SelectItem value="default">Default Sections</SelectItem>
-                                                                            {templates.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
-                                                                            <SelectItem value="custom">Custom...</SelectItem>
-                                                                        </SelectContent>
-                                                                    </Select>
-                                                                    <Button variant="outline" size="icon" onClick={() => setIsTemplateManagerOpen(true)}>
-                                                                        <FolderKanban className="h-4 w-4" />
-                                                                    </Button>
-                                                                </div>
-                                                            </div>
-                                                            <Separator />
-                                                            <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
-                                                                {selectedSections.map((section, index) => (
-                                                                    <div key={index} className="flex items-center space-x-2">
-                                                                        <Checkbox
-                                                                            id={`section-${index}`}
-                                                                            checked={true}
-                                                                            onCheckedChange={(checked) => {
-                                                                                if (!checked) {
-                                                                                    setSelectedSections(selectedSections.filter((s) => s !== section));
-                                                                                    setActiveTemplateId('custom');
-                                                                                }
-                                                                            }}
-                                                                        />
-                                                                        <Label htmlFor={`section-${index}`} className="font-normal">{section}</Label>
-                                                                    </div>
-                                                                ))}
-                                                                <Button variant="ghost" size="sm" onClick={() => { setSelectedSections([...selectedSections, 'New Section']); setActiveTemplateId('custom'); }}>
-                                                                    <Plus className="mr-2 h-4 w-4" /> Add Section
+                                    <div className="flex items-center gap-4">
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <Button variant="ghost" size="icon" className="rounded-full text-muted-foreground">
+                                                    <Settings className="h-4 w-4" />
+                                                </Button>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-80 p-4">
+                                                <div className="grid gap-4">
+                                                  
+                                                  <div className="grid gap-2">
+                                                    {searchType !== 'concise' && (
+                                                      <>
+                                                        <div className="space-y-2">
+                                                            <Label>Template</Label>
+                                                            <div className="flex gap-2">
+                                                                <Select value={activeTemplateId} onValueChange={handleTemplateSelect}>
+                                                                    <SelectTrigger>
+                                                                        <SelectValue placeholder="Select a template" />
+                                                                    </SelectTrigger>
+                                                                    <SelectContent>
+                                                                        <SelectItem value="default">Default Sections</SelectItem>
+                                                                        {templates.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
+                                                                        <SelectItem value="custom">Custom...</SelectItem>
+                                                                    </SelectContent>
+                                                                </Select>
+                                                                <Button variant="outline" size="icon" onClick={() => setIsTemplateManagerOpen(true)}>
+                                                                    <FolderKanban className="h-4 w-4" />
                                                                 </Button>
                                                             </div>
-                                                          </>
-                                                        )}
-                                                      </div>
-                                                    </div>
-                                                </PopoverContent>
-                                            </Popover>
+                                                        </div>
+                                                        <Separator />
+                                                        <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
+                                                            {selectedSections.map((section, index) => (
+                                                                <div key={index} className="flex items-center space-x-2">
+                                                                    <Checkbox
+                                                                        id={`section-${index}`}
+                                                                        checked={true}
+                                                                        onCheckedChange={(checked) => {
+                                                                            if (!checked) {
+                                                                                setSelectedSections(selectedSections.filter((s) => s !== section));
+                                                                                setActiveTemplateId('custom');
+                                                                            }
+                                                                        }}
+                                                                    />
+                                                                    <Label htmlFor={`section-${index}`} className="font-normal">{section}</Label>
+                                                                </div>
+                                                            ))}
+                                                            <Button variant="ghost" size="sm" onClick={() => { setSelectedSections([...selectedSections, 'New Section']); setActiveTemplateId('custom'); }}>
+                                                                <Plus className="mr-2 h-4 w-4" /> Add Section
+                                                            </Button>
+                                                        </div>
+                                                      </>
+                                                    )}
+                                                  </div>
+                                                </div>
+                                            </PopoverContent>
+                                        </Popover>
+                                        <TooltipProvider>
                                             <Tooltip>
                                                 <TooltipTrigger asChild>
                                                     <div className="flex items-center space-x-2">
@@ -581,3 +576,5 @@ export default function Home() {
     </div>
   );
 }
+
+    
