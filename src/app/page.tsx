@@ -422,27 +422,17 @@ export default function Home() {
                               <p>Get a 300-word summary and 10-15 key takeaways.</p>
                             </TooltipContent>
                         </Tooltip>
-                      </TooltipProvider>
-                      <Separator orientation="vertical" className="h-6" />
+                        <Separator orientation="vertical" className="h-6" />
                         <Popover>
                             <PopoverTrigger asChild>
                                 <Button variant="ghost" size="icon" className="rounded-full">
                                     <Settings className="h-4 w-4" />
                                 </Button>
                             </PopoverTrigger>
-                            <PopoverContent className="w-80 p-4 max-h-[80vh] overflow-y-auto">
+                            <PopoverContent className="w-80 p-4 max-h-[60vh] overflow-y-auto">
                                 <div className="space-y-4">
                                     <h4 className="font-medium leading-none">Report Settings</h4>
-                                    <div className="flex items-center space-x-2">
-                                      <Link className="h-4 w-4 text-muted-foreground" />
-                                      <Label htmlFor="references-switch" className="flex-1 text-muted-foreground">Generate with References</Label>
-                                      <Switch
-                                        id="references-switch"
-                                        checked={generateWithReferences}
-                                        onCheckedChange={setGenerateWithReferences}
-                                      />
-                                    </div>
-
+                                    
                                     {searchType !== 'concise' && (
                                       <>
                                         <Separator />
@@ -468,7 +458,7 @@ export default function Home() {
                                             </div>
                                         </div>
                                         <Separator />
-                                        <div className="space-y-2">
+                                        <div className="space-y-2 max-h-48 overflow-y-auto">
                                             {selectedSections.map((section, index) => (
                                                 <div key={index} className="flex items-center space-x-2">
                                                     <Checkbox
@@ -493,6 +483,22 @@ export default function Home() {
                                 </div>
                             </PopoverContent>
                         </Popover>
+
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <div className="flex items-center space-x-2">
+                                    <Switch
+                                        id="references-switch"
+                                        checked={generateWithReferences}
+                                        onCheckedChange={setGenerateWithReferences}
+                                    />
+                                </div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>Include a list of sources in the report.</p>
+                            </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     </div>
                   </div>
               </div>
@@ -566,6 +572,8 @@ export default function Home() {
     </div>
   );
 }
+
+    
 
     
 
