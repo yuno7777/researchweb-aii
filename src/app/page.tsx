@@ -430,7 +430,7 @@ export default function Home() {
                                     <Settings className="h-4 w-4" />
                                 </Button>
                             </PopoverTrigger>
-                            <PopoverContent className="w-80 p-4">
+                            <PopoverContent className="w-80 p-4 max-h-[80vh] overflow-y-auto">
                                 <div className="space-y-4">
                                     <h4 className="font-medium leading-none">Report Settings</h4>
                                     <div className="flex items-center space-x-2">
@@ -468,7 +468,7 @@ export default function Home() {
                                             </div>
                                         </div>
                                         <Separator />
-                                        <div className="space-y-2 max-h-60 overflow-y-auto">
+                                        <div className="space-y-2">
                                             {selectedSections.map((section, index) => (
                                                 <div key={index} className="flex items-center space-x-2">
                                                     <Checkbox
@@ -566,5 +566,7 @@ export default function Home() {
     </div>
   );
 }
+
+    
 
     
