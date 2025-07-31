@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { jsPDF } from 'jspdf';
-import { ArrowUp, Menu, Trash2, FileText, List, FileDown, BrainCircuit, Book, Link, Settings, Sparkles, Plus, FolderKanban, Send, Paperclip } from 'lucide-react';
+import { ArrowUp, Menu, Trash2, FileText, List, FileDown, Brain, Book, Link, Settings, Sparkles, Plus, FolderKanban, Send, Paperclip } from 'lucide-react';
 
 import type { GenerateReportOutput, GenerateReportInput } from '@/ai/flows/generate-report';
 import { useLocalStorage } from '@/hooks/use-local-storage';
@@ -393,7 +393,7 @@ export default function Home() {
                                                             searchType === 'deep' && 'bg-muted text-foreground'
                                                         )}
                                                     >
-                                                        <BrainCircuit className="h-4 w-4 mr-2" />
+                                                        <Brain className="h-4 w-4 mr-2" />
                                                         Deep research
                                                     </Button>
                                                 </TooltipTrigger>
@@ -576,3 +576,5 @@ export default function Home() {
     </div>
   );
 }
+
+    
