@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import React from 'react';
@@ -337,9 +336,9 @@ export default function Home() {
               </div>
 
                 <div className="mt-8 w-full max-w-4xl">
-                    <div className="rounded-2xl border bg-card p-4 shadow-lg dark:bg-zinc-900/50">
-                        <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                            <div className="rounded-2xl border bg-card p-4 shadow-lg dark:bg-zinc-900/50">
                                 <FormField
                                     control={form.control}
                                     name="topic"
@@ -349,190 +348,168 @@ export default function Home() {
                                                 <div className="relative">
                                                     <Input
                                                         placeholder="Ask anything..."
-                                                        className="h-14 w-full rounded-xl border-none bg-transparent py-4 pl-6 pr-48 text-lg focus-visible:ring-0 focus-visible:ring-offset-0"
+                                                        className="h-14 w-full rounded-xl border-none bg-transparent py-4 pl-6 pr-4 text-lg focus-visible:ring-0 focus-visible:ring-offset-0"
                                                         {...field}
                                                     />
-                                                    <div className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-2">
-                                                        <Logo className="h-6 w-6" />
-                                                        <TooltipProvider>
-                                                            <Tooltip>
-                                                                <TooltipTrigger asChild>
-                                                                    <Button type="button" variant="ghost" size="icon" className="rounded-full h-9 w-9">
-                                                                        <Sparkles className="h-5 w-5"/>
-                                                                    </Button>
-                                                                </TooltipTrigger>
-                                                                <TooltipContent>
-                                                                    <p>Enhance prompt</p>
-                                                                </TooltipContent>
-                                                            </Tooltip>
-                                                            <Tooltip>
-                                                                <TooltipTrigger asChild>
-                                                                    <Button type="button" variant="ghost" size="icon" className="rounded-full h-9 w-9">
-                                                                        <Paperclip className="h-5 w-5"/>
-                                                                    </Button>
-                                                                </TooltipTrigger>
-                                                                <TooltipContent>
-                                                                    <p>Attach files</p>
-                                                                </TooltipContent>
-                                                            </Tooltip>
-                                                        </TooltipProvider>
-                                                        <Button type="submit" size="icon" className="rounded-full h-9 w-9 bg-primary/90 hover:bg-primary" disabled={isLoading}>
-                                                            <Send className="h-5 w-5"/>
-                                                        </Button>
-                                                    </div>
                                                 </div>
                                             </FormControl>
                                             <FormMessage className="pl-4 text-left"/>
                                         </FormItem>
                                     )}
                                 />
-                            </form>
-                        </Form>
-                        <Separator className="my-2 bg-border/50" />
-                        <div className="flex flex-wrap items-center justify-between gap-2 pt-1 pb-2 px-2">
-                           <div className="flex flex-wrap items-center gap-2">
-                                <TooltipProvider>
-                                  <Tooltip>
-                                      <TooltipTrigger asChild>
-                                          <Button
-                                              variant="ghost"
-                                              size="sm"
-                                              onClick={() => setSearchType('web')}
-                                              className={cn(
-                                                  "rounded-full text-muted-foreground",
-                                                  searchType === 'web' && 'bg-muted text-foreground'
-                                              )}
-                                          >
-                                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-                                              Web search
-                                          </Button>
-                                      </TooltipTrigger>
-                                      <TooltipContent>
-                                          <p>Enable web search for brief, factual information from the internet (150-350 words)</p>
-                                      </TooltipContent>
-                                  </Tooltip>
-                                  <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() => setSearchType('deep')}
-                                                className={cn(
-                                                    "rounded-full text-muted-foreground",
-                                                    searchType === 'deep' && 'bg-muted text-foreground'
-                                                )}
-                                            >
-                                                <BrainCircuit className="h-4 w-4 mr-2" />
-                                                Deep research
-                                            </Button>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                            <p>Enable Deep Research for extensive academic-style analysis (approx. 1600 words)</p>
-                                        </TooltipContent>
-                                    </Tooltip>
-                                  <Tooltip>
-                                      <TooltipTrigger asChild>
-                                          <Button
-                                              variant="ghost"
-                                              size="sm"
-                                              onClick={() => setSearchType('concise')}
-                                              className={cn(
-                                                  "rounded-full text-muted-foreground",
-                                                  searchType === 'concise' && 'bg-muted text-foreground'
-                                              )}
-                                          >
-                                              <List className="h-4 w-4 mr-2" />
-                                              Concise Response
-                                          </Button>
-                                      </TooltipTrigger>
-                                      <TooltipContent>
-                                        <p>Get a 300-word summary and 10-15 key takeaways.</p>
-                                      </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <TooltipProvider>
-                                    <Popover>
-                                        <PopoverTrigger asChild>
-                                            <Button variant="ghost" size="icon" className="rounded-full text-muted-foreground">
-                                                <Settings className="h-4 w-4" />
-                                            </Button>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-80 p-4">
-                                            <div className="grid gap-4">
-                                              <div className="space-y-2">
-                                                <h4 className="font-medium leading-none">Report Settings</h4>
-                                                <p className="text-sm text-muted-foreground">
-                                                  Customize the sections and content of your report.
-                                                </p>
-                                              </div>
-                                              <div className="grid gap-2">
-                                                {searchType !== 'concise' && (
-                                                  <>
-                                                    <div className="space-y-2">
-                                                        <Label>Template</Label>
-                                                        <div className="flex gap-2">
-                                                            <Select value={activeTemplateId} onValueChange={handleTemplateSelect}>
-                                                                <SelectTrigger>
-                                                                    <SelectValue placeholder="Select a template" />
-                                                                </SelectTrigger>
-                                                                <SelectContent>
-                                                                    <SelectItem value="default">Default Sections</SelectItem>
-                                                                    {templates.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
-                                                                    <SelectItem value="custom">Custom...</SelectItem>
-                                                                </SelectContent>
-                                                            </Select>
-                                                            <Button variant="outline" size="icon" onClick={() => setIsTemplateManagerOpen(true)}>
-                                                                <FolderKanban className="h-4 w-4" />
-                                                            </Button>
-                                                        </div>
-                                                    </div>
-                                                    <Separator />
-                                                    <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
-                                                        {selectedSections.map((section, index) => (
-                                                            <div key={index} className="flex items-center space-x-2">
-                                                                <Checkbox
-                                                                    id={`section-${index}`}
-                                                                    checked={true}
-                                                                    onCheckedChange={(checked) => {
-                                                                        if (!checked) {
-                                                                            setSelectedSections(selectedSections.filter((s) => s !== section));
-                                                                            setActiveTemplateId('custom');
-                                                                        }
-                                                                    }}
-                                                                />
-                                                                <Label htmlFor={`section-${index}`} className="font-normal">{section}</Label>
+                                <Separator className="my-2 bg-border/50" />
+                                <div className="flex flex-wrap items-center justify-between gap-2 pt-1 pb-2 px-2">
+                                   <div className="flex flex-wrap items-center gap-2">
+                                        <TooltipProvider>
+                                          <Tooltip>
+                                              <TooltipTrigger asChild>
+                                                  <Button
+                                                      type="button"
+                                                      variant="ghost"
+                                                      size="sm"
+                                                      onClick={() => setSearchType('web')}
+                                                      className={cn(
+                                                          "rounded-full text-muted-foreground",
+                                                          searchType === 'web' && 'bg-muted text-foreground'
+                                                      )}
+                                                  >
+                                                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                                                      Web search
+                                                  </Button>
+                                              </TooltipTrigger>
+                                              <TooltipContent>
+                                                  <p>Enable web search for brief, factual information from the internet (150-350 words)</p>
+                                              </TooltipContent>
+                                          </Tooltip>
+                                          <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => setSearchType('deep')}
+                                                        className={cn(
+                                                            "rounded-full text-muted-foreground",
+                                                            searchType === 'deep' && 'bg-muted text-foreground'
+                                                        )}
+                                                    >
+                                                        <BrainCircuit className="h-4 w-4 mr-2" />
+                                                        Deep research
+                                                    </Button>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p>Enable Deep Research for extensive academic-style analysis (approx. 1600 words)</p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                          <Tooltip>
+                                              <TooltipTrigger asChild>
+                                                  <Button
+                                                      type="button"
+                                                      variant="ghost"
+                                                      size="sm"
+                                                      onClick={() => setSearchType('concise')}
+                                                      className={cn(
+                                                          "rounded-full text-muted-foreground",
+                                                          searchType === 'concise' && 'bg-muted text-foreground'
+                                                      )}
+                                                  >
+                                                      <List className="h-4 w-4 mr-2" />
+                                                      Concise Response
+                                                  </Button>
+                                              </TooltipTrigger>
+                                              <TooltipContent>
+                                                <p>Get a 300-word summary and 10-15 key takeaways.</p>
+                                              </TooltipContent>
+                                          </Tooltip>
+                                        </TooltipProvider>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <TooltipProvider>
+                                            <Popover>
+                                                <PopoverTrigger asChild>
+                                                    <Button variant="ghost" size="icon" className="rounded-full text-muted-foreground">
+                                                        <Settings className="h-4 w-4" />
+                                                    </Button>
+                                                </PopoverTrigger>
+                                                <PopoverContent className="w-80 p-4">
+                                                    <div className="grid gap-4">
+                                                      <div className="space-y-2">
+                                                        <h4 className="font-medium leading-none">Report Settings</h4>
+                                                        <p className="text-sm text-muted-foreground">
+                                                          Customize the sections and content of your report.
+                                                        </p>
+                                                      </div>
+                                                      <div className="grid gap-2">
+                                                        {searchType !== 'concise' && (
+                                                          <>
+                                                            <div className="space-y-2">
+                                                                <Label>Template</Label>
+                                                                <div className="flex gap-2">
+                                                                    <Select value={activeTemplateId} onValueChange={handleTemplateSelect}>
+                                                                        <SelectTrigger>
+                                                                            <SelectValue placeholder="Select a template" />
+                                                                        </SelectTrigger>
+                                                                        <SelectContent>
+                                                                            <SelectItem value="default">Default Sections</SelectItem>
+                                                                            {templates.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
+                                                                            <SelectItem value="custom">Custom...</SelectItem>
+                                                                        </SelectContent>
+                                                                    </Select>
+                                                                    <Button variant="outline" size="icon" onClick={() => setIsTemplateManagerOpen(true)}>
+                                                                        <FolderKanban className="h-4 w-4" />
+                                                                    </Button>
+                                                                </div>
                                                             </div>
-                                                        ))}
-                                                        <Button variant="ghost" size="sm" onClick={() => { setSelectedSections([...selectedSections, 'New Section']); setActiveTemplateId('custom'); }}>
-                                                            <Plus className="mr-2 h-4 w-4" /> Add Section
-                                                        </Button>
+                                                            <Separator />
+                                                            <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
+                                                                {selectedSections.map((section, index) => (
+                                                                    <div key={index} className="flex items-center space-x-2">
+                                                                        <Checkbox
+                                                                            id={`section-${index}`}
+                                                                            checked={true}
+                                                                            onCheckedChange={(checked) => {
+                                                                                if (!checked) {
+                                                                                    setSelectedSections(selectedSections.filter((s) => s !== section));
+                                                                                    setActiveTemplateId('custom');
+                                                                                }
+                                                                            }}
+                                                                        />
+                                                                        <Label htmlFor={`section-${index}`} className="font-normal">{section}</Label>
+                                                                    </div>
+                                                                ))}
+                                                                <Button variant="ghost" size="sm" onClick={() => { setSelectedSections([...selectedSections, 'New Section']); setActiveTemplateId('custom'); }}>
+                                                                    <Plus className="mr-2 h-4 w-4" /> Add Section
+                                                                </Button>
+                                                            </div>
+                                                          </>
+                                                        )}
+                                                      </div>
                                                     </div>
-                                                  </>
-                                                )}
-                                              </div>
-                                            </div>
-                                        </PopoverContent>
-                                    </Popover>
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <div className="flex items-center space-x-2">
-                                                <Switch
-                                                    id="references-switch"
-                                                    checked={generateWithReferences}
-                                                    onCheckedChange={setGenerateWithReferences}
-                                                />
-                                            </div>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                            <p>Include a list of sources in the report.</p>
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </TooltipProvider>
+                                                </PopoverContent>
+                                            </Popover>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <div className="flex items-center space-x-2">
+                                                        <Switch
+                                                            id="references-switch"
+                                                            checked={generateWithReferences}
+                                                            onCheckedChange={setGenerateWithReferences}
+                                                        />
+                                                    </div>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p>Include a list of sources in the report.</p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
+                                        <Button type="submit" size="icon" className="rounded-full h-9 w-9 bg-primary/90 hover:bg-primary" disabled={isLoading}>
+                                            <Send className="h-5 w-5"/>
+                                        </Button>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
+                        </form>
+                    </Form>
                 </div>
             </div>
             
@@ -604,10 +581,3 @@ export default function Home() {
     </div>
   );
 }
-
-    
-
-    
-
-    
-
