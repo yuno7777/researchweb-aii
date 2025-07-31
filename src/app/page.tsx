@@ -338,7 +338,7 @@ export default function Home() {
                 <div className="mt-8 w-full max-w-4xl">
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                            <div className="rounded-2xl border bg-card p-4 shadow-lg dark:bg-zinc-900/50">
+                            <div className="rounded-3xl border bg-card p-2 shadow-lg dark:bg-zinc-900/50">
                                 <FormField
                                     control={form.control}
                                     name="topic"
@@ -348,7 +348,7 @@ export default function Home() {
                                                 <div className="relative">
                                                     <Input
                                                         placeholder="Ask anything..."
-                                                        className="h-14 w-full rounded-xl border-none bg-transparent py-4 pl-6 pr-4 text-lg focus-visible:ring-0 focus-visible:ring-offset-0"
+                                                        className="h-12 w-full rounded-xl border-none bg-transparent py-4 pl-6 pr-4 text-lg focus-visible:ring-0 focus-visible:ring-offset-0"
                                                         {...field}
                                                     />
                                                 </div>
@@ -357,7 +357,7 @@ export default function Home() {
                                         </FormItem>
                                     )}
                                 />
-                                <Separator className="my-2 bg-border/50" />
+                                
                                 <div className="flex flex-wrap items-center justify-between gap-2 pt-1 pb-2 px-2">
                                    <div className="flex flex-wrap items-center gap-2">
                                         <TooltipProvider>
@@ -576,5 +576,3 @@ export default function Home() {
     </div>
   );
 }
-
-    
