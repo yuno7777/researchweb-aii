@@ -429,16 +429,10 @@ export default function Home() {
                                     <Settings className="h-4 w-4" />
                                 </Button>
                             </PopoverTrigger>
-                            <PopoverContent className="w-80 p-4 max-h-[60vh] overflow-y-auto">
+                            <PopoverContent className="w-80 p-4">
                                 <div className="space-y-4">
-                                    <h4 className="font-medium leading-none">Report Settings</h4>
-                                    
                                     {searchType !== 'concise' && (
                                       <>
-                                        <Separator />
-                                        <p className="text-sm text-muted-foreground">
-                                            Select a template or create a custom set of sections for your report.
-                                        </p>
                                         <div className="space-y-2">
                                             <Label>Template</Label>
                                             <div className="flex gap-2">
