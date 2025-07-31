@@ -28,6 +28,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { ConciseReportDisplay } from '@/components/ConciseReportDisplay';
+import { ReportDisplay } from '@/components/ReportDisplay';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Logo } from '@/components/Logo';
@@ -61,7 +62,6 @@ export default function Home() {
   const [searchType, setSearchType] = useState<SearchType>('web');
   const [generateWithReferences, setGenerateWithReferences] = useState(false);
   const [selectedSections, setSelectedSections] = useState<string[]>(defaultSections);
-  const [showThinking, setShowThinking] = useState(true);
   const [isTemplateManagerOpen, setIsTemplateManagerOpen] = useState(false);
   const [activeTemplateId, setActiveTemplateId] = useState<string>('default');
 
@@ -188,41 +188,20 @@ export default function Home() {
           pdf.setFontSize(contentFontSize);
           pdf.setTextColor(33, 37, 41);
           
-          const processContent = (text: string, isListItem = false) => {
-            const bulletRegex = /^\s*([*•-])\s(.*)/;
-            const numberedListRegex = /^\s*(\d+)\.\s(.*)/;
-
-            const lines = text.split('\n').filter(line => line.trim() !== '');
+          const processContent = (text: string) => {
+            const lines = pdf.splitTextToSize(text, contentWidth);
             lines.forEach((line: string) => {
-                let textToPrint = line;
-                let leftMargin = pageMargin;
-
-                const bulletMatch = line.match(bulletRegex);
-                if (bulletMatch) {
-                    textToPrint = `• ${bulletMatch[2]}`;
-                    leftMargin += 5;
-                }
-                const numberedMatch = line.match(numberedListRegex);
-                 if (numberedMatch) {
-                    textToPrint = `${numberedMatch[1]}. ${numberedMatch[2]}`;
-                    leftMargin += 5;
-                }
-
-                const splitLines = pdf.splitTextToSize(textToPrint, contentWidth - (leftMargin - pageMargin));
-                
-                splitLines.forEach((splitLine: string) => {
-                  if (y + contentLineHeight > pageHeight - pageMargin) {
-                      addPageWithHeaderFooter();
-                  }
-                  pdf.text(splitLine, leftMargin, y);
-                  y += contentLineHeight;
-                });
+              if (y + contentLineHeight > pageHeight - pageMargin) {
+                  addPageWithHeaderFooter();
+              }
+              pdf.text(line, pageMargin, y);
+              y += contentLineHeight;
             });
           };
 
           if (Array.isArray(content)) {
               content.forEach(item => {
-                  processContent(`• ${item}`, true);
+                  processContent(`• ${item}`);
               });
           } else {
               processContent(content);
@@ -238,26 +217,12 @@ export default function Home() {
                  addSection('Key Points', report.keyPoints);
                  if (report.sources) addSection('Sources', report.sources);
             } else if (isStandardOrDeepReport(report)) {
-                // Split the report by '###' headers. The regex will capture the title and the content.
-                const sections = report.report.split(/\n?###\s(.+)/).filter(s => s.trim() !== '');
-                
-                let reportContent = sections;
-
-                // Check if the first element is content without a header.
-                // This can happen if the AI generates an introduction without the '### Introduction' markdown.
-                if (reportContent.length % 2 !== 0) {
-                    addSection("Introduction", reportContent[0]);
-                    reportContent = reportContent.slice(1);
-                }
-
-                // Process the rest of the sections which should be in [title, content, title, content] format
-                for (let i = 0; i < reportContent.length; i += 2) {
-                    const title = reportContent[i] ? reportContent[i].trim() : "Untitled Section";
-                    const content = reportContent[i + 1] ? reportContent[i + 1].trim() : "";
-                    if (title && content) {
-                        addSection(title, content);
-                    }
-                }
+                if (report.introduction) addSection('Introduction', report.introduction);
+                if (report.history) addSection('History', report.history);
+                if (report.benefits) addSection('Benefits', report.benefits);
+                if (report.challenges) addSection('Challenges', report.challenges);
+                if (report.currentTrends) addSection('Current Trends', report.currentTrends);
+                if (report.futureScope) addSection('Future Scope', report.futureScope);
                 if (report.sources) addSection('Sources', report.sources);
             }
         }
@@ -319,8 +284,8 @@ export default function Home() {
     return report !== null && 'summary' in report && 'keyPoints' in report;
   };
 
-  const isStandardOrDeepReport = (report: ReportData | null): report is { title: string; report: string; sources?: string } => {
-      return report !== null && 'report' in report && typeof report.report === 'string' && 'title' in report && !('summary' in report);
+  const isStandardOrDeepReport = (report: ReportData | null): report is Exclude<ReportData, { summary: string; keyPoints: string[] } | null> => {
+      return report !== null && 'title' in report && !('summary' in report);
   };
   
   const handleTemplateSelect = (templateId: string) => {
@@ -336,93 +301,6 @@ export default function Home() {
         }
     }
   };
-
-
-  const renderFormattedReport = (reportText: string) => {
-    const subtitleRegex = /^###\s*(.*?)(?:\s*|\n|:)/;
-    const bulletRegex = /^\s*([*•-])\s(.*)/;
-    const numberedListRegex = /^\s*(\d+)\.\s(.*)/;
-
-    const lines = reportText.split('\n').filter(line => line.trim() !== '');
-    const formattedContent: JSX.Element[] = [];
-    let currentList: { type: 'ul' | 'ol'; items: JSX.Element[] } | null = null;
-
-    const flushList = () => {
-        if (currentList) {
-            const ListComponent = currentList.type;
-            const listKey = `list-${formattedContent.length}`;
-            formattedContent.push(
-                <ListComponent key={listKey} className={`my-4 space-y-2 ${currentList.type === 'ol' ? 'list-decimal' : 'list-disc'} ml-6`}>
-                    {currentList.items}
-                </ListComponent>
-            );
-            currentList = null;
-        }
-    };
-    
-    const formatLine = (line: string) => {
-        const parts = line.split(/\*\*(.*?)\*\*/g).map((part, i) => {
-            if (i % 2 === 1) { 
-                return <strong key={i} className="font-semibold text-foreground">{part}</strong>;
-            }
-            return part;
-        });
-        return <>{parts}</>;
-    };
-
-    const formatListItem = (line: string) => {
-        const firstColonIndex = line.indexOf(':');
-        if (firstColonIndex !== -1) {
-            const titlePart = line.substring(0, firstColonIndex + 1);
-            const descriptionPart = line.substring(firstColonIndex + 1);
-            return (
-                <>
-                    <strong className="font-semibold text-foreground">{formatLine(titlePart)}</strong>
-                    <span className="text-muted-foreground">{formatLine(descriptionPart)}</span>
-                </>
-            );
-        }
-        return <span className="text-muted-foreground">{formatLine(line)}</span>;
-    };
-
-
-    lines.forEach((line, index) => {
-        const subtitleMatch = line.match(subtitleRegex);
-        if (subtitleMatch) {
-            flushList();
-            formattedContent.push(<h3 key={`h3-${index}`} className="text-2xl font-bold text-foreground mt-8 mb-4">{subtitleMatch[1].trim()}</h3>);
-            return;
-        }
-
-        const bulletMatch = line.match(bulletRegex);
-        if (bulletMatch) {
-            if (!currentList || currentList.type !== 'ul') {
-                flushList();
-                currentList = { type: 'ul', items: [] };
-            }
-            currentList.items.push(<li key={`li-${index}`}>{formatListItem(bulletMatch[2])}</li>);
-            return;
-        }
-        
-        const numberedMatch = line.match(numberedListRegex);
-        if (numberedMatch) {
-            if (!currentList || currentList.type !== 'ol') {
-                flushList();
-                currentList = { type: 'ol', items: [] };
-            }
-            currentList.items.push(<li key={`li-${index}`}>{formatListItem(numberedMatch[2])}</li>);
-            return;
-        }
-        
-        flushList();
-        formattedContent.push(<p key={`p-${index}`} className="mb-4 text-muted-foreground leading-relaxed">{formatLine(line)}</p>);
-    });
-    
-    flushList();
-
-    return <div className="prose dark:prose-invert max-w-none">{formattedContent}</div>;
-  };
-
 
   return (
     <div id="home" className="flex min-h-screen w-full flex-col bg-background text-foreground" suppressHydrationWarning>
@@ -613,35 +491,12 @@ export default function Home() {
                             </Popover>
                         </>
                       )}
-                       <Separator orientation="vertical" className="h-6" />
-                       <Popover>
-                            <PopoverTrigger asChild>
-                                <Button variant="ghost" size="sm" className="rounded-full">
-                                    <Sparkles className="mr-2 h-4 w-4" />
-                                    Show thinking
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-64 p-4">
-                                <div className="flex items-center justify-between">
-                                    <Label htmlFor="thinking-switch" className="text-muted-foreground">Show AI thinking process</Label>
-                                    <Switch
-                                        id="thinking-switch"
-                                        checked={showThinking}
-                                        onCheckedChange={setShowThinking}
-                                    />
-                                </div>
-                            </PopoverContent>
-                        </Popover>
                   </div>
               </div>
             </div>
             
             <div id="report-output">
-              {isLoading && (
-                  <div className="py-12 max-w-4xl mx-auto">
-                      {showThinking ? <Thinking /> : <ReportSkeleton />}
-                  </div>
-              )}
+              {isLoading && <Thinking />}
 
               {report && !isLoading && (
                 <div className="py-12 max-w-4xl mx-auto">
@@ -657,23 +512,7 @@ export default function Home() {
                            <ConciseReportDisplay report={report} onReportUpdate={handleReportUpdate} topic={form.getValues('topic')} />
                         </CardContent>
                     ) : isStandardOrDeepReport(report) ? (
-                      <>
-                        <CardHeader>
-                            <CardTitle>{report.title}</CardTitle>
-                            <CardDescription>A report about "{form.getValues('topic')}".</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            {renderFormattedReport(report.report)}
-                             {report.sources && (
-                                <>
-                                    <h3 className="text-2xl font-bold text-foreground mt-8 mb-4">Sources</h3>
-                                    <div className="prose dark:prose-invert max-w-none">
-                                        <p className="mb-4 text-muted-foreground leading-relaxed whitespace-pre-wrap">{report.sources}</p>
-                                    </div>
-                                </>
-                             )}
-                        </CardContent>
-                      </>
+                      <ReportDisplay report={report} onReportUpdate={handleReportUpdate} />
                     ) : null}
                   </Card>
                 </div>

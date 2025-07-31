@@ -23,9 +23,14 @@ const GenerateReportInputSchema = z.object({
 export type GenerateReportInput = z.infer<typeof GenerateReportInputSchema>;
 
 const StandardReportSchema = z.object({
-    title: z.string().describe("A concise and engaging title for the report."),
-    report: z.string().describe("A comprehensive and well-structured report based on the user's selected sections."),
-    sources: z.string().optional().describe("A list of sources or citations used for the report, formatted as a string with each source on a new line."),
+  title: z.string().describe('A concise and engaging title for the report.'),
+  introduction: z.string().describe('A 150-word introduction to the topic.'),
+  history: z.string().optional().describe('A 200-word history of the topic.'),
+  benefits: z.string().optional().describe('A 200-word overview of the benefits or advantages.'),
+  challenges: z.string().optional().describe('A 200-word summary of the challenges or disadvantages.'),
+  currentTrends: z.string().optional().describe('A 200-word analysis of current trends.'),
+  futureScope: z.string().optional().describe('A 200-word projection of the future scope.'),
+  sources: z.string().optional().describe('A list of 2-3 sources or citations, formatted as a string with each source on a new line.'),
 });
 
 
@@ -36,9 +41,14 @@ const ConciseReportSchema = z.object({
 });
 
 const DeepReportSchema = z.object({
-    title: z.string().describe("A concise and engaging title for the report."),
-    report: z.string().describe("A comprehensive and in-depth report. It should be well-structured with clear paragraphs and headings for different sections like Introduction, History, Benefits, etc."),
-    sources: z.string().optional().describe("A list of sources or citations used for the report, formatted as a string with each source on a new line."),
+  title: z.string().describe('A concise and engaging title for the report.'),
+  introduction: z.string().describe('A comprehensive, 400-word introduction to the topic.'),
+  history: z.string().optional().describe('An in-depth, 400-word history of the topic.'),
+  benefits: z.string().optional().describe('A detailed, 400-word overview of the benefits or advantages.'),
+  challenges: z.string().optional().describe('A thorough, 400-word summary of the challenges or disadvantages.'),
+  currentTrends: z.string().optional().describe('An extensive, 400-word analysis of current trends.'),
+  futureScope: z.string().optional().describe('A forward-looking, 400-word projection of the future scope.'),
+  sources: z.string().optional().describe('A list of 5-7 sources or citations, formatted as a string with each source on a new line.'),
 });
 
 
@@ -57,20 +67,31 @@ const reportPrompt = ai.definePrompt({
   name: 'reportPrompt',
   input: {schema: GenerateReportInputSchema},
   output: {schema: StandardReportSchema },
-  prompt: `You are an expert AI research assistant. Your task is to generate a comprehensive, in-depth, and well-structured report on the given topic. The total length of the report should be between 150 and 350 words per section.
+  prompt: `You are an expert AI research assistant. Your task is to generate a comprehensive, in-depth, and well-structured report on the given topic.
 
-For the topic "{{{topic}}}", please provide a detailed explanation for each of the following sections provided.
+For the topic "{{{topic}}}", please provide a detailed explanation for each of the following sections that are provided in the 'sections' array. If a section is not in the array, you should not generate it.
 
 - Title: A concise and engaging title for the report.
-- Report: Generate a comprehensive report. For each of the section titles provided in the 'sections' array, generate a detailed section with a proper heading.
-
-{{#each sections}}
-### {{this}}
-{{/each}}
-
+{{#if (sections.includes "Introduction")}}
+- Introduction: A 150-word introduction to the topic.
+{{/if}}
+{{#if (sections.includes "History")}}
+- History: A 200-word history of the topic.
+{{/if}}
+{{#if (sections.includes "Benefits")}}
+- Benefits: A 200-word overview of the benefits or advantages.
+{{/if}}
+{{#if (sections.includes "Challenges")}}
+- Challenges: A 200-word summary of the challenges or disadvantages.
+{{/if}}
+{{#if (sections.includes "Current Trends")}}
+- Current Trends: A 200-word analysis of current trends.
+{{/if}}
+{{#if (sections.includes "Future Scope")}}
+- Future Scope: A 200-word projection of the future scope.
+{{/if}}
 {{#if generateWithReferences}}
-### Sources
-Provide a list of 2-3 web links or citations that were used to generate this report. Format them as a string, with each source on a new line.
+- Sources: Provide a list of 2-3 web links or citations that were used to generate this report. Format them as a string, with each source on a new line.
 {{/if}}
 `,
 });
@@ -79,20 +100,31 @@ const deepResearchPrompt = ai.definePrompt({
     name: 'deepResearchPrompt',
     input: { schema: GenerateReportInputSchema },
     output: { schema: DeepReportSchema },
-    prompt: `You are an expert AI research analyst. Your task is to generate a comprehensive and in-depth report on the given topic of approximately 1600 words. Your analysis must be thorough, insightful, and well-structured.
+    prompt: `You are an expert AI research analyst. Your task is to generate a comprehensive and in-depth report on the given topic. Your analysis must be thorough, insightful, and well-structured.
 
-For the topic "{{{topic}}}", provide a very detailed and extensive explanation for each of the following sections provided.
+For the topic "{{{topic}}}", provide a very detailed and extensive explanation for each of the following sections provided in the 'sections' array. If a section is not in the array, you should not generate it.
 
 - Title: A concise and engaging title for the report.
-- Report: Generate a comprehensive report. For each of the section titles provided in the 'sections' array, generate a detailed section with a proper heading.
-
-{{#each sections}}
-### {{this}}
-{{/each}}
-
+{{#if (sections.includes "Introduction")}}
+- Introduction: A comprehensive, 400-word introduction to the topic.
+{{/if}}
+{{#if (sections.includes "History")}}
+- History: An in-depth, 400-word history of the topic.
+{{/if}}
+{{#if (sections.includes "Benefits")}}
+- Benefits: A detailed, 400-word overview of the benefits or advantages.
+{{/if}}
+{{#if (sections.includes "Challenges")}}
+- Challenges: A thorough, 400-word summary of the challenges or disadvantages.
+{{/if}}
+{{#if (sections.includes "Current Trends")}}
+- Current Trends: An extensive, 400-word analysis of current trends.
+{{/if}}
+{{#if (sections.includes "Future Scope")}}
+- Future Scope: A forward-looking, 400-word projection of the future scope.
+{{/if}}
 {{#if generateWithReferences}}
-### Sources
-Provide a list of 5-7 web links or citations that were used to generate this report. Format them as a string, with each source on a new line.
+- Sources: Provide a list of 5-7 web links or citations that were used to generate this report. Format them as a string, with each source on a new line.
 {{/if}}
 `,
 });
