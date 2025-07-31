@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { jsPDF } from 'jspdf';
-import { ArrowUp, Menu, Trash2, FileText, List, FileDown, BrainCircuit, Book, Link, Settings, Sparkles, Plus, FolderKanban } from 'lucide-react';
+import { ArrowUp, Menu, Trash2, FileText, List, FileDown, BrainCircuit, Book, Link, Settings, Sparkles, Plus, FolderKanban, Send } from 'lucide-react';
 
 import type { GenerateReportOutput, GenerateReportInput } from '@/ai/flows/generate-report';
 import { useLocalStorage } from '@/hooks/use-local-storage';
@@ -336,114 +336,116 @@ export default function Home() {
               </div>
 
               <div className="mt-8 w-full max-w-2xl space-y-4">
-                  <Form {...form}>
-                      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                          <FormField
-                              control={form.control}
-                              name="topic"
-                              render={({ field }) => (
-                                  <FormItem>
-                                      <FormControl>
-                                          <div className="relative">
-                                              <Input
-                                                  placeholder="e.g., 'The Future of Renewable Energy'"
-                                                  className="h-14 w-full rounded-full border-gray-200 bg-background py-4 pl-6 pr-16 text-lg shadow-sm focus-visible:ring-primary"
-                                                  {...field}
-                                              />
-                                              <Button type="submit" size="icon" className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full w-10 h-10" disabled={isLoading}>
-                                                  <ArrowUp className="h-5 w-5"/>
-                                              </Button>
-                                          </div>
-                                      </FormControl>
-                                      <FormMessage />
-                                  </FormItem>
-                              )}
-                          />
-                      </form>
-                  </Form>
-                  <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
-                    <TooltipProvider>
-                      <Tooltip>
-                          <TooltipTrigger asChild>
-                              <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => setSearchType('web')}
-                                  className={cn(
-                                      "rounded-full",
-                                      searchType === 'web' && 'bg-muted text-foreground'
-                                  )}
-                              >
-                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-                                  Web search
-                              </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                              <p>Enable web search for brief, factual information from the internet (150-350 words)</p>
-                          </TooltipContent>
-                      </Tooltip>
-                      <Tooltip>
+                  <div className="rounded-2xl border bg-card p-2 shadow-lg">
+                    <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                            <FormField
+                                control={form.control}
+                                name="topic"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormControl>
+                                            <div className="relative">
+                                                <Input
+                                                    placeholder="Ask anything..."
+                                                    className="h-14 w-full rounded-xl border-none bg-transparent py-4 pl-6 pr-16 text-lg focus-visible:ring-0 focus-visible:ring-offset-0"
+                                                    {...field}
+                                                />
+                                                <Button type="submit" size="icon" className="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg w-10 h-10" disabled={isLoading}>
+                                                    <Send className="h-5 w-5"/>
+                                                </Button>
+                                            </div>
+                                        </FormControl>
+                                        <FormMessage className="pl-4"/>
+                                    </FormItem>
+                                )}
+                            />
+                        </form>
+                    </Form>
+                    <Separator className="my-2" />
+                    <div className="flex flex-wrap items-center justify-center gap-2 pt-1 pb-2">
+                      <TooltipProvider>
+                        <Tooltip>
                             <TooltipTrigger asChild>
                                 <Button
                                     variant="ghost"
                                     size="sm"
-                                    onClick={() => setSearchType('deep')}
+                                    onClick={() => setSearchType('web')}
                                     className={cn(
                                         "rounded-full",
-                                        searchType === 'deep' && 'bg-muted text-foreground'
+                                        searchType === 'web' && 'bg-muted text-foreground'
                                     )}
                                 >
-                                    <BrainCircuit className="h-4 w-4 mr-2" />
-                                    Deep research
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                                    Web search
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent>
-                                <p>Enable Deep Research for extensive academic-style analysis (approx. 1600 words)</p>
+                                <p>Enable web search for brief, factual information from the internet (150-350 words)</p>
                             </TooltipContent>
                         </Tooltip>
-                      <Tooltip>
-                          <TooltipTrigger asChild>
-                              <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => setSearchType('concise')}
-                                  className={cn(
-                                      "rounded-full",
-                                      searchType === 'concise' && 'bg-muted text-foreground'
-                                  )}
-                              >
-                                  <List className="h-4 w-4 mr-2" />
-                                  Concise Response
-                              </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Get a 300-word summary and 10-15 key takeaways.</p>
-                          </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                    <Separator orientation="vertical" className="h-6" />
-                     <div className="flex items-center space-x-2">
-                        <Link className="h-4 w-4 text-muted-foreground" />
-                        <Label htmlFor="references-switch" className="text-muted-foreground">Generate with References</Label>
-                        <Switch
-                          id="references-switch"
-                          checked={generateWithReferences}
-                          onCheckedChange={setGenerateWithReferences}
-                        />
-                      </div>
-                      {searchType !== 'concise' && (
-                        <>
-                          <Separator orientation="vertical" className="h-6" />
-                           <Popover>
-                                <PopoverTrigger asChild>
-                                    <Button variant="ghost" size="sm" className="rounded-full">
-                                        <Settings className="mr-2 h-4 w-4" />
-                                        Customize
-                                    </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-80 p-4">
-                                    <div className="space-y-4">
-                                        <h4 className="font-medium leading-none">Customize Sections</h4>
+                        <Tooltip>
+                              <TooltipTrigger asChild>
+                                  <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => setSearchType('deep')}
+                                      className={cn(
+                                          "rounded-full",
+                                          searchType === 'deep' && 'bg-muted text-foreground'
+                                      )}
+                                  >
+                                      <BrainCircuit className="h-4 w-4 mr-2" />
+                                      Deep research
+                                  </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                  <p>Enable Deep Research for extensive academic-style analysis (approx. 1600 words)</p>
+                              </TooltipContent>
+                          </Tooltip>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setSearchType('concise')}
+                                    className={cn(
+                                        "rounded-full",
+                                        searchType === 'concise' && 'bg-muted text-foreground'
+                                    )}
+                                >
+                                    <List className="h-4 w-4 mr-2" />
+                                    Concise Response
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Get a 300-word summary and 10-15 key takeaways.</p>
+                            </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      <Separator orientation="vertical" className="h-6" />
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button variant="ghost" size="icon" className="rounded-full">
+                                    <Settings className="h-4 w-4" />
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-80 p-4">
+                                <div className="space-y-4">
+                                    <h4 className="font-medium leading-none">Report Settings</h4>
+                                    <div className="flex items-center space-x-2">
+                                      <Link className="h-4 w-4 text-muted-foreground" />
+                                      <Label htmlFor="references-switch" className="flex-1 text-muted-foreground">Generate with References</Label>
+                                      <Switch
+                                        id="references-switch"
+                                        checked={generateWithReferences}
+                                        onCheckedChange={setGenerateWithReferences}
+                                      />
+                                    </div>
+
+                                    {searchType !== 'concise' && (
+                                      <>
+                                        <Separator />
                                         <p className="text-sm text-muted-foreground">
                                             Select a template or create a custom set of sections for your report.
                                         </p>
@@ -486,11 +488,12 @@ export default function Home() {
                                                 <Plus className="mr-2 h-4 w-4" /> Add Section
                                             </Button>
                                         </div>
-                                    </div>
-                                </PopoverContent>
-                            </Popover>
-                        </>
-                      )}
+                                      </>
+                                    )}
+                                </div>
+                            </PopoverContent>
+                        </Popover>
+                    </div>
                   </div>
               </div>
             </div>
