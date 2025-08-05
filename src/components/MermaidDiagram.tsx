@@ -16,6 +16,13 @@ const extractMermaidDefinition = (chart: string): string => {
   return match ? match[1].trim() : chart.trim();
 };
 
+mermaid.initialize({
+  startOnLoad: false,
+  theme: 'default', // Initial theme, will be updated in effect
+  securityLevel: 'loose',
+  fontFamily: 'inherit',
+});
+
 export function MermaidDiagram({ chart }: MermaidDiagramProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [theme] = useLocalStorage<'light' | 'dark'>('theme', 'light');
@@ -32,12 +39,11 @@ export function MermaidDiagram({ chart }: MermaidDiagramProps) {
       setIsLoading(true);
       try {
         const definition = extractMermaidDefinition(chart);
-        
+
+        // Update theme config before rendering
         mermaid.initialize({
           startOnLoad: false,
           theme: theme === 'dark' ? 'dark' : 'default',
-          securityLevel: 'loose',
-          fontFamily: 'inherit',
         });
         
         // Using async/await to handle the asynchronous rendering
