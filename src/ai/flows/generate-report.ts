@@ -42,12 +42,12 @@ const ConciseReportSchema = z.object({
 
 const DeepReportSchema = z.object({
   title: z.string().describe('A concise and engaging title for the report.'),
-  introduction: z.string().optional().describe('A comprehensive, 400-word introduction to the topic.'),
-  history: z.string().optional().describe('An in-depth, 400-word history of the topic.'),
-  benefits: z.string().optional().describe('A detailed, 400-word overview of the benefits or advantages.'),
-  challenges: z.string().optional().describe('A thorough, 400-word summary of the challenges or disadvantages.'),
-  currentTrends: z.string().optional().describe('An extensive, 400-word analysis of current trends.'),
-  futureScope: z.string().optional().describe('A forward-looking, 400-word projection of the future scope.'),
+  introduction: z.string().optional().describe('A comprehensive, 200-word introduction to the topic.'),
+  history: z.string().optional().describe('An in-depth, 200-word history of the topic.'),
+  benefits: z.string().optional().describe('A detailed, 200-word overview of the benefits or advantages.'),
+  challenges: z.string().optional().describe('A thorough, 200-word summary of the challenges or disadvantages.'),
+  currentTrends: z.string().optional().describe('An extensive, 200-word analysis of current trends.'),
+  futureScope: z.string().optional().describe('A forward-looking, 200-word projection of the future scope.'),
   sources: z.string().optional().describe('A list of 5-7 sources or citations, formatted as a string with each source on a new line.'),
 });
 
@@ -117,22 +117,22 @@ For the topic "{{{topic}}}", provide a very detailed and extensive explanation f
 - Title: A concise and engaging title for the report.
 
 {{#if sections.Introduction}}
-- Introduction: A comprehensive, 400-word introduction to the topic.
+- Introduction: A comprehensive, 200-word introduction to the topic.
 {{/if}}
 {{#if sections.History}}
-- History: An in-depth, 400-word history of the topic.
+- History: An in-depth, 200-word history of the topic.
 {{/if}}
 {{#if sections.Benefits}}
-- Benefits: A detailed, 400-word overview of the benefits or advantages.
+- Benefits: A detailed, 200-word overview of the benefits or advantages.
 {{/if}}
 {{#if sections.Challenges}}
-- Challenges: A thorough, 400-word summary of the challenges or disadvantages.
+- Challenges: A thorough, 200-word summary of the challenges or disadvantages.
 {{/if}}
 {{#if sections.CurrentTrends}}
-- Current Trends: An extensive, 400-word analysis of current trends.
+- Current Trends: An extensive, 200-word analysis of current trends.
 {{/if}}
 {{#if sections.FutureScope}}
-- Future Scope: A forward-looking, 400-word projection of the future scope.
+- Future Scope: A forward-looking, 200-word projection of the future scope.
 {{/if}}
 
 {{#if generateWithReferences}}
