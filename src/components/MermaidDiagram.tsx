@@ -75,7 +75,7 @@ export function MermaidDiagram({ chart }: MermaidDiagramProps) {
     }
   }, [chart, theme, isMounted]);
 
-  if (isLoading) {
+  if (!isMounted || isLoading) {
     return <Skeleton className="h-64 w-full" />;
   }
 
