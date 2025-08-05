@@ -66,3 +66,27 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  /* Styles for HTML-based ERD */
+  .erd-container {
+    @apply flex flex-col items-center justify-center gap-4 rounded-lg border bg-muted/20 p-6 text-center font-sans;
+  }
+  .dark .erd-container {
+      @apply bg-muted/50;
+  }
+  .erd-entity {
+    @apply rounded-md border-2 border-primary bg-background px-4 py-2 font-semibold shadow-md;
+  }
+  .erd-relationship {
+    @apply relative text-sm font-medium text-muted-foreground;
+  }
+  .erd-relationship::before {
+      content: '';
+      @apply absolute left-1/2 top-[-1rem] h-4 w-px -translate-x-1/2 bg-border;
+  }
+  .erd-relationship::after {
+      content: '';
+      @apply absolute bottom-[-1rem] left-1/2 h-4 w-px -translate-x-1/2 bg-border;
+  }
+}
