@@ -10,18 +10,10 @@ interface MermaidDiagramProps {
   chart: string;
 }
 
-// Helper to extract the pure Mermaid definition from markdown code blocks
 const extractMermaidDefinition = (chart: string): string => {
   const match = chart.match(/```mermaid\n([\s\S]*?)\n```/);
   return match ? match[1].trim() : chart.trim();
 };
-
-mermaid.initialize({
-  startOnLoad: false,
-  theme: 'default', // Initial theme, will be updated in effect
-  securityLevel: 'loose',
-  fontFamily: 'inherit',
-});
 
 export function MermaidDiagram({ chart }: MermaidDiagramProps) {
   const ref = useRef<HTMLDivElement>(null);
@@ -30,59 +22,50 @@ export function MermaidDiagram({ chart }: MermaidDiagramProps) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // This ensures the component has mounted on the client before trying to render
     setIsMounted(true);
   }, []);
 
   useEffect(() => {
     if (isMounted && ref.current && chart) {
       setIsLoading(true);
-      try {
-        const definition = extractMermaidDefinition(chart);
 
-        // Update theme config before rendering
-        mermaid.initialize({
-          startOnLoad: false,
-          theme: theme === 'dark' ? 'dark' : 'default',
-        });
-        
-        // Using async/await to handle the asynchronous rendering
-        const renderDiagram = async () => {
-          try {
-            // mermaid.render returns a promise with the rendered SVG code
-            const { svg } = await mermaid.render('mermaid-graph-' + Date.now(), definition);
-            if (ref.current) {
-                ref.current.innerHTML = svg;
-            }
-          } catch (e) {
-            console.error("Error rendering mermaid chart:", e);
-            if (ref.current) {
-              ref.current.innerHTML = `<p class="text-destructive">Error rendering diagram. Please check the Mermaid syntax.</p>`;
-            }
-          } finally {
-            setIsLoading(false);
+      // Initialize mermaid on the client side only
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: theme === 'dark' ? 'dark' : 'default',
+        securityLevel: 'loose',
+        fontFamily: 'inherit',
+      });
+
+      const renderDiagram = async () => {
+        try {
+          const definition = extractMermaidDefinition(chart);
+          const { svg } = await mermaid.render('mermaid-graph-' + Date.now(), definition);
+          if (ref.current) {
+            ref.current.innerHTML = svg;
           }
-        };
-
-        renderDiagram();
-        
-      } catch (e) {
-        console.error("Caught a sync error during mermaid setup:", e);
-        if (ref.current) {
-            ref.current.innerHTML = `<p class="text-destructive">Error initializing diagram.</p>`;
+        } catch (e) {
+          console.error("Error rendering mermaid chart:", e);
+          if (ref.current) {
+            ref.current.innerHTML = `<p class="text-destructive">Error rendering diagram. Please check the Mermaid syntax.</p>`;
+          }
+        } finally {
+          setIsLoading(false);
         }
-        setIsLoading(false);
-      }
-    } else if (chart) {
-        // Still loading or ref not available yet
-        setIsLoading(true);
-    } else {
-        setIsLoading(false);
+      };
+
+      renderDiagram();
+    } else if (!chart) {
+      setIsLoading(false);
     }
   }, [chart, theme, isMounted]);
 
   if (!isMounted || isLoading) {
     return <Skeleton className="h-64 w-full" />;
+  }
+  
+  if (!chart) {
+    return null;
   }
 
   return <div ref={ref} className="mermaid-container w-full flex justify-center p-4" />;
