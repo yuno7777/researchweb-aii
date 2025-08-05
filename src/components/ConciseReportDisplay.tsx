@@ -11,7 +11,6 @@ import { CardHeader, CardTitle, CardDescription, CardContent } from './ui/card';
 interface ConciseReport {
   summary: string;
   keyPoints: string[];
-  sources?: string;
 }
 
 interface ConciseReportDisplayProps {
@@ -22,21 +21,19 @@ interface ConciseReportDisplayProps {
 
 export function ConciseReportDisplay({ report, onReportUpdate, topic }: ConciseReportDisplayProps) {
   const [editableReport, setEditableReport] = useState(report);
-  const [editingSection, setEditingSection] = useState<'summary' | 'keyPoints' | 'sources' | null>(null);
+  const [editingSection, setEditingSection] = useState<'summary' | 'keyPoints' | null>(null);
   const [editContent, setEditContent] = useState('');
 
   useEffect(() => {
     setEditableReport(report);
   }, [report]);
 
-  const handleEditClick = (section: 'summary' | 'keyPoints' | 'sources') => {
+  const handleEditClick = (section: 'summary' | 'keyPoints') => {
     setEditingSection(section);
     if (section === 'summary') {
       setEditContent(editableReport.summary);
     } else if (section === 'keyPoints') {
       setEditContent(editableReport.keyPoints.join('\n'));
-    } else if (section === 'sources') {
-        setEditContent(editableReport.sources || '');
     }
   };
 
@@ -47,11 +44,9 @@ export function ConciseReportDisplay({ report, onReportUpdate, topic }: ConciseR
 
     if (editingSection === 'summary') {
       updatedReport = { ...editableReport, summary: editContent };
-    } else if (editingSection === 'keyPoints'){
+    } else {
       const newKeyPoints = editContent.split('\n').filter(point => point.trim() !== '');
       updatedReport = { ...editableReport, keyPoints: newKeyPoints };
-    } else {
-        updatedReport = { ...editableReport, sources: editContent };
     }
     
     setEditableReport(updatedReport);
@@ -131,38 +126,6 @@ export function ConciseReportDisplay({ report, onReportUpdate, topic }: ConciseR
             </ul>
           )}
         </div>
-
-        {/* Sources Section */}
-        {editableReport.sources !== undefined && (
-          <>
-            <Separator />
-            <div>
-              <div className="flex flex-row items-center justify-between mb-2">
-                <h3 className="font-semibold text-lg">Sources</h3>
-                {editingSection !== 'sources' && (
-                  <Button variant="outline" size="sm" onClick={() => handleEditClick('sources')} className="rounded-full">
-                    <Edit className="mr-2 h-4 w-4" />Edit
-                  </Button>
-                )}
-              </div>
-              {editingSection === 'sources' ? (
-                <div className="space-y-4">
-                  <Textarea
-                    value={editContent}
-                    onChange={(e) => setEditContent(e.target.value)}
-                    className="min-h-[150px] text-base leading-relaxed rounded-lg"
-                  />
-                  <div className="flex justify-end space-x-2">
-                    <Button variant="ghost" size="sm" onClick={handleCancelClick} className="rounded-full"><X className="mr-2 h-4 w-4" />Cancel</Button>
-                    <Button size="sm" onClick={handleSaveClick} className="rounded-full"><Save className="mr-2 h-4 w-4" />Save</Button>
-                  </div>
-                </div>
-              ) : (
-                <p className="text-base text-muted-foreground leading-relaxed whitespace-pre-wrap">{editableReport.sources}</p>
-              )}
-            </div>
-          </>
-        )}
       </CardContent>
     </>
   );

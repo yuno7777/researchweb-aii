@@ -60,7 +60,6 @@ export default function Home() {
   const [templates, setTemplates] = useLocalStorage<Template[]>('report-templates', []);
   const { toast } = useToast();
   const [searchType, setSearchType] = useState<SearchType>('web');
-  const [generateWithReferences, setGenerateWithReferences] = useState(false);
   const [selectedSections, setSelectedSections] = useState<string[]>(defaultSections);
   const [isTemplateManagerOpen, setIsTemplateManagerOpen] = useState(false);
   const [activeTemplateId, setActiveTemplateId] = useState<string>('default');
@@ -215,7 +214,6 @@ export default function Home() {
             if (isConciseReport(report)) {
                  addSection('Summary', report.summary);
                  addSection('Key Points', report.keyPoints);
-                 if (report.sources) addSection('Sources', report.sources);
             } else if (isStandardOrDeepReport(report)) {
                 if (report.introduction) addSection('Introduction', report.introduction);
                 if (report.history) addSection('History', report.history);
@@ -223,7 +221,6 @@ export default function Home() {
                 if (report.challenges) addSection('Challenges', report.challenges);
                 if (report.currentTrends) addSection('Current Trends', report.currentTrends);
                 if (report.futureScope) addSection('Future Scope', report.futureScope);
-                if (report.sources) addSection('Sources', report.sources);
             }
         }
 
@@ -259,7 +256,6 @@ export default function Home() {
     const result = await handleGenerateReport({ 
         topic: values.topic, 
         searchType, 
-        generateWithReferences,
         sections: searchType === 'concise' ? undefined : selectedSections,
     });
 
@@ -280,7 +276,7 @@ export default function Home() {
     setIsLoading(false);
   };
   
-  const isConciseReport = (report: ReportData | null): report is { summary: string; keyPoints: string[], sources?: string } => {
+  const isConciseReport = (report: ReportData | null): report is { summary: string; keyPoints: string[] } => {
     return report !== null && 'summary' in report && 'keyPoints' in report;
   };
 
@@ -481,22 +477,6 @@ export default function Home() {
                                                 </div>
                                             </PopoverContent>
                                         </Popover>
-                                        <TooltipProvider>
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <div className="flex items-center space-x-2">
-                                                        <Switch
-                                                            id="references-switch"
-                                                            checked={generateWithReferences}
-                                                            onCheckedChange={setGenerateWithReferences}
-                                                        />
-                                                    </div>
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    <p>Include a list of sources in the report.</p>
-                                                </TooltipContent>
-                                            </Tooltip>
-                                        </TooltipProvider>
                                         <Button type="submit" size="icon" className="rounded-full h-9 w-9 bg-primary/90 hover:bg-primary" disabled={isLoading}>
                                             <Send className="h-5 w-5"/>
                                         </Button>

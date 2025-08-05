@@ -11,13 +11,13 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import mermaid from 'mermaid';
 
 const sectionsSchema = z.string();
 
 const GenerateReportInputSchema = z.object({
   topic: z.string().describe('The topic to generate a report on.'),
   searchType: z.enum(['concise', 'web', 'deep']).describe('The type of search to perform.'),
-  generateWithReferences: z.boolean().optional().describe('Whether to include a list of sources.'),
   sections: z.array(sectionsSchema).optional().describe('A list of sections to include in the report.'),
 });
 export type GenerateReportInput = z.infer<typeof GenerateReportInputSchema>;
@@ -31,14 +31,12 @@ const StandardReportSchema = z.object({
   currentTrends: z.string().optional().describe('A 200-word analysis of current trends.'),
   futureScope: z.string().optional().describe('A 200-word projection of the future scope.'),
   erd: z.string().describe("Generate an Entity Relationship Diagram in Mermaid.js syntax. The diagram should be enclosed in a 'erDiagram' block. It must represent the key entities and their relationships based on the report's content. Example: erDiagram\\n    CUSTOMER ||--o{ ORDER : places\\n    ORDER ||--|{ LINE_ITEM : contains"),
-  sources: z.string().optional().describe('A list of 2-3 sources or citations, formatted as a string with each source on a new line.'),
 });
 
 
 const ConciseReportSchema = z.object({
     summary: z.string().describe("A detailed, 300-word summary of the topic."),
     keyPoints: z.array(z.string()).describe("A list of 10-15 key takeaways or bullet points about the topic."),
-    sources: z.string().optional().describe("A list of sources or citations used for the report, formatted as a string with each source on a new line."),
 });
 
 const DeepReportSchema = z.object({
@@ -50,7 +48,6 @@ const DeepReportSchema = z.object({
   currentTrends: z.string().optional().describe('An extensive, 200-word analysis of current trends.'),
   futureScope: z.string().optional().describe('A forward-looking, 200-word projection of the future scope.'),
   erd: z.string().describe("Generate a detailed Entity Relationship Diagram in Mermaid.js syntax. The diagram should be enclosed in a 'erDiagram' block. It must represent the key entities and their relationships based on the report's content. Example: erDiagram\\n    CUSTOMER ||--o{ ORDER : places\\n    ORDER ||--|{ LINE_ITEM : contains"),
-  sources: z.string().optional().describe('A list of 5-7 sources or citations, formatted as a string with each source on a new line.'),
 });
 
 
@@ -69,7 +66,6 @@ const reportPrompt = ai.definePrompt({
   name: 'reportPrompt',
   input: {schema: z.object({
       topic: z.string(),
-      generateWithReferences: z.boolean().optional(),
       sections: z.record(z.string(), z.boolean()),
   })},
   output: {schema: StandardReportSchema },
@@ -99,10 +95,6 @@ For the topic "{{{topic}}}", please provide a detailed explanation for each of t
 {{/if}}
 
 - ERD: Generate an Entity Relationship Diagram in Mermaid.js syntax, based on the report's content. The diagram should be enclosed in a 'erDiagram' block. Example: erDiagram\\n    CUSTOMER ||--o{ ORDER : places\\n    ORDER ||--|{ LINE_ITEM : contains
-
-{{#if generateWithReferences}}
-- Sources: Provide a list of 2-3 web links or citations that were used to generate this report. Format them as a string, with each source on a new line.
-{{/if}}
 `,
 });
 
@@ -110,7 +102,6 @@ const deepResearchPrompt = ai.definePrompt({
     name: 'deepResearchPrompt',
     input: { schema: z.object({
         topic: z.string(),
-        generateWithReferences: z.boolean().optional(),
         sections: z.record(z.string(), z.boolean()),
     }) },
     output: { schema: DeepReportSchema },
@@ -140,10 +131,6 @@ For the topic "{{{topic}}}", provide a very detailed and extensive explanation f
 {{/if}}
 
 - ERD: Generate an Entity Relationship Diagram in Mermaid.js syntax, based on the report's content. The diagram should be enclosed in a 'erDiagram' block. Example: erDiagram\\n    CUSTOMER ||--o{ ORDER : places\\n    ORDER ||--|{ LINE_ITEM : contains
-
-{{#if generateWithReferences}}
-- Sources: Provide a list of 5-7 web links or citations that were used to generate this report. Format them as a string, with each source on a new line.
-{{/if}}
 `,
 });
 
@@ -155,10 +142,6 @@ const conciseReportPrompt = ai.definePrompt({
 
 1.  A detailed summary of the topic, approximately 300 words in length.
 2.  A list of 10-15 key takeaways presented as bullet points.
-
-{{#if generateWithReferences}}
-3.  A list of 2-3 web links or citations that were used to generate this summary. Format them as a string, with each source on a new line.
-{{/if}}
 `,
 });
 
@@ -185,7 +168,6 @@ const generateReportFlow = ai.defineFlow(
 
         const flowInput = { 
             topic: input.topic,
-            generateWithReferences: input.generateWithReferences,
             sections: sectionsAsObject,
         };
 
