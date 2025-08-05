@@ -6,8 +6,8 @@ import type { GenerateReportOutput } from '@/ai/flows/generate-report';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Edit, Save, X } from 'lucide-react';
-import { Separator } from './ui/separator';
-import { CardHeader, CardTitle, CardDescription, CardContent } from './ui/card';
+import { CardHeader, CardTitle, CardContent } from './ui/card';
+import { MermaidDiagram } from './MermaidDiagram';
 
 type Report = Exclude<GenerateReportOutput['report'], { summary: string, keyPoints: string[] } | null>;
 type ReportSection = keyof Omit<Report, 'title' | 'sources' | 'erd'>;
@@ -116,7 +116,7 @@ export function ReportDisplay({ report, onReportUpdate }: ReportDisplayProps) {
                     </div>
                   </div>
                 ) : (
-                  <div dangerouslySetInnerHTML={{ __html: editableReport.erd ?? '' }} />
+                  <MermaidDiagram diagram={editableReport.erd ?? ''} />
                 )}
               </div>
             )}
