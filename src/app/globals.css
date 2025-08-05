@@ -70,23 +70,46 @@
 @layer components {
   /* Styles for HTML-based ERD */
   .erd-container {
-    @apply flex flex-col items-center justify-center gap-4 rounded-lg border bg-muted/20 p-6 text-center font-sans;
+      @apply flex w-full justify-center overflow-x-auto p-8 font-sans;
   }
-  .dark .erd-container {
-      @apply bg-muted/50;
+  .erd-set {
+      @apply flex items-center justify-center;
+  }
+  .erd-entity-group {
+      @apply relative flex flex-col items-center justify-center;
   }
   .erd-entity {
-    @apply rounded-md border-2 border-primary bg-background px-4 py-2 font-semibold shadow-md;
+      @apply relative z-10 w-32 rounded-md border-2 border-primary bg-background px-4 py-2 text-center font-semibold shadow-md;
+  }
+  .erd-attribute {
+      @apply relative z-10 mt-12 w-32 rounded-full border-2 border-foreground bg-background px-4 py-2 text-center text-sm;
+  }
+  .erd-attribute.erd-pk {
+      @apply border-destructive text-destructive;
+      text-decoration: underline;
+  }
+  /* Vertical line from entity to a central point */
+  .erd-entity::before {
+      content: '';
+      @apply absolute bottom-full left-1/2 h-6 w-px -translate-x-1/2 bg-foreground;
+  }
+  /* Vertical line from attribute to a central point */
+  .erd-attribute::before {
+      content: '';
+      @apply absolute bottom-full left-1/2 h-6 w-px -translate-x-1/2 bg-foreground;
   }
   .erd-relationship {
-    @apply relative text-sm font-medium text-muted-foreground;
+      @apply relative flex items-center justify-center px-8;
   }
+  /* Horizontal line for relationship */
   .erd-relationship::before {
       content: '';
-      @apply absolute left-1/2 top-[-1rem] h-4 w-px -translate-x-1/2 bg-border;
+      @apply absolute left-0 top-1/2 h-px w-full -translate-y-1/2 bg-foreground;
   }
-  .erd-relationship::after {
-      content: '';
-      @apply absolute bottom-[-1rem] left-1/2 h-4 w-px -translate-x-1/2 bg-border;
+  .erd-diamond {
+      @apply relative z-10 h-24 w-24 rotate-45 border-2 border-primary bg-background;
+  }
+  .erd-diamond span {
+      @apply absolute inset-0 flex -rotate-45 items-center justify-center text-center text-sm font-semibold;
   }
 }

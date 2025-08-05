@@ -30,7 +30,7 @@ const StandardReportSchema = z.object({
   challenges: z.string().optional().describe('A 200-word summary of the challenges or disadvantages.'),
   currentTrends: z.string().optional().describe('A 200-word analysis of current trends.'),
   futureScope: z.string().optional().describe('A 200-word projection of the future scope.'),
-  erd: z.string().describe("A responsive, accessible entity relationship diagram represented as an HTML string. The diagram should be wrapped in a div with the class 'erd-container'. Entities should be divs with the class 'erd-entity'. Relationships should be divs with the class 'erd-relationship', containing spans for the relationship type."),
+  erd: z.string().describe("Generate a responsive and accessible Entity-Relationship Diagram (ERD) as an HTML string. The structure should be: a main container `<div class=\"erd-container\">`, which holds one or more `<div class=\"erd-set\">`. Each `erd-set` contains an `<div class=\"erd-entity-group\">` for one entity and its attributes. An `erd-entity-group` has a central `<div class=\"erd-entity\">` (a rectangle). It also contains multiple `<div class=\"erd-attribute\">` (ovals), some of which can be primary keys by adding the class `erd-pk`. Between entity groups, place a `<div class=\"erd-relationship\">` which contains a `<div class=\"erd-diamond\">` (a diamond shape) to represent the relationship between entities. The diagram should visually connect these elements to represent their relationships clearly."),
   sources: z.string().optional().describe('A list of 2-3 sources or citations, formatted as a string with each source on a new line.'),
 });
 
@@ -49,7 +49,7 @@ const DeepReportSchema = z.object({
   challenges: z.string().optional().describe('A thorough, 200-word summary of the challenges or disadvantages.'),
   currentTrends: z.string().optional().describe('An extensive, 200-word analysis of current trends.'),
   futureScope: z.string().optional().describe('A forward-looking, 200-word projection of the future scope.'),
-  erd: z.string().describe("A responsive, accessible entity relationship diagram represented as an HTML string. The diagram should be wrapped in a div with the class 'erd-container'. Entities should be divs with the class 'erd-entity'. Relationships should be divs with the class 'erd-relationship', containing spans for the relationship type."),
+  erd: z.string().describe("Generate a responsive and accessible Entity-Relationship Diagram (ERD) as an HTML string. The structure should be: a main container `<div class=\"erd-container\">`, which holds one or more `<div class=\"erd-set\">`. Each `erd-set` contains an `<div class=\"erd-entity-group\">` for one entity and its attributes. An `erd-entity-group` has a central `<div class=\"erd-entity\">` (a rectangle). It also contains multiple `<div class=\"erd-attribute\">` (ovals), some of which can be primary keys by adding the class `erd-pk`. Between entity groups, place a `<div class=\"erd-relationship\">` which contains a `<div class=\"erd-diamond\">` (a diamond shape) to represent the relationship between entities. The diagram should visually connect these elements to represent their relationships clearly."),
   sources: z.string().optional().describe('A list of 5-7 sources or citations, formatted as a string with each source on a new line.'),
 });
 
@@ -98,7 +98,7 @@ For the topic "{{{topic}}}", please provide a detailed explanation for each of t
 - Future Scope: A 200-word projection of the future scope.
 {{/if}}
 
-- ERD: You must generate an entity relationship diagram (ERD) in HTML format. Wrap it in a <div class="erd-container">. Each entity should be a <div class="erd-entity">. Each relationship should be a <div class="erd-relationship"> containing a span. This should visualize the main entities and their relationships based on the report's content.
+- ERD: Generate a responsive and accessible Entity-Relationship Diagram (ERD) as an HTML string, based on the report's content. The structure should be: a main container \`<div class="erd-container">\`, which holds one or more \`<div class="erd-set">\`. Each \`erd-set\` contains an \`<div class="erd-entity-group">\` for one entity and its attributes. An \`erd-entity-group\` has a central \`<div class="erd-entity">\` (a rectangle). It also contains multiple \`<div class="erd-attribute">\` (ovals), some of which can be primary keys by adding the class \`erd-pk\`. Between entity groups, place a \`<div class="erd-relationship">\` which contains a \`<div class="erd-diamond">\` (a diamond shape) to represent the relationship between entities. The diagram should visually connect these elements to represent their relationships clearly.
 
 {{#if generateWithReferences}}
 - Sources: Provide a list of 2-3 web links or citations that were used to generate this report. Format them as a string, with each source on a new line.
@@ -139,7 +139,7 @@ For the topic "{{{topic}}}", provide a very detailed and extensive explanation f
 - Future Scope: A forward-looking, 200-word projection of the future scope.
 {{/if}}
 
-- ERD: You must generate an entity relationship diagram (ERD) in HTML format. Wrap it in a <div class="erd-container">. Each entity should be a <div class="erd-entity">. Each relationship should be a <div class="erd-relationship"> containing a span. This should visualize the main entities and their relationships based on the report's content.
+- ERD: Generate a responsive and accessible Entity-Relationship Diagram (ERD) as an HTML string, based on the report's content. The structure should be: a main container \`<div class="erd-container">\`, which holds one or more \`<div class="erd-set">\`. Each \`erd-set\` contains an \`<div class="erd-entity-group">\` for one entity and its attributes. An \`erd-entity-group\` has a central \`<div class="erd-entity">\` (a rectangle). It also contains multiple \`<div class="erd-attribute">\` (ovals), some of which can be primary keys by adding the class \`erd-pk\`. Between entity groups, place a \`<div class="erd-relationship">\` which contains a \`<div class="erd-diamond">\` (a diamond shape) to represent the relationship between entities. The diagram should visually connect these elements to represent their relationships clearly.
 
 {{#if generateWithReferences}}
 - Sources: Provide a list of 5-7 web links or citations that were used to generate this report. Format them as a string, with each source on a new line.
