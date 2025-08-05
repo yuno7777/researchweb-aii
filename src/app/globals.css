@@ -89,6 +89,10 @@
       text-decoration: underline;
   }
   /* Vertical line from entity to a central point */
+  .erd-entity-group::before {
+      content: '';
+      @apply absolute bottom-1/2 left-1/2 h-full w-px -translate-x-1/2 bg-foreground;
+  }
   .erd-entity::before {
       content: '';
       @apply absolute bottom-full left-1/2 h-6 w-px -translate-x-1/2 bg-foreground;
