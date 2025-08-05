@@ -47,7 +47,7 @@ const DeepReportSchema = z.object({
   challenges: z.string().optional().describe('A thorough, 200-word summary of the challenges or disadvantages.'),
   currentTrends: z.string().optional().describe('An extensive, 200-word analysis of current trends.'),
   futureScope: z.string().optional().describe('A forward-looking, 200-word projection of the future scope.'),
-  erd: z.string().describe("Generate a detailed Entity Relationship Diagram in Mermaid.js syntax. The diagram should be enclosed in a 'erDiagram' block. It must represent the key entities and their relationships based on the report's content. Example: erDiagram\\n    CUSTOMER ||--o{ ORDER : places\\n    ORDER ||--|{ LINE_ITEM : contains"),
+  erd: z.string().describe("Generate an Entity Relationship Diagram in Mermaid.js syntax. The diagram should be enclosed in a 'erDiagram' block. It must represent the key entities and their relationships based on the report's content. Example: erDiagram\\n    CUSTOMER ||--o{ ORDER : places\\n    ORDER ||--|{ LINE_ITEM : contains"),
 });
 
 
