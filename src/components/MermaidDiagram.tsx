@@ -1,9 +1,9 @@
 
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import mermaid from 'mermaid';
-import { useTheme } from 'next-themes';
+import { useLocalStorage } from '@/hooks/use-local-storage';
 import { Skeleton } from './ui/skeleton';
 
 interface MermaidDiagramProps {
@@ -19,8 +19,8 @@ const extractMermaidDefinition = (chart: string): string => {
 
 export function MermaidDiagram({ chart }: MermaidDiagramProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const { resolvedTheme } = useTheme();
-  const [isMounted, setIsMounted] = React.useState(false);
+  const [theme] = useLocalStorage<'light' | 'dark'>('theme', 'light');
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -33,7 +33,7 @@ export function MermaidDiagram({ chart }: MermaidDiagramProps) {
         
         mermaid.initialize({
           startOnLoad: false,
-          theme: resolvedTheme === 'dark' ? 'dark' : 'default',
+          theme: theme === 'dark' ? 'dark' : 'default',
           securityLevel: 'loose',
           fontFamily: 'inherit',
         });
@@ -50,7 +50,7 @@ export function MermaidDiagram({ chart }: MermaidDiagramProps) {
         }
       }
     }
-  }, [chart, resolvedTheme, isMounted]);
+  }, [chart, theme, isMounted]);
 
   if (!isMounted) {
     return <Skeleton className="h-64 w-full" />;
