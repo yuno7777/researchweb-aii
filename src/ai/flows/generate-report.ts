@@ -11,7 +11,6 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import mermaid from 'mermaid';
 
 const sectionsSchema = z.string();
 
@@ -19,6 +18,7 @@ const GenerateReportInputSchema = z.object({
   topic: z.string().describe('The topic to generate a report on.'),
   searchType: z.enum(['concise', 'web', 'deep']).describe('The type of search to perform.'),
   sections: z.array(sectionsSchema).optional().describe('A list of sections to include in the report.'),
+  generateDiagram: z.boolean().optional().describe('Whether to generate an ERD diagram.'),
 });
 export type GenerateReportInput = z.infer<typeof GenerateReportInputSchema>;
 
@@ -30,7 +30,7 @@ const StandardReportSchema = z.object({
   challenges: z.string().optional().describe('A 200-word summary of the challenges or disadvantages.'),
   currentTrends: z.string().optional().describe('A 200-word analysis of current trends.'),
   futureScope: z.string().optional().describe('A 200-word projection of the future scope.'),
-  erd: z.string().describe("Generate an Entity Relationship Diagram in Mermaid.js syntax. The diagram should be enclosed in a 'erDiagram' block. It must represent the key entities and their relationships based on the report's content. Example: erDiagram\\n    CUSTOMER ||--o{ ORDER : places\\n    ORDER ||--|{ LINE_ITEM : contains"),
+  erd: z.string().optional().describe("Generate an Entity Relationship Diagram in Mermaid.js syntax. The diagram should be enclosed in a 'erDiagram' block. It must represent the key entities and their relationships based on the report's content. Example: erDiagram\\n    CUSTOMER ||--o{ ORDER : places\\n    ORDER ||--|{ LINE_ITEM : contains"),
 });
 
 
@@ -47,7 +47,7 @@ const DeepReportSchema = z.object({
   challenges: z.string().optional().describe('A thorough, 200-word summary of the challenges or disadvantages.'),
   currentTrends: z.string().optional().describe('An extensive, 200-word analysis of current trends.'),
   futureScope: z.string().optional().describe('A forward-looking, 200-word projection of the future scope.'),
-  erd: z.string().describe("Generate an Entity Relationship Diagram in Mermaid.js syntax. The diagram should be enclosed in a 'erDiagram' block. It must represent the key entities and their relationships based on the report's content. Example: erDiagram\\n    CUSTOMER ||--o{ ORDER : places\\n    ORDER ||--|{ LINE_ITEM : contains"),
+  erd: z.string().optional().describe("Generate an Entity Relationship Diagram in Mermaid.js syntax. The diagram should be enclosed in a 'erDiagram' block. It must represent the key entities and their relationships based on the report's content. Example: erDiagram\\n    CUSTOMER ||--o{ ORDER : places\\n    ORDER ||--|{ LINE_ITEM : contains"),
 });
 
 
@@ -61,13 +61,15 @@ export async function generateReport(input: GenerateReportInput): Promise<Genera
   return generateReportFlow(input);
 }
 
+const reportPromptInputSchema = z.object({
+    topic: z.string(),
+    sections: z.record(z.string(), z.boolean()),
+    generateDiagram: z.boolean(),
+});
 
 const reportPrompt = ai.definePrompt({
   name: 'reportPrompt',
-  input: {schema: z.object({
-      topic: z.string(),
-      sections: z.record(z.string(), z.boolean()),
-  })},
+  input: {schema: reportPromptInputSchema },
   output: {schema: StandardReportSchema },
   prompt: `You are an expert AI research assistant. Your task is to generate a comprehensive, in-depth, and well-structured report on the given topic.
 
@@ -94,16 +96,15 @@ For the topic "{{{topic}}}", please provide a detailed explanation for each of t
 - Future Scope: A 200-word projection of the future scope.
 {{/if}}
 
+{{#if generateDiagram}}
 - ERD: Generate an Entity Relationship Diagram in Mermaid.js syntax, based on the report's content. The diagram should be enclosed in a 'erDiagram' block. Example: erDiagram\\n    CUSTOMER ||--o{ ORDER : places\\n    ORDER ||--|{ LINE_ITEM : contains
+{{/if}}
 `,
 });
 
 const deepResearchPrompt = ai.definePrompt({
     name: 'deepResearchPrompt',
-    input: { schema: z.object({
-        topic: z.string(),
-        sections: z.record(z.string(), z.boolean()),
-    }) },
+    input: { schema: reportPromptInputSchema },
     output: { schema: DeepReportSchema },
     prompt: `You are an expert AI research analyst. Your task is to generate a comprehensive and in-depth report on the given topic. Your analysis must be thorough, insightful, and well-structured.
 
@@ -130,7 +131,9 @@ For the topic "{{{topic}}}", provide a very detailed and extensive explanation f
 - Future Scope: A forward-looking, 200-word projection of the future scope.
 {{/if}}
 
+{{#if generateDiagram}}
 - ERD: Generate an Entity Relationship Diagram in Mermaid.js syntax, based on the report's content. The diagram should be enclosed in a 'erDiagram' block. Example: erDiagram\\n    CUSTOMER ||--o{ ORDER : places\\n    ORDER ||--|{ LINE_ITEM : contains
+{{/if}}
 `,
 });
 
@@ -169,6 +172,7 @@ const generateReportFlow = ai.defineFlow(
         const flowInput = { 
             topic: input.topic,
             sections: sectionsAsObject,
+            generateDiagram: !!input.generateDiagram,
         };
 
         if (input.searchType === 'web') {
