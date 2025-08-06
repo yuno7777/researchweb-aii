@@ -37,9 +37,7 @@ const DeepReportSchema = z.object({
 });
 
 
-const GenerateReportOutputSchema = z.object({
-    report: z.union([StandardReportSchema, ConciseReportSchema, DeepReportSchema]),
-});
+const GenerateReportOutputSchema = z.union([StandardReportSchema, ConciseReportSchema, DeepReportSchema]);
 export type GenerateReportOutput = z.infer<typeof GenerateReportOutputSchema>;
 
 
@@ -108,6 +106,6 @@ const generateReportFlow = ai.defineFlow(
       throw new Error('Report generation failed.');
     }
 
-    return { report: reportOutput };
+    return reportOutput;
   }
 );

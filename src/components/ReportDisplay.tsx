@@ -9,7 +9,7 @@ import { Edit, Save, X } from 'lucide-react';
 import { CardHeader, CardTitle, CardContent } from './ui/card';
 import { MermaidDiagram } from './MermaidDiagram';
 
-type Report = Exclude<GenerateReportOutput['report'], { summary: string, keyPoints: string[] } | null>;
+type Report = Exclude<GenerateReportOutput, { summary: string, keyPoints: string[] } | null>;
 type ReportSection = keyof Omit<Report, 'title'>;
 
 interface ReportDisplayProps {

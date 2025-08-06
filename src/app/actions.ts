@@ -4,18 +4,18 @@
 import { generateReport, type GenerateReportInput, type GenerateReportOutput } from "@/ai/flows/generate-report";
 
 export async function handleGenerateReport(input: GenerateReportInput): Promise<{ 
-  report: GenerateReportOutput['report'] | null;
+  report: GenerateReportOutput | null;
   error: string | null 
 }> {
   try {
     const output = await generateReport(input);
 
-    if (!output || !output.report) {
+    if (!output) {
         return { report: null, error: 'Failed to generate report. The AI returned no data.' };
     }
     
     return { 
-      report: output.report, 
+      report: output, 
       error: null 
     };
   } catch (e) {

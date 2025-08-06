@@ -35,7 +35,7 @@ const formSchema = z.object({
   topic: z.string().min(3, { message: "Topic must be at least 3 characters long." }).max(100, { message: "Topic must be at most 100 characters long." }),
 });
 
-type ReportData = GenerateReportOutput['report'];
+type ReportData = GenerateReportOutput;
 type SearchType = 'concise' | 'web' | 'deep';
 
 export default function Home() {
