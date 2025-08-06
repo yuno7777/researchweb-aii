@@ -24,17 +24,11 @@ import { GradientText } from '@/components/GradientText';
 import { HomePageContent } from '@/components/HomePageContent';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { ConciseReportDisplay } from '@/components/ConciseReportDisplay';
 import { ReportDisplay } from '@/components/ReportDisplay';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Logo } from '@/components/Logo';
 import { Thinking } from '@/components/Thinking';
-import { TemplateManager, type Template } from '@/components/TemplateManager';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 
 const formSchema = z.object({
@@ -44,25 +38,12 @@ const formSchema = z.object({
 type ReportData = GenerateReportOutput['report'];
 type SearchType = 'concise' | 'web' | 'deep';
 
-const defaultSections: string[] = [
-    'Introduction',
-    'History',
-    'Benefits',
-    'Challenges',
-    'Current Trends',
-    'Future Scope',
-];
-
 export default function Home() {
   const [report, setReport] = useState<ReportData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [history, setHistory] = useLocalStorage<string[]>('report-history', []);
-  const [templates, setTemplates] = useLocalStorage<Template[]>('report-templates', []);
   const { toast } = useToast();
   const [searchType, setSearchType] = useState<SearchType>('web');
-  const [selectedSections, setSelectedSections] = useState<string[]>(defaultSections);
-  const [isTemplateManagerOpen, setIsTemplateManagerOpen] = useState(false);
-  const [activeTemplateId, setActiveTemplateId] = useState<string>('default');
 
   
   const handleSelectTopic = (topic: string) => {
@@ -80,7 +61,7 @@ export default function Home() {
     toast({ title: "Report updated.", description: "Your changes have been saved locally." });
   }
 
-  const handleExportPdf = () => {
+  const handleExportPdf = async () => {
     if (!report) {
       toast({ variant: 'destructive', title: 'Error', description: 'No report data available to export.' });
       return;
@@ -103,128 +84,163 @@ export default function Home() {
     toast({ title: 'Exporting PDF...', description: 'Please wait while your report is being prepared.' });
 
     try {
-        const pdf = new jsPDF({
-            orientation: 'p',
-            unit: 'mm',
-            format: 'a4',
-        });
+        const generatePdf = async () => {
+            const pdf = new jsPDF({
+                orientation: 'p',
+                unit: 'mm',
+                format: 'a4',
+            });
 
-        const pageMargin = 20;
-        const contentWidth = pdf.internal.pageSize.getWidth() - (pageMargin * 2);
-        const pageHeight = pdf.internal.pageSize.getHeight();
-        let y = pageMargin;
-        let pageNum = 1;
-        const contentFontSize = 12;
+            const pageMargin = 20;
+            const contentWidth = pdf.internal.pageSize.getWidth() - (pageMargin * 2);
+            const pageHeight = pdf.internal.pageSize.getHeight();
+            let y = pageMargin;
+            const contentFontSize = 12;
 
-        const addPageHeaderAndFooter = () => {
-            pdf.setFontSize(9);
-            pdf.setFont('helvetica', 'italic');
-            pdf.setTextColor(150);
-            pdf.text(`Page ${pageNum}`, pdf.internal.pageSize.getWidth() / 2, pageHeight - 10, { align: 'center' });
-            
-            // Reset font for the content
-            pdf.setTextColor(33, 37, 41);
+            const addPageHeaderAndFooter = () => {
+                pdf.setFontSize(9);
+                pdf.setFont('helvetica', 'italic');
+                pdf.setTextColor(150);
+                pdf.text(`Page ${pdf.internal.getNumberOfPages()}`, pdf.internal.pageSize.getWidth() / 2, pageHeight - 10, { align: 'center' });
+                pdf.setTextColor(33, 37, 41);
+                pdf.setFont('helvetica', 'normal');
+                pdf.setFontSize(contentFontSize);
+            };
+
+            const addPageWithHeaderFooter = () => {
+                pdf.addPage();
+                y = pageMargin;
+                addPageHeaderAndFooter();
+            };
+
+            // --- TITLE PAGE ---
+            pdf.setFont('helvetica', 'bold');
+            pdf.setFontSize(28);
+            pdf.setTextColor(32, 19, 32); 
+            const titleLines = pdf.splitTextToSize(reportTitle, contentWidth - 20);
+            const titleHeight = titleLines.length * (pdf.getLineHeight() / pdf.internal.scaleFactor);
+            const titleY = pageHeight / 2 - titleHeight;
+            pdf.text(titleLines, pdf.internal.pageSize.getWidth() / 2, titleY, { align: 'center' });
+
             pdf.setFont('helvetica', 'normal');
-            pdf.setFontSize(contentFontSize);
-        };
+            pdf.setFontSize(14);
+            pdf.setTextColor(108, 117, 125);
+            pdf.text(`AI-Generated Research Report`, pdf.internal.pageSize.getWidth() / 2, titleY + titleHeight + 5, { align: 'center' });
+            
+            pdf.setDrawColor(222, 226, 230);
+            pdf.setLineWidth(0.5);
+            pdf.line(pageMargin, titleY + titleHeight + 15, contentWidth + pageMargin, titleY + titleHeight + 15);
 
-        const addPageWithHeaderFooter = () => {
-            pdf.addPage();
-            pageNum++;
-            y = pageMargin;
-            addPageHeaderAndFooter();
-        };
+            pdf.setFontSize(12);
+            const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            pdf.text(`Generated by Insight Forge on ${date}`, pdf.internal.pageSize.getWidth() / 2, pageHeight - 20, { align: 'center' });
+            
+            // --- CONTENT PAGES ---
+            const addSection = (title: string, content: string | string[]) => {
+              const titleFontSize = 16;
+              const sectionTitleMargin = 10;
+              const contentMargin = 5;
+              const lineHeightMultiplier = 1.25;
 
-        // --- TITLE PAGE ---
-        pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(28);
-        pdf.setTextColor(32, 19, 32); 
-        const titleLines = pdf.splitTextToSize(reportTitle, contentWidth - 20);
-        const titleHeight = titleLines.length * (pdf.getLineHeight() / pdf.internal.scaleFactor);
-        const titleY = pageHeight / 2 - titleHeight;
-        pdf.text(titleLines, pdf.internal.pageSize.getWidth() / 2, titleY, { align: 'center' });
+              const titleLineHeight = titleFontSize * lineHeightMultiplier / pdf.internal.scaleFactor;
+              const contentLineHeight = contentFontSize * lineHeightMultiplier / pdf.internal.scaleFactor;
 
-        pdf.setFont('helvetica', 'normal');
-        pdf.setFontSize(14);
-        pdf.setTextColor(108, 117, 125);
-        pdf.text(`AI-Generated Research Report`, pdf.internal.pageSize.getWidth() / 2, titleY + titleHeight + 5, { align: 'center' });
-        
-        pdf.setDrawColor(222, 226, 230);
-        pdf.setLineWidth(0.5);
-        pdf.line(pageMargin, titleY + titleHeight + 15, contentWidth + pageMargin, titleY + titleHeight + 15);
-
-        pdf.setFontSize(12);
-        const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-        pdf.text(`Generated by Insight Forge on ${date}`, pdf.internal.pageSize.getWidth() / 2, pageHeight - 20, { align: 'center' });
-        
-        // --- CONTENT PAGES ---
-        const addSection = (title: string, content: string | string[]) => {
-          const titleFontSize = 16;
-          const sectionTitleMargin = 10;
-          const contentMargin = 5;
-          const lineHeightMultiplier = 1.25;
-
-          const titleLineHeight = titleFontSize * lineHeightMultiplier / pdf.internal.scaleFactor;
-          const contentLineHeight = contentFontSize * lineHeightMultiplier / pdf.internal.scaleFactor;
-
-          // Check for page break before adding section title
-          if (y + titleLineHeight + sectionTitleMargin > pageHeight - pageMargin) { 
-              addPageWithHeaderFooter();
-          }
-          
-          pdf.setFont('helvetica', 'bold');
-          pdf.setFontSize(titleFontSize);
-          pdf.setTextColor(49, 53, 57);
-          pdf.text(title, pageMargin, y);
-          y += titleLineHeight;
-          
-          pdf.setDrawColor(222, 226, 230);
-          pdf.setLineWidth(0.25);
-          pdf.line(pageMargin, y, contentWidth + pageMargin, y);
-          y += contentMargin;
-
-          pdf.setFont('helvetica', 'normal');
-          pdf.setFontSize(contentFontSize);
-          pdf.setTextColor(33, 37, 41);
-          
-          const processContent = (text: string) => {
-            const lines = pdf.splitTextToSize(text, contentWidth);
-            lines.forEach((line: string) => {
-              if (y + contentLineHeight > pageHeight - pageMargin) {
+              if (y + titleLineHeight + sectionTitleMargin > pageHeight - pageMargin) { 
                   addPageWithHeaderFooter();
               }
-              pdf.text(line, pageMargin, y);
-              y += contentLineHeight;
-            });
-          };
+              
+              pdf.setFont('helvetica', 'bold');
+              pdf.setFontSize(titleFontSize);
+              pdf.setTextColor(49, 53, 57);
+              pdf.text(title, pageMargin, y);
+              y += titleLineHeight;
+              
+              pdf.setDrawColor(222, 226, 230);
+              pdf.setLineWidth(0.25);
+              pdf.line(pageMargin, y, contentWidth + pageMargin, y);
+              y += contentMargin;
 
-          if (Array.isArray(content)) {
-              content.forEach(item => {
-                  processContent(`• ${item}`);
-              });
-          } else {
-              processContent(content);
-          }
-          y += sectionTitleMargin; // Space after section
-        };
-        
-        if (report) {
-            addPageWithHeaderFooter();
+              pdf.setFont('helvetica', 'normal');
+              pdf.setFontSize(contentFontSize);
+              pdf.setTextColor(33, 37, 41);
+              
+              const processContent = (text: string) => {
+                const lines = pdf.splitTextToSize(text, contentWidth);
+                lines.forEach((line: string) => {
+                  if (y + contentLineHeight > pageHeight - pageMargin) {
+                      addPageWithHeaderFooter();
+                  }
+                  pdf.text(line, pageMargin, y);
+                  y += contentLineHeight;
+                });
+              };
 
-            if (isConciseReport(report)) {
-                 addSection('Summary', report.summary);
-                 addSection('Key Points', report.keyPoints);
-            } else if (isStandardOrDeepReport(report)) {
-                if (report.introduction) addSection('Introduction', report.introduction);
-                if (report.history) addSection('History', report.history);
-                if (report.benefits) addSection('Benefits', report.benefits);
-                if (report.challenges) addSection('Challenges', report.challenges);
-                if (report.currentTrends) addSection('Current Trends', report.currentTrends);
-                if (report.futureScope) addSection('Future Scope', report.futureScope);
+              if (Array.isArray(content)) {
+                  content.forEach(item => {
+                      processContent(`• ${item}`);
+                  });
+              } else {
+                  processContent(content);
+              }
+              y += sectionTitleMargin;
+            };
+            
+            if (report) {
+                addPageWithHeaderFooter();
+
+                if (isConciseReport(report)) {
+                     addSection('Summary', report.summary);
+                     addSection('Key Points', report.keyPoints);
+                } else if (isStandardOrDeepReport(report)) {
+                    addSection('Report', report.reportContent);
+
+                    if (report.erd) {
+                        const diagramElement = document.getElementById('report-output')?.querySelector<HTMLDivElement>('.mermaid-diagram-container > svg');
+                        if (diagramElement) {
+                            const { jsPDF } = await import('jspdf');
+                            const canvas = document.createElement('canvas');
+                            const scale = 2;
+                            canvas.width = diagramElement.clientWidth * scale;
+                            canvas.height = diagramElement.clientHeight * scale;
+                            const ctx = canvas.getContext('2d');
+                            if (ctx) {
+                                ctx.scale(scale, scale);
+                                const svgData = new XMLSerializer().serializeToString(diagramElement);
+                                const img = new Image();
+                                img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+                                
+                                await new Promise<void>((resolve) => {
+                                    img.onload = () => {
+                                        ctx.fillStyle = 'white';
+                                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                                        ctx.drawImage(img, 0, 0);
+                                        
+                                        const imgData = canvas.toDataURL('image/png');
+                                        const imgWidth = 180;
+                                        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                                        
+                                        if (y + imgHeight + 20 > pageHeight - pageMargin) {
+                                            addPageWithHeaderFooter();
+                                        }
+                                        
+                                        addSection("Entity Relationship Diagram", "");
+                                        pdf.addImage(imgData, 'PNG', pageMargin, y, imgWidth, imgHeight);
+                                        y += imgHeight + 10;
+                                        resolve();
+                                    };
+                                    img.onerror = () => resolve(); // continue even if image fails
+                                });
+                            }
+                        }
+                    }
+                }
             }
+
+            pdf.save(fileName);
         }
 
-        pdf.save(fileName);
+        await generatePdf();
+
         toast({ title: 'Export complete!', description: `${fileName} has been downloaded.`});
     } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred.';
@@ -255,8 +271,7 @@ export default function Home() {
 
     const result = await handleGenerateReport({ 
         topic: values.topic, 
-        searchType, 
-        sections: searchType === 'concise' ? undefined : selectedSections,
+        searchType,
     });
 
     if (result.error) {
@@ -284,20 +299,6 @@ export default function Home() {
       return report !== null && 'title' in report && !('summary' in report);
   };
   
-  const handleTemplateSelect = (templateId: string) => {
-    setActiveTemplateId(templateId);
-    if (templateId === 'default') {
-        setSelectedSections(defaultSections);
-    } else if (templateId === 'custom') {
-        setSelectedSections([]);
-    } else {
-        const template = templates.find(t => t.id === templateId);
-        if (template) {
-            setSelectedSections(template.sections);
-        }
-    }
-  };
-
   return (
     <div id="home" className="flex min-h-screen w-full flex-col bg-background text-foreground" suppressHydrationWarning>
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -420,63 +421,6 @@ export default function Home() {
                                         </TooltipProvider>
                                     </div>
                                     <div className="flex items-center gap-4">
-                                        <Popover>
-                                            <PopoverTrigger asChild>
-                                                <Button variant="ghost" size="icon" className="rounded-full text-muted-foreground">
-                                                    <Settings className="h-4 w-4" />
-                                                </Button>
-                                            </PopoverTrigger>
-                                            <PopoverContent className="w-80 p-4">
-                                                <div className="grid gap-4">
-                                                  
-                                                  <div className="grid gap-2">
-                                                    {searchType !== 'concise' && (
-                                                      <>
-                                                        <div className="space-y-2">
-                                                            <Label>Template</Label>
-                                                            <div className="flex gap-2">
-                                                                <Select value={activeTemplateId} onValueChange={handleTemplateSelect}>
-                                                                    <SelectTrigger>
-                                                                        <SelectValue placeholder="Select a template" />
-                                                                    </SelectTrigger>
-                                                                    <SelectContent>
-                                                                        <SelectItem value="default">Default Sections</SelectItem>
-                                                                        {templates.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
-                                                                        <SelectItem value="custom">Custom...</SelectItem>
-                                                                    </SelectContent>
-                                                                </Select>
-                                                                <Button variant="outline" size="icon" onClick={() => setIsTemplateManagerOpen(true)}>
-                                                                    <FolderKanban className="h-4 w-4" />
-                                                                </Button>
-                                                            </div>
-                                                        </div>
-                                                        <Separator />
-                                                        <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
-                                                            {selectedSections.map((section, index) => (
-                                                                <div key={index} className="flex items-center space-x-2">
-                                                                    <Checkbox
-                                                                        id={`section-${index}`}
-                                                                        checked={true}
-                                                                        onCheckedChange={(checked) => {
-                                                                            if (!checked) {
-                                                                                setSelectedSections(selectedSections.filter((s) => s !== section));
-                                                                                setActiveTemplateId('custom');
-                                                                            }
-                                                                        }}
-                                                                    />
-                                                                    <Label htmlFor={`section-${index}`} className="font-normal">{section}</Label>
-                                                                </div>
-                                                            ))}
-                                                            <Button variant="ghost" size="sm" onClick={() => { setSelectedSections([...selectedSections, 'New Section']); setActiveTemplateId('custom'); }}>
-                                                                <Plus className="mr-2 h-4 w-4" /> Add Section
-                                                            </Button>
-                                                        </div>
-                                                      </>
-                                                    )}
-                                                  </div>
-                                                </div>
-                                            </PopoverContent>
-                                        </Popover>
                                         <Button type="submit" size="icon" className="rounded-full h-9 w-9 bg-primary/90 hover:bg-primary" disabled={isLoading}>
                                             <Send className="h-5 w-5"/>
                                         </Button>
@@ -544,17 +488,8 @@ export default function Home() {
             </div>
         </section>
 
-        <TemplateManager
-            isOpen={isTemplateManagerOpen}
-            onOpenChange={setIsTemplateManagerOpen}
-            templates={templates}
-            setTemplates={setTemplates}
-        />
-
         <HomePageContent />
       </main>
     </div>
   );
 }
-
-    

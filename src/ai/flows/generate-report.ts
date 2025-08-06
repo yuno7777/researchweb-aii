@@ -12,24 +12,15 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-const sectionsSchema = z.string();
-
 const GenerateReportInputSchema = z.object({
   topic: z.string().describe('The topic to generate a report on.'),
   searchType: z.enum(['concise', 'web', 'deep']).describe('The type of search to perform.'),
-  sections: z.array(sectionsSchema).optional().describe('A list of sections to include in the report.'),
-  generateDiagram: z.boolean().optional().describe('Whether to generate an ERD diagram.'),
 });
 export type GenerateReportInput = z.infer<typeof GenerateReportInputSchema>;
 
 const StandardReportSchema = z.object({
   title: z.string().describe('A concise and engaging title for the report.'),
-  introduction: z.string().optional().describe('A 150-word introduction to the topic.'),
-  history: z.string().optional().describe('A 200-word history of the topic.'),
-  benefits: z.string().optional().describe('A 200-word overview of the benefits or advantages.'),
-  challenges: z.string().optional().describe('A 200-word summary of the challenges or disadvantages.'),
-  currentTrends: z.string().optional().describe('A 200-word analysis of current trends.'),
-  futureScope: z.string().optional().describe('A 200-word projection of the future scope.'),
+  reportContent: z.string().describe('A comprehensive, multi-paragraph report on the topic, approximately 600-800 words long. It should be well-structured and detailed.'),
   erd: z.string().describe("Generate an Entity Relationship Diagram in Mermaid.js syntax. The diagram should be enclosed in a 'erDiagram' block. It must represent the key entities and their relationships based on the report's content. Example: erDiagram\\n    CUSTOMER ||--o{ ORDER : places\\n    ORDER ||--|{ LINE_ITEM : contains"),
 });
 
@@ -41,12 +32,7 @@ const ConciseReportSchema = z.object({
 
 const DeepReportSchema = z.object({
   title: z.string().describe('A concise and engaging title for the report.'),
-  introduction: z.string().optional().describe('A comprehensive, 200-word introduction to the topic.'),
-  history: z.string().optional().describe('An in-depth, 200-word history of the topic.'),
-  benefits: z.string().optional().describe('A detailed, 200-word overview of the benefits or advantages.'),
-  challenges: z.string().optional().describe('A thorough, 200-word summary of the challenges or disadvantages.'),
-  currentTrends: z.string().optional().describe('An extensive, 200-word analysis of current trends.'),
-  futureScope: z.string().optional().describe('A forward-looking, 200-word projection of the future scope.'),
+  reportContent: z.string().describe('An in-depth, comprehensive, multi-paragraph report on the topic, approximately 1200-1500 words long. The analysis must be thorough, insightful, and well-structured.'),
   erd: z.string().describe("Generate an Entity Relationship Diagram in Mermaid.js syntax. The diagram should be enclosed in a 'erDiagram' block. It must represent the key entities and their relationships based on the report's content. Example: erDiagram\\n    CUSTOMER ||--o{ ORDER : places\\n    ORDER ||--|{ LINE_ITEM : contains"),
 });
 
@@ -61,75 +47,29 @@ export async function generateReport(input: GenerateReportInput): Promise<Genera
   return generateReportFlow(input);
 }
 
-const reportPromptInputSchema = z.object({
-    topic: z.string(),
-    sections: z.record(z.string(), z.boolean()),
-    generateDiagram: z.boolean(),
-});
-
 const reportPrompt = ai.definePrompt({
   name: 'reportPrompt',
-  input: {schema: reportPromptInputSchema },
+  input: {schema: GenerateReportInputSchema },
   output: {schema: StandardReportSchema },
-  prompt: `You are an expert AI research assistant. Your task is to generate a comprehensive, in-depth, and well-structured report on the given topic.
+  prompt: `You are an expert AI research assistant. Your task is to generate a comprehensive, well-structured report on the given topic.
 
-For the topic "{{{topic}}}", please provide a detailed explanation for each of the following sections that are provided in the 'sections' object. If a section is not in the object, you should not generate it.
+For the topic "{{{topic}}}", please provide the following:
 
-- Title: A concise and engaging title for the report.
-
-{{#if sections.Introduction}}
-- Introduction: A 150-word introduction to the topic.
-{{/if}}
-{{#if sections.History}}
-- History: A 200-word history of the topic.
-{{/if}}
-{{#if sections.Benefits}}
-- Benefits: A 200-word overview of the benefits or advantages.
-{{/if}}
-{{#if sections.Challenges}}
-- Challenges: A 200-word summary of the challenges or disadvantages.
-{{/if}}
-{{#if sections.CurrentTrends}}
-- Current Trends: A 200-word analysis of current trends.
-{{/if}}
-{{#if sections.FutureScope}}
-- Future Scope: A 200-word projection of the future scope.
-{{/if}}
-
-- ERD: Generate an Entity Relationship Diagram in Mermaid.js syntax, based on the report's content. The diagram should be enclosed in a 'erDiagram' block. Example: erDiagram\\n    CUSTOMER ||--o{ ORDER : places\\n    ORDER ||--|{ LINE_ITEM : contains
+1.  **Report Content**: A detailed, multi-paragraph report. This should cover various aspects of the topic like its history, importance, challenges, and future trends, woven together in a flowing narrative. Aim for a word count between 600 and 800 words.
+2.  **ERD**: An Entity Relationship Diagram in Mermaid.js syntax based on the report's content. The diagram should be enclosed in an 'erDiagram' block.
 `,
 });
 
 const deepResearchPrompt = ai.definePrompt({
     name: 'deepResearchPrompt',
-    input: { schema: reportPromptInputSchema },
+    input: { schema: GenerateReportInputSchema },
     output: { schema: DeepReportSchema },
-    prompt: `You are an expert AI research analyst. Your task is to generate a comprehensive and in-depth report on the given topic. Your analysis must be thorough, insightful, and well-structured.
+    prompt: `You are an expert AI research analyst. Your task is to generate a highly comprehensive and in-depth report on the given topic. Your analysis must be thorough, insightful, and well-structured.
 
-For the topic "{{{topic}}}", provide a very detailed and extensive explanation for each of the following sections provided in the 'sections' object. If a section is not in the object, you should not generate it.
+For the topic "{{{topic}}}", please provide the following:
 
-- Title: A concise and engaging title for the report.
-
-{{#if sections.Introduction}}
-- Introduction: A comprehensive, 200-word introduction to the topic.
-{{/if}}
-{{#if sections.History}}
-- History: An in-depth, 200-word history of the topic.
-{{/if}}
-{{#if sections.Benefits}}
-- Benefits: A detailed, 200-word overview of the benefits or advantages.
-{{/if}}
-{{#if sections.Challenges}}
-- Challenges: A thorough, 200-word summary of the challenges or disadvantages.
-{{/if}}
-{{#if sections.CurrentTrends}}
-- Current Trends: An extensive, 200-word analysis of current trends.
-{{/if}}
-{{#if sections.FutureScope}}
-- Future Scope: A forward-looking, 200-word projection of the future scope.
-{{/if}}
-
-- ERD: Generate an Entity Relationship Diagram in Mermaid.js syntax, based on the report's content. The diagram should be enclosed in a 'erDiagram' block. Example: erDiagram\\n    CUSTOMER ||--o{ ORDER : places\\n    ORDER ||--|{ LINE_ITEM : contains
+1.  **Report Content**: A very detailed, extensive, multi-paragraph report. This should provide a deep dive into the topic, covering its nuances, history, complexities, current landscape, and future outlook. Aim for a word count between 1200 and 1500 words.
+2.  **ERD**: An Entity Relationship Diagram in Mermaid.js syntax, based on the report's content. The diagram should be enclosed in an 'erDiagram' block.
 `,
 });
 
@@ -156,28 +96,12 @@ const generateReportFlow = ai.defineFlow(
     if (input.searchType === 'concise') {
         const { output } = await conciseReportPrompt(input);
         reportOutput = output;
-    } else {
-        const defaultSections = ["Introduction", "History", "Benefits", "Challenges", "Current Trends", "Future Scope"];
-        const sectionsToGenerate = input.sections && input.sections.length > 0 ? input.sections : defaultSections;
-            
-        const sectionsAsObject = sectionsToGenerate.reduce((acc, section) => {
-            acc[section] = true;
-            return acc;
-        }, {} as Record<string, boolean>);
-
-        const flowInput = { 
-            topic: input.topic,
-            sections: sectionsAsObject,
-            generateDiagram: !!input.generateDiagram,
-        };
-
-        if (input.searchType === 'web') {
-            const { output } = await reportPrompt(flowInput);
-            reportOutput = output;
-        } else if (input.searchType === 'deep') {
-            const { output } = await deepResearchPrompt(flowInput);
-            reportOutput = output;
-        }
+    } else if (input.searchType === 'web') {
+        const { output } = await reportPrompt(input);
+        reportOutput = output;
+    } else if (input.searchType === 'deep') {
+        const { output } = await deepResearchPrompt(input);
+        reportOutput = output;
     }
     
     if (!reportOutput) {
