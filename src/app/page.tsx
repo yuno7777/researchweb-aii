@@ -195,19 +195,21 @@ export default function Home() {
                     addSection('Report', report.reportContent);
 
                     if (report.erd) {
-                        const diagramElement = document.getElementById('report-output')?.querySelector<HTMLDivElement>('.mermaid-diagram-container > svg');
-                        if (diagramElement) {
+                        const diagramElement = document.getElementById('report-output')?.querySelector<HTMLDivElement>('.mermaid-diagram-container > div');
+                        if (diagramElement && diagramElement.firstElementChild?.tagName === 'svg') {
+                            const svgElement = diagramElement.firstElementChild as SVGElement;
                             const { jsPDF } = await import('jspdf');
                             const canvas = document.createElement('canvas');
                             const scale = 2;
-                            canvas.width = diagramElement.clientWidth * scale;
-                            canvas.height = diagramElement.clientHeight * scale;
+                            canvas.width = svgElement.clientWidth * scale;
+                            canvas.height = svgElement.clientHeight * scale;
                             const ctx = canvas.getContext('2d');
                             if (ctx) {
                                 ctx.scale(scale, scale);
-                                const svgData = new XMLSerializer().serializeToString(diagramElement);
+                                const svgData = new XMLSerializer().serializeToString(svgElement);
                                 const img = new Image();
-                                img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+                                const svgBase64 = btoa(unescape(encodeURIComponent(svgData)));
+                                img.src = 'data:image/svg+xml;base64,' + svgBase64;
                                 
                                 await new Promise<void>((resolve) => {
                                     img.onload = () => {
@@ -228,7 +230,10 @@ export default function Home() {
                                         y += imgHeight + 10;
                                         resolve();
                                     };
-                                    img.onerror = () => resolve(); // continue even if image fails
+                                    img.onerror = (e) => {
+                                      console.error("Image loading for PDF failed", e)
+                                      resolve(); // continue even if image fails
+                                    };
                                 });
                             }
                         }
