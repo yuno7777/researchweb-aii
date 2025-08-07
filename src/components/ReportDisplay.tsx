@@ -75,8 +75,7 @@ export function ReportDisplay({ report, onReportUpdate }: ReportDisplayProps) {
             </div>
              {report.erd && (
               <div className="mermaid-diagram-container">
-                <div className="flex flex-row items-center justify-between mb-2">
-                  <h3 className="text-xl font-bold">Entity Relationship Diagram</h3>
+                <div className="flex flex-row items-center justify-end mb-2">
                   {editingSection !== 'erd' && (
                     <Button variant="outline" size="sm" onClick={() => handleEditClick('erd')} className="rounded-full"><Edit className="mr-2 h-4 w-4" />Edit</Button>
                   )}

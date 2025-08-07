@@ -225,7 +225,7 @@ export default function Home() {
                                             addPageWithHeaderFooter();
                                         }
                                         
-                                        addSection("Entity Relationship Diagram", "");
+                                        y += 10; // Add some space before the diagram
                                         pdf.addImage(imgData, 'PNG', pageMargin, y, imgWidth, imgHeight);
                                         y += imgHeight + 10;
                                         resolve();
