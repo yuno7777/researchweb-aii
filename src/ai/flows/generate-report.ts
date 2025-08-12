@@ -31,7 +31,7 @@ const ReportSectionSchema = z.object({
 const StandardReportSchema = z.object({
   title: z.string().describe('A concise and engaging title for the report.'),
   sections: ReportSectionSchema.describe("The structured content of the report, broken down into predefined sections."),
-  erd: z.string().describe("Generate an Entity Relationship Diagram in Mermaid.js syntax. The diagram must be enclosed in an 'erDiagram' block. It must only represent the key entities and their relationships based on the report content. Do not include attributes inside the entities. Example: erDiagram\\n    USER ||--o{ POST : \\\"creates\\\"\\n    POST ||--|{ COMMENT : \\\"has\\\"\""),
+  erd: z.string().describe("Generate an Entity Relationship Diagram in Mermaid.js syntax. The diagram must be enclosed in an 'erDiagram' block. It must only represent the key entities and their relationships based on the report content. Do not include attributes inside the entities. Example: erDiagram\\n    USER ||--o{ POST : \\\"creates\\\"\\n    POST ||--|{ COMMENT : \\\"has\\\""),
 });
 
 
@@ -43,7 +43,7 @@ const ConciseReportSchema = z.object({
 const DeepReportSchema = z.object({
   title: z.string().describe('A concise and engaging title for the report.'),
   sections: ReportSectionSchema.describe("An in-depth and thorough breakdown of the report content into predefined sections."),
-  erd: z.string().describe("Generate an Entity Relationship Diagram in Mermaid.js syntax. The diagram must be enclosed in an 'erDiagram' block. It must only represent the key entities and their relationships based on the report content. Do not include attributes inside the entities. Example: erDiagram\\n    USER ||--o{ POST : \\\"creates\\\"\\n    POST ||--|{ COMMENT : \\\"has\\\"\""),
+  erd: z.string().describe("Generate an Entity Relationship Diagram in Mermaid.js syntax. The diagram must be enclosed in an 'erDiagram' block. It must only represent the key entities and their relationships based on the report content. Do not include attributes inside the entities. Example: erDiagram\\n    USER ||--o{ POST : \\\"creates\\\"\\n    POST ||--|{ COMMENT : \\\"has\\\""),
 });
 
 
@@ -80,7 +80,7 @@ const deepResearchPrompt = ai.definePrompt({
     output: { schema: DeepReportSchema },
     prompt: `You are an expert AI research analyst. Your task is to generate a highly comprehensive and in-depth report on the given topic. Your analysis must be thorough, insightful, and well-structured.
 
-For the topic "{{{topic}}}", please generate in-depth content for the following sections:
+For the topic "{{{topic}}}", please generate in-depth content for the following sections. Ensure each section is detailed and comprehensive, aiming for approximately 250-300 words per section to create a thorough report of around 1500-1800 words in total.
 - Introduction
 - History
 - Benefits
