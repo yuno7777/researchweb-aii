@@ -18,10 +18,20 @@ const GenerateReportInputSchema = z.object({
 });
 export type GenerateReportInput = z.infer<typeof GenerateReportInputSchema>;
 
+const ReportSectionSchema = z.object({
+    introduction: z.string().describe("A brief introduction to the topic."),
+    history: z.string().describe("A summary of the history and evolution of the topic."),
+    benefits: z.string().describe("A discussion of the key benefits and advantages related to the topic."),
+    challenges: z.string().describe("An overview of the challenges, risks, and disadvantages associated with the topic."),
+    currentTrends: z.string().describe("An analysis of the current trends and state-of-the-art in this area."),
+    futureScope: z.string().describe("A look into the future scope and potential developments."),
+});
+
+
 const StandardReportSchema = z.object({
   title: z.string().describe('A concise and engaging title for the report.'),
-  reportContent: z.string().describe('A comprehensive, multi-paragraph report on the topic, approximately 600-800 words long. It should be well-structured and detailed.'),
-  erd: z.string().describe("Generate an Entity Relationship Diagram in Mermaid.js syntax. The diagram must be enclosed in an 'erDiagram' block. It must only represent the key entities and their relationships based on the report content. Do not include attributes inside the entities. Example: erDiagram\\n    USER ||--o{ POST : \"creates\"\\n    POST ||--|{ COMMENT : \"has\""),
+  sections: ReportSectionSchema.describe("The structured content of the report, broken down into predefined sections."),
+  erd: z.string().describe("Generate an Entity Relationship Diagram in Mermaid.js syntax. The diagram must be enclosed in an 'erDiagram' block. It must only represent the key entities and their relationships based on the report content. Do not include attributes inside the entities. Example: erDiagram\\n    USER ||--o{ POST : \\\"creates\\\"\\n    POST ||--|{ COMMENT : \\\"has\\\"\""),
 });
 
 
@@ -32,8 +42,8 @@ const ConciseReportSchema = z.object({
 
 const DeepReportSchema = z.object({
   title: z.string().describe('A concise and engaging title for the report.'),
-  reportContent: z.string().describe('An in-depth, comprehensive, multi-paragraph report on the topic, approximately 1200-1500 words long. The analysis must be thorough, insightful, and well-structured.'),
-  erd: z.string().describe("Generate an Entity Relationship Diagram in Mermaid.js syntax. The diagram must be enclosed in an 'erDiagram' block. It must only represent the key entities and their relationships based on the report content. Do not include attributes inside the entities. Example: erDiagram\\n    USER ||--o{ POST : \"creates\"\\n    POST ||--|{ COMMENT : \"has\""),
+  sections: ReportSectionSchema.describe("An in-depth and thorough breakdown of the report content into predefined sections."),
+  erd: z.string().describe("Generate an Entity Relationship Diagram in Mermaid.js syntax. The diagram must be enclosed in an 'erDiagram' block. It must only represent the key entities and their relationships based on the report content. Do not include attributes inside the entities. Example: erDiagram\\n    USER ||--o{ POST : \\\"creates\\\"\\n    POST ||--|{ COMMENT : \\\"has\\\"\""),
 });
 
 
@@ -51,10 +61,16 @@ const reportPrompt = ai.definePrompt({
   output: {schema: StandardReportSchema },
   prompt: `You are an expert AI research assistant. Your task is to generate a comprehensive, well-structured report on the given topic.
 
-For the topic "{{{topic}}}", please provide the following:
+For the topic "{{{topic}}}", please generate content for the following sections:
+- Introduction
+- History
+- Benefits
+- Challenges
+- Current Trends
+- Future Scope
 
-1.  **Report Content**: A detailed, multi-paragraph report. This should cover various aspects of the topic like its history, importance, challenges, and future trends, woven together in a flowing narrative. Aim for a word count between 600 and 800 words.
-2.  **ERD**: An Entity Relationship Diagram in Mermaid.js syntax based on the report's content. The diagram must be enclosed in an 'erDiagram' block. The diagram should only show relationships between entities, not attributes within entities.
+Also provide the following:
+1.  **ERD**: An Entity Relationship Diagram in Mermaid.js syntax based on the report's content. The diagram must be enclosed in an 'erDiagram' block. The diagram should only show relationships between entities, not attributes within entities.
 `,
 });
 
@@ -64,10 +80,16 @@ const deepResearchPrompt = ai.definePrompt({
     output: { schema: DeepReportSchema },
     prompt: `You are an expert AI research analyst. Your task is to generate a highly comprehensive and in-depth report on the given topic. Your analysis must be thorough, insightful, and well-structured.
 
-For the topic "{{{topic}}}", please provide the following:
+For the topic "{{{topic}}}", please generate in-depth content for the following sections:
+- Introduction
+- History
+- Benefits
+- Challenges
+- Current Trends
+- Future Scope
 
-1.  **Report Content**: A very detailed, extensive, multi-paragraph report. This should provide a deep dive into the topic, covering its nuances, history, complexities, current landscape, and future outlook. Aim for a word count between 1200 and 1500 words.
-2.  **ERD**: An Entity Relationship Diagram in Mermaid.js syntax, based on the report's content. The diagram must be enclosed in an 'erDiagram' block. The diagram should only show relationships between entities, not attributes within entities.
+Also provide the following:
+1.  **ERD**: An Entity Relationship Diagram in Mermaid.js syntax, based on the report's content. The diagram must be enclosed in an 'erDiagram' block. The diagram should only show relationships between entities, not attributes within entities.
 `,
 });
 
@@ -109,4 +131,3 @@ const generateReportFlow = ai.defineFlow(
     return reportOutput;
   }
 );
-

@@ -192,7 +192,19 @@ export default function Home() {
                      addSection('Summary', report.summary);
                      addSection('Key Points', report.keyPoints);
                 } else if (isStandardOrDeepReport(report)) {
-                    addSection('Report', report.reportContent);
+                    const sectionTitles: Record<string, string> = {
+                      introduction: 'Introduction',
+                      history: 'History',
+                      benefits: 'Benefits',
+                      challenges: 'Challenges',
+                      currentTrends: 'Current Trends',
+                      futureScope: 'Future Scope',
+                    };
+                    for (const [key, content] of Object.entries(report.sections)) {
+                      if (content) {
+                        addSection(sectionTitles[key] || capitalizeTitle(key), content);
+                      }
+                    }
 
                     if (report.erd) {
                         const diagramElement = document.getElementById('report-output')?.querySelector<HTMLDivElement>('.mermaid-diagram-container > div');
