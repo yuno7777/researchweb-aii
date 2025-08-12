@@ -192,6 +192,15 @@ export default function Home() {
                      addSection('Summary', report.summary);
                      addSection('Key Points', report.keyPoints);
                 } else if (isStandardOrDeepReport(report)) {
+                    const sectionOrder: (keyof typeof report.sections)[] = [
+                      'introduction',
+                      'history',
+                      'benefits',
+                      'challenges',
+                      'currentTrends',
+                      'futureScope',
+                    ];
+
                     const sectionTitles: Record<string, string> = {
                       introduction: 'Introduction',
                       history: 'History',
@@ -200,9 +209,11 @@ export default function Home() {
                       currentTrends: 'Current Trends',
                       futureScope: 'Future Scope',
                     };
-                    for (const [key, content] of Object.entries(report.sections)) {
+
+                    for (const sectionKey of sectionOrder) {
+                      const content = report.sections[sectionKey];
                       if (content) {
-                        addSection(sectionTitles[key] || capitalizeTitle(key), content);
+                        addSection(sectionTitles[sectionKey] || capitalizeTitle(sectionKey), content);
                       }
                     }
 
