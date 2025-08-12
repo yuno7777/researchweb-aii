@@ -22,6 +22,16 @@ const sectionTitles: Record<keyof Report['sections'], string> = {
   futureScope: 'Future Scope',
 };
 
+// Define the order of sections to ensure consistent rendering
+const sectionOrder: (keyof Report['sections'])[] = [
+  'introduction',
+  'history',
+  'benefits',
+  'challenges',
+  'currentTrends',
+  'futureScope',
+];
+
 export function ReportDisplay({ report, onReportUpdate }: ReportDisplayProps) {
   const [editableReport, setEditableReport] = useState<Report>(report);
   const [editingSection, setEditingSection] = useState<EditableSection | null>(null);
@@ -69,10 +79,12 @@ export function ReportDisplay({ report, onReportUpdate }: ReportDisplayProps) {
             <CardTitle>{report.title}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-8">
-            {Object.entries(report.sections).map(([key, content]) => {
-              const sectionKey = key as keyof Report['sections'];
+            {sectionOrder.map((sectionKey) => {
+              const content = report.sections[sectionKey];
+              if (!content) return null; // Don't render if a section is empty for some reason
+
               return (
-                <div key={key}>
+                <div key={sectionKey}>
                     <div className="flex flex-row items-center justify-between mb-2">
                         <h3 className="text-xl font-bold">{sectionTitles[sectionKey]}</h3>
                         {editingSection !== sectionKey && (
